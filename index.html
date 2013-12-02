@@ -14,28 +14,58 @@
 	
 	<style type="text/css">
 
-		html, body, div { margin:0px; padding:0px; }
+		html, body, nav, header, section, div { margin:0px; padding:0px; }
 		body { background: white url('src-img/texture_diag_grey.png') repeat left top; 
 			font-family: 'Open Sans', sans-serif; font-weight: lighter; }
-		#pageContainer { margin:0 auto; padding:0; width:600px; }
+		.wrapper { width: 750px; margin:0 auto; }
+		
+		#nav { position:fixed; width:100%; top:0px; left:0px; background:white; border-bottom: 1px solid #eee;
+			box-shadow: 0px 1px 5px #555; -webkit-box-shadow: 0px 1px 5px #555; -moz-box-shadow: 0px 1px 5px #555; }
+		
+		#pageContainer { margin:40px auto; padding:0; width:750px; }
+		
 		#header { margin:20px 0px; padding:20px; box-sizing:border-box; 
 			background: rgba(0,0,0,0.7); border-radius: 11px;
 			color: #eee; text-align: center; 
 			box-shadow: 0px 1px 4px #777; -webkit-box-shadow: 0px 1px 4px #777; -moz-box-shadow: 0px 1px 4px #777; }
+		#header .headers { display:none; }
 		
 		img.icon { cursor: pointer;
-			transition: transform 1s; -webkit-transition: -webkit-transform 1s; -moz-transition: -moz-transform 1s; 
-			/*transform: 1s; -webkit-transform: 1s; -moz-transform: 1s;*/ }
+			transition: transform 2s; -webkit-transition: -webkit-transform 2s; -moz-transition: -moz-transform 2s; }
 		img.icon:hover { transform: rotate(360deg); -webkit-transform: rotate(360deg); -moz-transform: rotate(360deg); }
 		
 	</style>
+	
+	<!-- JAVASCRIPT -->
+	<script type='text/javascript' src='src-jquery/jquery-1.9.0.min.js'></script>
+	<script type='text/javascript'>
+		$(document).ready( function(){
+			//Rotating quotes on the homepage
+			//$('.headers');
+			setInterval( function(){
+				$('.headers').filter(':visible').fadeOut( 1000, function(){
+					if( $(this).next('.headers').size() ){ $(this).next().fadeIn(700); } 
+					else{ $('.headers').eq(0).fadeIn(700); }
+				});
+			}, 2000 );
+		});
+	</script>
 	
 </head>
 
 <body>
 
+<nav id="nav">
+	<div class="wrapper">HELLO!</div>
+	
+</nav>
+
 <div id="pageContainer">
-	<div id="header"> My personal GitHub space. Working on a design. </div>
+	<div id="header">
+		<div class="headers" style="display:block;"> My personal GitHub space. Working on a design. </div>
+		<div class="headers"> I hope that it will be something nice... </div>
+		<div class="headers"> Check back later please! </div>
+	</div>
 	<div align="center"> <img src="src-img/icon_linkedin.png" height="40" class="icon"> <img src="src-img/icon_twitter.png" height="40" class="icon"> <img src="src-img/icon_github.png" height="40" class="icon"> </div>
 </div>
 
