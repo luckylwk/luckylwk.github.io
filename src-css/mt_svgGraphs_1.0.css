@@ -1,0 +1,70 @@
+/*	SVG GRAPH STYLES 
+
+	Standard Color series	
+*/
+.s0 { background: #007a8a; fill: #007a8a;
+	background: linear-gradient(left, #007a8a 50.0%, #005d6a 100%);
+	background: -webkit-linear-gradient(left, #007a8a 50.0%, #005d6a 100%);
+	background: -moz-linear-gradient(left, #007a8a 50.0%, #005d6a 100%);
+	background: -ms-linear-gradient(left, #007a8a 50.0%, #005d6a 100%); 
+	background: -o-linear-gradient(left, #007a8a 50.0%, #005d6a 100%);
+}
+.s1 { background: #96b5bd; fill: #96b5bd;
+	background: linear-gradient(left, #96b5bd 50.0%, #8aa3a9 100%);
+	background: -webkit-linear-gradient(left, #96b5bd 50.0%, #8aa3a9 100%);
+	background: -moz-linear-gradient(left, #96b5bd 50.0%, #8aa3a9 100%);
+	background: -ms-linear-gradient(left, #96b5bd 50.0%, #8aa3a9 100%); 
+	background: -o-linear-gradient(left, #96b5bd 50.0%, #8aa3a9 100%);
+}
+.s2 { background:#bf2841; fill:#bf2841;
+	background: linear-gradient(left, #bf2841 50.0%, #b3112d 100%);
+	background: -webkit-linear-gradient(left, #bf2841 50.0%, #b3112d 100%);
+	background: -moz-linear-gradient(left, #bf2841 50.0%, #b3112d 100%);
+	background: -ms-linear-gradient(left, #bf2841 50.0%, #b3112d 100%); 
+	background: -o-linear-gradient(left, #bf2841 50.0%, #b3112d 100%); 
+} 
+.s3 { background:#D95B43; fill:#D95B43;
+
+}
+.s4 { background:#ECD078; fill:#ECD078;
+	
+}
+.s5 { background: #336699; fill: #336699;
+	background: linear-gradient(left, #336699 50.0%, #225587 100%);
+	background: -webkit-linear-gradient(left, #336699 50.0%, #225587 100%);
+	background: -moz-linear-gradient(left, #336699 50.0%, #225587 100%);
+	background: -ms-linear-gradient(left, #336699 50.0%, #225587 100%); 
+	background: -o-linear-gradient(left, #336699 50.0%, #225587 100%); 
+}
+.s6 { background: #636363; fill: #636363;
+	background: linear-gradient(left, #636363 50.0%, #505050 100%);
+	background: -webkit-linear-gradient(left, #636363 50.0%, #505050 100%);
+	background: -moz-linear-gradient(left, #636363 50.0%, #505050 100%);
+	background: -ms-linear-gradient(left, #636363 50.0%, #505050 100%); 
+	background: -o-linear-gradient(left, #636363 50.0%, #505050 100%); 
+} 
+.heat0 { background:#d7d7d7; fill:#d7d7d7; }
+.heat1 { background:#f9d55f; fill:#f9d55f; }
+.heat2 { background:#daae1d; fill:#daae1d; }
+.heat3 { background:#da941a; fill:#da941a; }
+.heat4 { background:#bf6528; fill:#bf6528; }
+.heat5 { background:#9e041d; fill:#9e041d; }
+
+
+.svg_graph ul { list-style: none; margin:0px; padding:0px; }
+.svg_graph li { display:block; float:left; margin:0px 5px; padding:5px; cursor:pointer; border:1px solid white; border-radius:3px; font-size:12px; line-height: 1em; }
+.svg_graph li:hover { background:#eee; border:1px solid #ddd; }
+.svg_graph li.off { opacity: 0.5; }
+.svg_graph li.hide { display:none; }
+.svg_graph span.legend { display:block; float:left; height:12px; width:12px; margin:0px 4px 0px 0px; border-radius:2px; }
+
+
+
+/*	PIE CHART LEGEND */
+.svg_graph_pie ul { list-style: none; margin:0px; padding:0px; }
+.svg_graph_pie li { display:block; float:left; margin:0px; padding:5px 5px; border:1px solid white; border-radius:3px; font-size:14px; line-height:1em; text-align: center; }
+.svg_graph_pie li.hide { display:none; }
+.svg_graph_pie span.legend { display:block; float:left; height:14px; width:14px; margin:0px 4px 0px 0px; border-radius:3px; }
+/*	PIE CHART SPECIFICS */
+.svg_graph_pie .pieSlice { stroke: white; stroke-width: 1; cursor: pointer; }
+.svg_graph_pie .pieSlice:hover { -webkit-svg-shadow: 0px 0px 4px #666; -moz-svg-shadow: 0px 0px 4px #666; -o-svg-shadow: 0px 0px 4px #666; -ms-svg-shadow: 0px 0px 4px #666; }

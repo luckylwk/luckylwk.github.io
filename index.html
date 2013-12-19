@@ -12,21 +12,28 @@
 	<link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,500italic,400,300,500' rel='stylesheet' type='text/css'>
 	<!--<link href='http://fonts.googleapis.com/css?family=Cabin:400,500,400italic,500italic' rel='stylesheet' type='text/css'>-->
 	
+	<link href='src-css/mt_svgGraphs_1.0.css' rel='stylesheet' type='text/css'>
+	
 	<style type="text/css">
 
 		html, body, nav, header, section, div { margin:0px; padding:0px; }
+		
 		body { background: white url('src-img/texture_diag_grey.png') repeat left top; 
 			font-family: 'Open Sans', sans-serif; font-weight: lighter; }
+		
 		.wrapper { width: 750px; margin:0 auto; }
+		.left { float:left; }
+		.right { float:right; }
+		.clear { clear:both; }
 		
 		#nav { position:fixed; width:100%; top:0px; left:0px; background:white; border-bottom: 1px solid #eee;
 			box-shadow: 0px 1px 5px #555; -webkit-box-shadow: 0px 1px 5px #555; -moz-box-shadow: 0px 1px 5px #555; }
 		
-		#pageContainer { margin:40px auto; padding:0; width:750px; }
+		#pageContainer { margin:40px auto; padding:0; width:654px; }
 		
 		#header { margin:20px 0px; padding:20px; box-sizing:border-box; 
-			background: rgba(0,0,0,0.7); border-radius: 11px;
-			color: #eee; text-align: center; 
+			background: rgba(255,255,255,0.9); border-radius: 11px;
+			color: #333; text-align: center; 
 			box-shadow: 0px 1px 4px #777; -webkit-box-shadow: 0px 1px 4px #777; -moz-box-shadow: 0px 1px 4px #777; }
 		#header .headers { display:none; }
 		
@@ -34,10 +41,22 @@
 			transition: transform 2s; -webkit-transition: -webkit-transform 2s; -moz-transition: -moz-transform 2s; }
 		img.icon:hover { transform: rotate(360deg); -webkit-transform: rotate(360deg); -moz-transform: rotate(360deg); }
 		
+		div.graphHeader { background:#f7f7f7; 
+			border:1px dotted #e7e7e7; border-radius: 5px; -webkit-border-radius: 5px; -moz-border-radius: 5px; 
+			font-weight: 500;
+		}
+		
+		svg.stdGraph { background:#f7f7f7; border:1px dotted #e7e7e7; border-radius: 5px; -webkit-border-radius: 5px; -moz-border-radius: 5px; }
+		div.stdLegend {  background:#f7f7f7; border:1px dotted #e7e7e7; border-radius: 5px; -webkit-border-radius: 5px; -moz-border-radius: 5px; }
+		
+		#svgGraphPIE { height: 300px; width: 300px; }
+		#svgGraphDONUT { height: 300px; width: 300px; }
+		
 	</style>
 	
 	<!-- JAVASCRIPT -->
 	<script type='text/javascript' src='src-jquery/jquery-1.9.0.min.js'></script>
+	<script type='text/javascript' src='src-js/mt_svgGraphs_1.0.js'></script>
 	<script type='text/javascript'>
 		$(document).ready( function(){
 			//Rotating quotes on the homepage
@@ -48,6 +67,33 @@
 					else{ $('.headers').eq(0).fadeIn(700); }
 				});
 			}, 2000 );
+			
+			func_buildChart_PIEDONUT( 'svgGraphPIE', { type:'PIE', data:[40,30,30,18,12,6], label:['CLIENT1','CLIENT2','CLIENT3','CLIENT4','CLIENT5','OTHERS'] } );
+			
+			$('#svgGraphPIE .pieSlice').each( function(index){
+				$(this).on('mouseenter', function(event){
+					$('#svgGraphPIE .pieSlice').css({'opacity':'0.4'});
+					$(this).css({'opacity':'1'});
+					$('#svgGraphPIE_legend .li_s'+$(this).data('s')).removeClass('hide');
+				}).on('mouseleave', function(event){
+					$('#svgGraphPIE .pieSlice').css({'opacity':'1'});
+					$('#svgGraphPIE_legend .li_s'+$(this).data('s')).addClass('hide');
+				});
+			});
+			
+			func_buildChart_PIEDONUT( 'svgGraphDONUT', { type:'DONUT', data:[40,30,30,18,12,6], label:['CLIENT1','CLIENT2','CLIENT3','CLIENT4','CLIENT5','OTHERS'] } );
+			
+			$('#svgGraphDONUT .pieSlice').each( function(index){
+				$(this).on('mouseenter', function(event){
+					$('#svgGraphDONUT .pieSlice').css({'opacity':'0.4'});
+					$(this).css({'opacity':'1'});
+					$('#svgGraphDONUT_legend .li_s'+$(this).data('s')).removeClass('hide');
+				}).on('mouseleave', function(event){
+					$('#svgGraphDONUT .pieSlice').css({'opacity':'1'});
+					$('#svgGraphDONUT_legend .li_s'+$(this).data('s')).addClass('hide');
+				});
+			});
+			
 		});
 	</script>
 	
@@ -55,16 +101,29 @@
 
 <body>
 
-<nav id="nav">
+<!--<nav id="nav">
 	<div class="wrapper">HELLO!</div>
-	
-</nav>
+</nav>-->
 
 <div id="pageContainer">
 	<div id="header">
 		<div class="headers" style="display:block;"> My personal GitHub space. Working on a design. </div>
 		<div class="headers"> I hope that it will be something nice... </div>
 		<div class="headers"> Check back later please! </div>
+		<div class="graphHeader" style="margin-top:20px; margin-bottom:10px;">
+			PIE CHART AND DONUT CHART
+		</div>
+		<div>
+			<div class="left" style="position:relative;">
+				<svg id="svgGraphPIE" class="stdGraph svg_graph_pie"> <!-- GRAPH HERE --> </svg>
+				<div id="svgGraphPIE_legend" class="stdLegend svg_graph_pie" style="height:26px;"> <!-- LEGEND(S) HERE --> </div>
+			</div>
+			<div class="left" style="position:relative; margin-left:10px;">
+				<svg id="svgGraphDONUT" class="stdGraph svg_graph_pie"> <!-- GRAPH HERE --> </svg>
+				<div id="svgGraphDONUT_legend" class="stdLegend svg_graph_pie" style="height:26px;"> <!-- LEGEND(S) HERE --> </div>
+			</div>
+			<div class="clear"></div>
+		</div>
 	</div>
 	<div align="center"> <img src="src-img/icon_linkedin.png" height="40" class="icon"> <img src="src-img/icon_twitter.png" height="40" class="icon"> <img src="src-img/icon_github.png" height="40" class="icon"> </div>
 </div>
