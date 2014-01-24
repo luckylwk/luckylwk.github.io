@@ -1,0 +1,31 @@
+<svg 	width="660" height="120" version="1.1" style="background:#eee; margin:0px; padding:0px;"
+		xmlns="http://www.w3.org/2000/svg">
+	
+	<defs>
+		<style type="text/css">
+			.line { stroke: #333; stroke-width: 1px; fill: none; }
+		</style>
+	</defs>
+	
+	<defs>
+	    <marker id="markerCircle" markerWidth="8" markerHeight="8" refx="5" refy="5">
+	        <circle cx="5" cy="5" r="3" style="stroke: none; fill:#000000;"/>
+	    </marker>
+	    <marker id="markerSquare" markerWidth="8" markerHeight="8" refx="3" refy="3" orient="auto">
+			  <rect x="1" y="1" width="4" height="4" style="stroke: none; fill:#000000;"/>
+		</marker>
+	    <marker id="markerArrow" markerWidth="13" markerHeight="13" refx="2" refy="6" orient="auto">
+	        <path d="M2,2 L2,11 L10,6 L2,2" style="fill:black;" />
+	    </marker>
+	</defs>
+
+
+	<rect 	x="10" y="10"
+			width="100" height="50" 
+			style="fill:#eee;stroke-width:1;stroke:rgb(0,0,0)" />
+	<!--<text x="20" y="40" style="fill:black;">Example SVG text 1</text>-->
+	
+	<path 	d="M150,20 L200,50 L250,20" class="line"
+     		style=" marker-start:url(#markerCircle); marker-mid:url(#markerSquare); marker-end:url(#markerArrow); " />
+	
+</svg>

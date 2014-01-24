@@ -1,0 +1,48 @@
+
+pre {
+    background-color: rgba(27,47,68,0.95);
+    word-wrap: break-word;
+    margin: 0px;
+    padding: 20px;
+    color: #faead3;
+    font-size: 14px; line-height: 20px;
+    margin: 20px 0px 20px 0px; border-radius: 13px; -webkit-border-radius: 13px; -moz-border-radius: 13px;
+    box-shadow: 0 1px 8px #aaa; -webkit-box-shadow: 0 1px 8px #aaa; -moz-box-shadow: 0 1px 8px #aaa;
+}
+
+pre, code {
+    font-family: 'Monaco', courier, monospace;
+}
+
+pre .comment {
+    color: #7c7d82;
+}
+
+pre .variable.global, pre .variable.class, pre .variable.instance {
+    color: #889b4a; /* green */
+}
+
+/* ADDED THIS ONE */
+pre .attribute, pre .variable {
+    color: #78c4c4;
+}
+
+pre .constant.numeric, pre .constant.language, pre .constant.hex-color, pre .keyword.unit {
+    color: #f79a32; /* orange */
+}
+
+pre .constant, pre .entity, pre .entity.class, pre .support {
+    color: #f06431; /* yellow */
+}
+
+pre .constant.symbol, pre .string {
+    color: #f54f6d; /* red */
+}
+
+pre .entity.function, pre .support.css-property, pre .selector {
+    color: #8ab1b0; /* blue */
+}
+
+pre .keyword, pre .storage {
+    color: #b45ab0; /* purple */
+}
