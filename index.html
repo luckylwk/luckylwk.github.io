@@ -52,19 +52,91 @@
 		#svgGraphPIE { height: 300px; width: 300px; }
 		#svgGraphDONUT { height: 300px; width: 300px; }
 		
+		
+		/* BAR CHART */
+		.chart { background:white; }
+        .chart text { fill: black; font-size:10px; font-family:sans-serif; text-anchor: middle; }            
+        .bar1 .bar {
+            fill: #007a8a;
+			background: -webkit-linear-gradient(left, #007a8a 50.0%, #005d6a 100%);
+			background: -moz-linear-gradient(left, #007a8a 50.0%, #005d6a 100%);
+			background: -ms-linear-gradient(left, #007a8a 50.0%, #005d6a 100%); 
+			background: -o-linear-gradient(left, #007a8a 50.0%, #005d6a 100%);
+        }
+        .bar2 .bar {
+            fill: #96b5bd;
+			background: -webkit-linear-gradient(left, #96b5bd 50.0%, #8aa3a9 100%);
+			background: -moz-linear-gradient(left, #96b5bd 50.0%, #8aa3a9 100%);
+			background: -ms-linear-gradient(left, #96b5bd 50.0%, #8aa3a9 100%); 
+			background: -o-linear-gradient(left, #96b5bd 50.0%, #8aa3a9 100%);
+        }
+        .bar:hover { fill:orange; }
+
+        .bar {
+           -moz-transition: all 0.2s;
+           -o-transition: all 0.2s;
+           -webkit-transition: all 0.2s;
+           transition: all 0.2s;
+        }
+
+        .axis { font: 10px sans-serif; color:#555; }
+
+        .axis path, .axis line { fill: none; stroke: #000; shape-rendering: crispEdges; }
+
+        .x.axis path { display: none; }
+        
+        .grid .tick { stroke: lightgrey; opacity: 0.7; }
+        .grid path { stroke-width: 0; }
+        
+        /* BUTTON */
+        .buttonclick { 
+            padding: 3px 6px;
+            border: 1px solid #aaa; border-radius:4px; -webkit-border-radius:4px; -moz-border-radius:4px;
+            background: #eee; cursor: pointer;
+            font-family: sans-serif; font-size:12px; text-transform: uppercase;
+        }
+        .buttonclick:hover {
+            background:#aaa;
+        }
+        .buttonclick.sel {
+            background:yellow;
+        }
+        
+        /* LABEL */
+        .svg_graph_label { 
+			position:absolute; display:none; width:80px; z-index:99; box-sizing: border-box;
+			padding:4px 4px; background:black; border-radius: 3px; -webkit-border-radius: 3px; -moz-border-radius: 3px;
+			font-family:sans-serif; font-size:12px; line-height:1em; color:white; text-align: center;
+			
+		}
+		.svg_graph_label > p { margin:0px; padding:3px 6px; line-height: 1em; }
+			.svg_graph_label:after {
+				content:""; display:block; position:absolute; width:0;
+				bottom:-4px; right:36px; top:auto; left:auto;
+				border-style:solid; border-width:4px 4px 0px; border-color:black transparent;
+			}
+		
 	</style>
 	
 	<!-- JAVASCRIPT -->
-	<script type='text/javascript' src='src_jquery/jquery_2.0.3.min.js'></script>
-	<script type='text/javascript' src='src_js/mt_svgGraphs_1.0.js'></script>
+	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <!-- JAVASCRIPT -->
+    <script type='text/javascript' src='src_js/graph_pie_man.js'></script>
+    <script type='text/javascript' src='src_js/graph_bar_d3.js'></script>
+	<!-- JAVASCRIPT -->
 	<script type='text/javascript'>
 		$(document).ready( function(){
 			//Rotating quotes on the homepage
 			//$('.headers');
 			setInterval( function(){
 				$('.headers').filter(':visible').fadeOut( 1000, function(){
-					if( $(this).next('.headers').size() ){ $(this).next().fadeIn(700); } 
-					else{ $('.headers').eq(0).fadeIn(700); }
+					if( $(this).next('.headers').size() ){ 
+					    $(this).next().fadeIn(700);
+                    } 
+					else{ 
+					    $('.headers').eq(0).fadeIn(700);
+                    }
 				});
 			}, 2000 );
 			
@@ -127,7 +199,17 @@
 	</div>
 	
 	<div id="header">
-		punchcard here
+		<div id="graph_cont" style="position:relative;">
+            <div id="svg_label" class="svg_graph_label">
+				<p id="label"><strong>MATXX</strong></p>
+                <p id="value">xx</p>
+			</div>
+        </div>
+        <div>
+            <button class="buttonclick sel" value="notional">data1</button>
+            <button class="buttonclick" value="trades">data2</button>
+            <button class="buttonclick" value="sort">sort</button>
+        </div>
 	</div>
 	
 	<div align="center">
