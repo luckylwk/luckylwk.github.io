@@ -59,10 +59,10 @@ function start_kmeans( $div_id, $svg_id ){
     svg.append("g").attr("class","circle data");
 
     //Create X axis
-    svg.append("g").attr("class", "x axis").attr("transform", "translate(0," + (height - padding) + ")").call(xAxis);
+    svg.append("g").attr("class", "xAxis axis").attr("transform", "translate(0," + (height - padding) + ")").call(xAxis);
 
     //Create Y axis
-    svg.append("g").attr("class", "y axis").attr("transform", "translate(" + padding + ",0)").call(yAxis);
+    svg.append("g").attr("class", "yAxis axis").attr("transform", "translate(" + padding + ",0)").call(yAxis);
 
     function get_random( type ){
         if( type=='pivot' ){

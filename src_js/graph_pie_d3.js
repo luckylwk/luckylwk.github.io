@@ -22,8 +22,9 @@ function mt_db_pieChart( $div_id, $svg_id, $is_pie ){
     dataset = func_get_dataset();
     dataset_new = dataset; // to initialize set equal.
     
-    var color = d3.scale.ordinal().range( ["#3399FF", "#5DAEF8", "#86C3FA", "#ADD6FB", "#D6EBFD"] );
-    
+    //var color = d3.scale.ordinal().range( ["#3399FF", "#5DAEF8", "#86C3FA", "#ADD6FB", "#D6EBFD"] );
+    var color = d3.scale.ordinal().range( ["#bf2841", "#D95B43", "#ECD078", "#336699", "#20b3c0"] );
+
     // Initialize width, height and radius (function of former two).
     var width = 340,
         height = 340,
@@ -38,7 +39,6 @@ function mt_db_pieChart( $div_id, $svg_id, $is_pie ){
                 .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
     
     // Create a PIE() function.
-    //var pie =  d3.layout.pie().value( function(d){ return d.value; } ).sort( null );
     var pie =  d3.layout.pie().value( function(d){ return d.value; } ).sort( null )
                         .startAngle(0*Math.PI)
                         .endAngle(2*Math.PI);
@@ -68,21 +68,22 @@ function mt_db_pieChart( $div_id, $svg_id, $is_pie ){
         //.text( function(d){ return d.data.label; } );
     
     
-    $('.buttonclick').click( func_change );
+    $('.btn_pie').click( func_change );
     
     // function to change.
     function func_change(){
-       
-        if( data.label==$(this).val() ){
+        
+        var toVal = $(this).val();
+               
+        if( data.label==toVal ){
             // do nothing.
         }
         else{
             
-            data.label = $(this).val();
+            data.label = toVal;
             
             // dataset = current dataset used.
             dataset_new = func_get_dataset();
-            
             
             // Set new information in slices.
             var slices = svg.selectAll("path").data( pie(dataset_new) );

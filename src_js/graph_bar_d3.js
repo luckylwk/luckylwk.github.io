@@ -103,7 +103,7 @@ function mt_db_barChart(){
         .attr("data-lab", function(d){ return d.label; });
     
    
-    $('.buttonclick').click( func_change );
+    $('.btn_bar').click( func_change );
     $('.chart .bar').each( func_label );
     
     
@@ -165,9 +165,10 @@ function mt_db_barChart(){
     }
     
     function func_label(){
+    
         $(this).on('mouseenter', function(event){
             
-            var xPos = parseFloat( d3.select(this).attr("x") ) + xScale.rangeBand() - 12,
+            var xPos = parseFloat( d3.select(this).attr("x") ) + xScale.rangeBand()/4,
                 yPos = height - parseFloat( d3.select(this).attr("height") ) - 40;
             
             d3.select("#svg_label")
@@ -179,6 +180,7 @@ function mt_db_barChart(){
         }).on('mouseleave', function(event){
             d3.select("#svg_label").style({"display":"none"});
         });
+        
     }    
     
 }
