@@ -80,6 +80,10 @@ function mt_db_pieChart( $div_id, $svg_id, $is_pie ){
         }
         else{
             
+            // Change button sel. value.
+            $('.btn_pie').removeClass('sel');
+            $(this).addClass('sel');
+            
             data.label = toVal;
             
             // dataset = current dataset used.

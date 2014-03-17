@@ -17,7 +17,7 @@ function start_kmeans( $div_id, $svg_id ){
     var margin = { 'random':50 },
         padding = 30;
 	var width = 700,
-	    height = 350;
+	    height = 400;
 
 	// Generate a dynamic, random dataset
 	var numDataPoints = 3;	// Number of dummy data points to create
@@ -129,9 +129,8 @@ function start_kmeans( $div_id, $svg_id ){
             .attr("d", function(d){ return "M" + d.join("L") + "Z"; } );
 		
 		
-		for( var r=0; r<4; r++ ){
-		    // Run KMEANS using the specified index.
-			run_kmeans_iter( r );
+		for( var r=0; r<5; r++ ){
+			run_kmeans_iter( r ); // Run KMEANS using the specified index.
 		}
 		
     }

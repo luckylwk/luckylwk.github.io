@@ -1,4 +1,4 @@
-function mt_db_barChart(){
+function mt_db_barChart( $div_id, $svg_id ){
     
     // Create a DATA obj. Has two sets of data labelled notional and trades.
     var data =  {   "notional": [
@@ -31,9 +31,7 @@ function mt_db_barChart(){
                     ],
                     "sort":false,
                     "label":"notional"
-                };
-    //var data_label = 'notional'; // Global variable data_label.
-    //var data_sort = false; // Data to be sorted on value.   
+                }; 
     var dataset = func_get_dataset(); // Get starting dataset. Always an ARRAY with OBJECTS.
     
     
@@ -43,7 +41,7 @@ function mt_db_barChart(){
         height = 380 - margin.top - margin.bottom;
 
     // Create an svg object.
-    var svg = d3.select("#graph_cont").append("svg").attr("class","chart")
+    var svg = d3.select( $div_id ).append("svg").attr("id", $svg_id )
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)
                 .append("g")
@@ -104,7 +102,7 @@ function mt_db_barChart(){
     
    
     $('.btn_bar').click( func_change );
-    $('.chart .bar').each( func_label );
+    $('#' + $svg_id + ' .bar').each( func_label );
     
     
     function func_change(){
@@ -117,12 +115,15 @@ function mt_db_barChart(){
             else{
                 data.sort = true;
             }
+            // Remove or add 'sel' class from button.
+            ( $(this).hasClass('sel') ) ? $(this).removeClass('sel') : $(this).addClass('sel');
         }
         else{
             data.label = $(this).val();
+            $('.btn_bar.data').removeClass('sel');
+            $(this).addClass('sel');
         }
-        //console.log('Changing to: ' + data.label +' (label) / ' + data.sort + ' (sort)' );
-        dataset = func_get_dataset(); //console.log(dataset);
+        dataset = func_get_dataset();
         
         // CHANGE GRAPH
         // Change Y-AXIS and GRID
@@ -153,14 +154,12 @@ function mt_db_barChart(){
     
     function func_get_dataset(){
         tmp_data = data[data.label];
-        //console.log('Data in (sorted: ' + data.sort + '): ' + tmp_data);
         if( data.sort==true ){
             tmp_data = tmp_data.sort( function(a,b){ return b.value_1+b.value_2-a.value_1-a.value_2; } );
         }
         else{
             tmp_data = tmp_data.sort( function(a,b){ return a.idx-b.idx; } );
         }
-        //console.log('Data out: ', tmp_data);
         return tmp_data;
     }
     

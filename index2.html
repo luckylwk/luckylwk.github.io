@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="author" content="Luuk Derksen - lwkylab - github.com/luckylwk">
+	
+	<title>luckylwk.github.io</title>
+	
+	<link href='https://raw.github.com/necolas/normalize.css/master/normalize.css' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,500italic,400,300,500' rel='stylesheet' type='text/css'>
+	<link href='src_css/design.css' rel='stylesheet' type='text/css'>
+	
+	<style type="text/css">
+		
+        /* LABEL */
+        .svg_graph_label { 
+			position:absolute; display:none; width:80px; z-index:99; box-sizing: border-box;
+			padding:4px 4px; 
+			background:black; 
+			border-radius: 3px; -webkit-border-radius: 3px; -moz-border-radius: 3px;
+			font-family:sans-serif; font-size:12px; line-height:1em; color:white; text-align: center;
+			
+		}
+		.svg_graph_label > p { 
+		    margin:0px; padding:3px 6px; 
+		    line-height: 1em;
+        }
+		.svg_graph_label:after {
+			content:""; display:block; position:absolute; width:0;
+			bottom:-4px; right:36px; top:auto; left:auto;
+			border-style:solid; border-width:4px 4px 0px; border-color:black transparent;
+		}
+
+        /* PIE */
+		.slice { stroke-width:2; stroke:white; }
+		        
+        /* BUTTONS */
+        .btn {
+            margin: 5px; padding: 10px 20px; 
+            background: steelblue;
+            border: 0px; border-radius: 3px; -webkit-border-radius: 3px; -moz-border-radius: 3px;
+            color: white;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background: #225a87;
+        }
+        .btn.sel {
+            background: #093356; color: yellow;
+        }
+		
+		
+	</style>
+	
+	<link href='src_css/graph_kmeans.css' rel='stylesheet' type='text/css'>
+	<link href='src_css/graph_bar.css' rel='stylesheet' type='text/css'>
+	
+	
+	<!-- JAVASCRIPT -->
+	<script src="src_js/jquery.v1.9.0.min.js"></script>
+    <script src="src_js/d3.v3.4.3.min.js"></script>
+    <!-- JAVASCRIPT -->
+    <script type='text/javascript' src='src_js/graph_kmeans_d3.js'></script>
+    <script type='text/javascript' src='src_js/graph_bar_d3.js'></script>
+    <script type='text/javascript' src='src_js/graph_pie_d3.js'></script>
+	<!-- JAVASCRIPT -->
+	<script type='text/javascript'>
+	    function reset_graph(){
+            d3.select('#d3_kmeans').select("#svg_kmeans").remove();
+            start_kmeans( '#d3_kmeans', 'svg_kmeans' );
+        }
+        
+        $(document).ready( function(){
+		    
+		    start_kmeans( '#d3_kmeans', 'svg_kmeans' );
+		    mt_db_pieChart( '#d3_donut', 'svg_donut', false );
+		    mt_db_pieChart( '#d3_pie', 'svg_pie', true );
+			mt_db_barChart( '#d3_bar', 'svg_bar' );
+			
+		});
+	</script>
+	
+</head>
+
+<body>
+
+    <section style="background:#e7e7e7;">
+        <div class="wrapper" style="padding:20px 0px; text-align:center;">
+            LWKY.
+        </div>
+    </section>
+    
+    <section>
+        <div class="wrapper">
+    	    <h1> K-MEANS CLUSTERING ALGORITHM (D3) </h1>
+    	    <p>Basic implementation of the K-Means clustering algorithm. Uses Voronoi Tessalation mapping to display the cluster area's.<br/><br/>Performance of the clustering algorithm is heavily dependent on the location of both the randomized pivots (used for generation of the datapoints) and the randomized cluster pivots.</p>
+    	    <div id="d3_kmeans"></div>
+    		<div align="center">
+                <button onClick="reset_graph();" class="btn">RESET GRAPH</button>
+                <button id="btn_genData" value="notional" class="btn">Generate Datapoints</button>
+                <button id="btn_startKM" value="trades" class="btn">Start KMeans Clustering</button>
+            </div>
+        </div>
+	</section>
+	
+	<section style="background:#e7e7e7;">
+	    <div class="wrapper">
+    	    <h1> PIE CHART AND DONUT CHART (D3) </h1>
+    	    <p>Animated pie and donut chart.</p>
+    	    <div>
+    			<div class="left" id="d3_donut" style="position:relative;"></div>
+    			<div class="left" id="d3_pie" style="position:relative; margin-left:20px;"></div>
+    			<div class="clear"></div>
+    		</div>
+    		<div align="center">
+                <button class="btn_pie btn" value="2013">Dataset 1</button>
+                <button class="btn_pie btn sel" value="2014">Dataset 2</button>
+            </div>
+	    </div>
+	</section>
+	
+	
+	<section>
+	    <div class="wrapper">
+    	    <h1> SORTABLE BAR-CHART (D3) </h1>
+    	    <p> Bar chart that has the ability to switch (animated) between two different datasets. It also has the option to toggle between sorting the dataset on its labels (x-axis) and the values. The value-sorting is now based on the sum of the two values per x-label.</p>
+    		<div id="d3_bar" style="position:relative;">
+                <div id="svg_label" class="svg_graph_label">
+    				<p id="label"><strong>MATXX</strong></p>
+                    <p id="value">xx</p>
+    			</div>
+            </div>
+            <div align="center">
+                <button class="btn_bar data btn sel" value="notional">Dataset 1</button>
+                <button class="btn_bar data btn" value="trades">Dataset 2</button>
+                <button class="btn_bar btn" value="sort">Sort</button>
+            </div>
+	    </div>
+	</section>
+	
+	
+	<section style="background:#e7e7e7;">
+	    <div class="wrapper" style="padding:20px 0px; text-align:center;">
+    		<img src="src_img/icon_linkedin.png" height="40" class="icon">
+    		<a href="https://twitter.com/luckylwk" target="_blank"><img src="src_img/icon_twitter.png" height="40" class="icon"></a>
+    		<a href="https://github.com/luckylwk" target="_blank"><img src="src_img/icon_github.png" height="40" class="icon"></a>
+	    </div>
+	</section>
+
+    <script type='text/javascript' src='src_js/ga.js'></script>
+
+</body>
+
+</html>
