@@ -23,7 +23,7 @@
     stroke: green;
 }
 #svg_kmeans .vor { 
-    opacity:0.2; 
+    opacity:0.1; 
 }
 #svg_kmeans line.km0, #svg_kmeans line.km1, #svg_kmeans line.km2 {
     stroke-width: 1; 

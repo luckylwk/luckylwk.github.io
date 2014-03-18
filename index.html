@@ -70,12 +70,12 @@
 	<script type='text/javascript'>
 	    function reset_graph(){
             d3.select('#d3_kmeans').select("#svg_kmeans").remove();
-            start_kmeans( '#d3_kmeans', 'svg_kmeans' );
+            start_kmeans( 'd3_kmeans', 'svg_kmeans' );
         }
         
         $(document).ready( function(){
 		    
-		    start_kmeans( '#d3_kmeans', 'svg_kmeans' );
+		    start_kmeans( 'd3_kmeans', 'svg_kmeans' );
 		    mt_db_pieChart( '#d3_donut', 'svg_donut', false );
 		    mt_db_pieChart( '#d3_pie', 'svg_pie', true );
 			mt_db_barChart( '#d3_bar', 'svg_bar' );
