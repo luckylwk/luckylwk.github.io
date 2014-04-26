@@ -11,19 +11,15 @@
 	
 	<link href='https://raw.github.com/necolas/normalize.css/master/normalize.css' rel='stylesheet' type='text/css'>
 	
+	<!--
 	<link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,500italic,400,300,500' rel='stylesheet' type='text/css'>
 	<link href='http://fonts.googleapis.com/css?family=Playfair+Display+SC:600' rel='stylesheet' type='text/css'>
+	-->
+	<link href='http://fonts.googleapis.com/css?family=Raleway:400,300,500,600,700' rel='stylesheet' type='text/css'>
 	
 	<link href='src_css/design.css' rel='stylesheet' type='text/css'>
 	
 	<style type="text/css">
-		
-		header {
-    		padding: 40px 0px;
-    		font-family: 'Playfair Display SC', serif; font-weight: 600; font-size: 48px; 
-    		color: #333; text-shadow: 0px 1px 2px #ccc;
-    		letter-spacing: 2px;
-		}
 		
         /* LABEL */
         .svg_graph_label { 
@@ -47,21 +43,7 @@
         /* PIE */
 		.slice { stroke-width:2; stroke:white; }
 		        
-        /* BUTTONS */
-        .btn {
-            margin: 5px; padding: 10px 20px; 
-            background: steelblue;
-            border: 0px; border-radius: 3px; -webkit-border-radius: 3px; -moz-border-radius: 3px;
-            color: white;
-            cursor: pointer;
-            appearance: none; -webkit-appearance: none; -moz-appearance: none;
-        }
-        .btn:hover {
-            background: #225a87;
-        }
-        .btn.sel {
-            background: #093356; color: yellow;
-        }
+        
 		
 		
 	</style>
@@ -99,11 +81,74 @@
 
 <body>
 
-    <section style="background:#e7e7e7;">
-        <div class="wrapper" style="padding:20px 0px; text-align:center;">
+    <section>
+        <div class="wrapper" style="padding:60px 0px 80px 0px; text-align:center;">
             <header>LWKY</header>
+            <div>
+                <img src="src_img/icon_linkedin.png" height="40" class="icon">
+                <a href="https://twitter.com/luckylwk" target="_blank"><img src="src_img/icon_twitter.png" height="40" class="icon"></a>
+                <a href="https://github.com/luckylwk" target="_blank"><img src="src_img/icon_github.png" height="40" class="icon"></a>
+            </div>
         </div>
     </section>
+    <!--
+    <section>
+        <div class="wrapper">
+            <div id="btcbook"></div>
+            <em>Quotes obtained via <a href="https://www.bitstamp.net/">BitStamp</a> API</em>
+            <script>
+                var btc_data = {
+                    'error':false,
+                    'timestamp':0,
+                    'bid':[],
+                    'ask':[]
+                }
+                var btc_tb = '';
+                
+                var btc_req = $.getJSON( "https://www.bitstamp.net/api/order_book/", function(){
+                        group: 1
+                    })
+                    .done( function(btc){ doSomething( btc ); } )
+                    .fail( function(){ console.log( "Error retrieving BTCUSD order-book" ); })
+                    .always( function(){ console.log( "Done retrieving BTCUSD order-book" ); });
+                
+                btc_req = null;
+                
+                function doSomething( raw_data ){
+                    console.log('Parsing USDBTC order-book');
+                    btc_data.timestamp = raw_data.timestamp;
+                    
+                    btc_tb = '';
+                    btc_tb += '<div><table>';
+                    btc_tb += '<head><tr><th colspan="2">size</th><th>BID</th><th>ASK</th><th colspan="2">size</th></tr></head><body>';
+                    
+                    for( var i=0; i<5; i++ ){
+                        btc_data.bid.push( raw_data.bids[i] );
+                        btc_data.ask.push( raw_data.asks[i] );
+                        
+                        // add bids.
+                        btc_tb += '<tr>';
+                        btc_tb += '<td>' + Math.round(raw_data.bids[i][1]*raw_data.bids[i][0]*100)/100 + '</td>';
+                        btc_tb += '<td>' + raw_data.bids[i][1] + '</td>';
+                        btc_tb += '<td>' + raw_data.bids[i][0] + '</td>';
+                        // add asks
+                        btc_tb += '<td>' + raw_data.asks[i][0] + '</td>';
+                        btc_tb += '<td>' + raw_data.asks[i][1] + '</td>';
+                        btc_tb += '<td>' + Math.round(raw_data.asks[i][1]*raw_data.asks[i][0]*100)/100 + '</td>';
+                        btc_tb += '</tr>';
+                        
+                    }
+                    raw_data = null;
+                    
+                    btc_tb += '</body></table></div>';
+                    $('#btcbook').append(btc_tb);
+                    
+                    //console.log('USD (BTC): ', btc_data);
+                }
+            </script>
+        </div>
+    </section>
+    -->
     
     <section>
         <div class="wrapper">
@@ -122,7 +167,7 @@
         </div>
 	</section>
 	
-	<section style="background:#e7e7e7;">
+	<section>
 	    <div class="wrapper">
     	    <h1> PIE CHART AND DONUT CHART (D3) </h1>
     	    <p>Animated pie and donut chart.</p>
@@ -157,14 +202,6 @@
 	    </div>
 	</section>
 	
-	
-	<section style="background:#e7e7e7;">
-	    <div class="wrapper" style="padding:20px 0px; text-align:center;">
-    		<img src="src_img/icon_linkedin.png" height="40" class="icon">
-    		<a href="https://twitter.com/luckylwk" target="_blank"><img src="src_img/icon_twitter.png" height="40" class="icon"></a>
-    		<a href="https://github.com/luckylwk" target="_blank"><img src="src_img/icon_github.png" height="40" class="icon"></a>
-	    </div>
-	</section>
 
     <script type='text/javascript' src='src_js/ga.js'></script>
 
