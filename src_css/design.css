@@ -4,7 +4,7 @@ html, body, nav, header, section, div, h1, p, ul, li { margin:0px; padding:0px; 
 		
 body { 
     background: white; 
-	font-family: 'Raleway', sans-serif; font-weight: lighter; font-size: 16px;
+	font-family: 'Raleway', sans-serif; font-weight: 300; font-size: 16px;
 }
 
 h1 {
@@ -15,7 +15,14 @@ h1 {
 }
 p {
     padding: 10px 100px; padding-bottom: 30px;
-    line-height: 1.3em;
+    line-height: 1.4em;
+}
+ul {
+    display:block;
+    padding: 10px 150px;
+}
+li {
+    
 }
 
 .left { float:left; }
@@ -49,6 +56,13 @@ img.icon:hover {
 div.graphHeader { 
     margin-bottom: 20px;
 	font-weight: 500;
+}
+
+span.lbl {
+    padding: 2px 4px;
+    background: #c3d3e0; 
+    border: 0px; border-radius: 3px; -webkit-border-radius: 3px; -moz-border-radius: 3px;
+    font-weight: 500;
 }
 
 

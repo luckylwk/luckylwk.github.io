@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="author" content="Luuk Derksen - lwkylab - github.com/luckylwk">
+	
+	<title>luckylwk.github.io</title>
+	
+	<link href='https://raw.github.com/necolas/normalize.css/master/normalize.css' rel='stylesheet' type='text/css'>
+	
+	<link href='http://fonts.googleapis.com/css?family=Raleway:400,300,500,600,700' rel='stylesheet' type='text/css'>
+	
+	<link href='src_css/design.css' rel='stylesheet' type='text/css'>
+	
+	<style type="text/css"></style>
+	
+	
+	
+	<!-- JAVASCRIPT -->
+	<script src="src_js/jquery.v1.9.0.min.js"></script>
+    <script src="src_js/d3.v3.4.3.min.js"></script>
+    <!-- JAVASCRIPT -->
+	
+	
+</head>
+
+<body>
+
+    <section>
+        <div class="wrapper" style="padding:60px 0px 80px 0px; text-align:center;">
+            <header>LWKY</header>
+            <div>
+                <img src="src_img/icon_linkedin.png" height="40" class="icon">
+                <a href="https://twitter.com/luckylwk" target="_blank"><img src="src_img/icon_twitter.png" height="40" class="icon"></a>
+                <a href="https://github.com/luckylwk" target="_blank"><img src="src_img/icon_github.png" height="40" class="icon"></a>
+            </div>
+        </div>
+    </section>
+    
+    
+    <section>
+	    <div class="wrapper">
+    	    <h1> INTRODUCTION </h1>
+    	    <p>text here.</p>
+	    </div>
+	</section>
+	
+	
+	<section>
+	    <div class="wrapper">
+            <h1>MAKING SENSE OF THE DATA</h1>
+            <p>First thing I like to do is just look at the data itself to see what sense I can make from it. In this competition Kaggle provides us with a number of files:</p>
+            <ul>
+                <li>Transactions</li>
+                <li>Offers</li>
+                <li>TrainHistory</li>
+                <li>TestHistory*</li>
+                <li>SampleSubmission*</li>
+            </ul>
+            <p>The latter two we'll look at later, since they are used for the testing and submission, but the other ones are important to understand the data for the competition itself.</p>
+    	    <p>Lets first look at the biggest of them all: transactions. Zipped it is a mere 3GB and unzipped it gives you around 350 million rows with a filesize of around 22GB. Because we are just taking a look I have used a file created by Vadim Kyssa that looks at <a href="http://www.kaggle.com/c/acquire-valued-shoppers-challenge/forums/t/7659/sample-of-transaction-data" target="_blank">all transactions by one specific user</a>.</p>
+    	    <p>The file itself is structured as a *.csv file and provides us with a header row and a number of transactions that each take a line. The sample file that we have on user 86246 has a total of X rows over Y dates. So it seems these are shopping baskets, where each row represents an item and the data binds together the single transactions into a basket checkout. To illustrate I have selected four rows from the first shop-checkout on March 2nd, 2012.</p>
+            <script src="https://gist.github.com/luckylwk/11344095.js?file=kaggle-avs-transactions-86246.csv"></script>
+            <p>Lets take a look at a single transaction line to see what kind of features and data it holds.</p>
+    		<script src="https://gist.github.com/luckylwk/11344095.js?file=kaggle-avs-transaction.json"></script>
+            <p>The <span class="lbl">id</span> holds a unique customer-id. Both the <span class="lbl">chain</span> and <span class="lbl">dept</span> features seem to be related to the store the transaction took place. Then we get three features related to the product bought: <span class="lbl">category</span>, <span class="lbl">company</span> and <span class="lbl">brand</span>. We are provided with a <span class="lbl">date</span> of the purchase and some extra features related to the size, quantity and price of the product.</p>
+            <p>Look at an offer</p>
+            <script src="https://gist.github.com/luckylwk/11344095.js?file=kaggle-avs-offer.json"></script>
+            <p>Link is by <span class="lbl">category</span>, <span class="lbl">company</span> and <span class="lbl">brand</span>.</p>
+	    </div>
+	</section>
+	
+
+    <!--<script type='text/javascript' src='src_js/ga.js'></script>-->
+
+</body>
+
+</html>
