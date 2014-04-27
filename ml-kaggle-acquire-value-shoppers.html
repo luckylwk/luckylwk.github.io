@@ -67,9 +67,9 @@
             <p>Lets take a look at a single transaction line to see what kind of features and data it holds.</p>
     		<script src="https://gist.github.com/luckylwk/11344095.js?file=kaggle-avs-transaction.json"></script>
             <p>The <span class="lbl">id</span> holds a unique customer-id. Both the <span class="lbl">chain</span> and <span class="lbl">dept</span> features seem to be related to the store the transaction took place. Then we get three features related to the product bought: <span class="lbl">category</span>, <span class="lbl">company</span> and <span class="lbl">brand</span>. We are provided with a <span class="lbl">date</span> of the purchase and some extra features related to the size, quantity and price of the product.</p>
-            <p>Look at an offer</p>
+            <p>Another file Kaggle provided us with was the offers-file. So lets take a look at the information in the offers file and perhaps see if it is linked to information in the transaction file.</p>
             <script src="https://gist.github.com/luckylwk/11344095.js?file=kaggle-avs-offer.json"></script>
-            <p>Link is by <span class="lbl">category</span>, <span class="lbl">company</span> and <span class="lbl">brand</span>.</p>
+            <p>We can immediately see here that the offers can be linked to the transactions by <span class="lbl">category</span>, <span class="lbl">company</span> and <span class="lbl">brand</span> features. However, it does not hold any information on the offer-date, so we cannot just link them to transactions and assume the product is bought on an offer (we may be able to distill that from the quantity and offer-price though).</p>
 	    </div>
 	</section>
 	
