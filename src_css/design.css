@@ -7,6 +7,10 @@ body {
 	font-family: 'Raleway', sans-serif; font-weight: 300; font-size: 16px;
 }
 
+strong {
+    font-weight: 500;
+}
+
 h1 {
     padding: 0px 100px;
     padding-bottom: 20px; 

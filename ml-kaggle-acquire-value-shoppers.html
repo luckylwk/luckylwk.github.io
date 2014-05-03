@@ -60,16 +60,33 @@
                 <li>TestHistory*</li>
                 <li>SampleSubmission*</li>
             </ul>
-            <p>The latter two we'll look at later, since they are used for the testing and submission, but the other ones are important to understand the data for the competition itself.</p>
-    	    <p>Lets first look at the biggest of them all: transactions. Zipped it is a mere 3GB and unzipped it gives you around 350 million rows with a filesize of around 22GB. Because we are just taking a look I have used a file created by Vadim Kyssa that looks at <a href="http://www.kaggle.com/c/acquire-valued-shoppers-challenge/forums/t/7659/sample-of-transaction-data" target="_blank">all transactions by one specific user</a>.</p>
+            <p>The latter two we'll need for the submissions, the others are all to build features and train the model using labelled data. The first thing to do is to take a look at the labelled and unlabelled data, so we have some idea of what we need to do in this competition. When looking at the <strong>trainHistory</strong> file we see that there are roughly two types of labelled rows: those of repeaters and non-repeaters.</p>
+            <script src="https://gist.github.com/luckylwk/11344095.js?file=kaggle-avs-trainHistory.json"></script>
+            <p>In addition to this labelled data we were provided with the test-history, where the two labels <span class="lbl">repeattrips</span> and <span class="lbl">repeater</span> are left out and for us to be predicted.</p>
+            <script src="https://gist.github.com/luckylwk/11344095.js?file=kaggle-avs-testHistory.json"></script>
+            <p>So the task will be to come up with features related to each customer/offer combination in the history files that hold some predictive value over whether they become repeat-buyers. This is where we need to turn to the other files.</p>
+            
+            <p>Kaggle provided us with was the offers-file. So lets take a look at the information in the offers file and perhaps see how it is linked to information in the history files.</p>
+            <script src="https://gist.github.com/luckylwk/11344095.js?file=kaggle-avs-offer.json"></script>
+            <p>We can immediately see here that the offers can be linked to the history files by the <span class="lbl">offer</span> id.</p>
+            
+    	    <p>To build the features we best take a look at the biggest file of all: transactions. Zipped it is a mere 3GB and unzipped it gives you around 350 million rows with a filesize of around 22GB. Because we are just taking a look I have used a file created by Vadim Kyssa that looks at <a href="http://www.kaggle.com/c/acquire-valued-shoppers-challenge/forums/t/7659/sample-of-transaction-data" target="_blank">all transactions by one specific user</a>.</p>
     	    <p>The file itself is structured as a *.csv file and provides us with a header row and a number of transactions that each take a line. The sample file that we have on user 86246 has a total of X rows over Y dates. So it seems these are shopping baskets, where each row represents an item and the data binds together the single transactions into a basket checkout. To illustrate I have selected four rows from the first shop-checkout on March 2nd, 2012.</p>
             <script src="https://gist.github.com/luckylwk/11344095.js?file=kaggle-avs-transactions-86246.csv"></script>
             <p>Lets take a look at a single transaction line to see what kind of features and data it holds.</p>
     		<script src="https://gist.github.com/luckylwk/11344095.js?file=kaggle-avs-transaction.json"></script>
             <p>The <span class="lbl">id</span> holds a unique customer-id. Both the <span class="lbl">chain</span> and <span class="lbl">dept</span> features seem to be related to the store the transaction took place. Then we get three features related to the product bought: <span class="lbl">category</span>, <span class="lbl">company</span> and <span class="lbl">brand</span>. We are provided with a <span class="lbl">date</span> of the purchase and some extra features related to the size, quantity and price of the product.</p>
-            <p>Another file Kaggle provided us with was the offers-file. So lets take a look at the information in the offers file and perhaps see if it is linked to information in the transaction file.</p>
-            <script src="https://gist.github.com/luckylwk/11344095.js?file=kaggle-avs-offer.json"></script>
-            <p>We can immediately see here that the offers can be linked to the transactions by <span class="lbl">category</span>, <span class="lbl">company</span> and <span class="lbl">brand</span> features. However, it does not hold any information on the offer-date, so we cannot just link them to transactions and assume the product is bought on an offer (we may be able to distill that from the quantity and offer-price though).</p>
+	    </div>
+	</section>
+	
+	
+	<section>
+	    <div class="wrapper">
+    	    <h1> BUILDING FEATURES </h1>
+    	    <p>From the benchmark we already have 4 features: Has bought in the coupon offer category before, has bought the brand before, has bought from the company before, has bought company + category + brand on offer.</p>
+    	    <p>
+    	        feature ideas: average time between purchases at the shop, time since last purchase at the shop. same for company/brand/category.
+    	    </p>
 	    </div>
 	</section>
 	
