@@ -4,7 +4,7 @@ html, body, nav, header, section, div, h1, p, ul, li { margin:0px; padding:0px; 
 		
 body { 
     background: white; 
-	font-family: 'Raleway', sans-serif; font-weight: 300; font-size: 16px;
+	font-family: 'Merriweather', sans-serif; font-weight: 300; font-size: 16px;
 }
 
 strong {
@@ -14,12 +14,12 @@ strong {
 h1 {
     padding: 0px 100px;
     padding-bottom: 20px; 
-    font-size: 1.5em; font-weight: 500;
+    font-size: 2.5em; font-weight: 500;
     text-align:center; text-shadow: 0px 1px 2px #ddd;
 }
 p {
-    padding: 10px 100px; padding-bottom: 30px;
-    line-height: 1.4em;
+    padding: 20px 100px; padding-bottom: 40px;
+    line-height: 1.8em;
 }
 ul {
     display:block;
@@ -40,10 +40,10 @@ header {
     letter-spacing: 2px;
 }
 section {
-    border-bottom: 2px solid #f7f7f7;
+    /*border-bottom: 2px solid #f7f7f7;*/
 }
 .wrapper {
-    width: 710px;
+    width: 800px;
     margin:0px auto; padding: 100px 0px;
 }
 
@@ -63,12 +63,30 @@ div.graphHeader {
 }
 
 span.lbl {
-    padding: 2px 4px;
-    background: #c3d3e0; 
+    padding: 3px 6px;
+    background: rgba(12,98,177,0.1); /*#c3d3e0; */
     border: 0px; border-radius: 3px; -webkit-border-radius: 3px; -moz-border-radius: 3px;
     font-weight: 500;
 }
 
+table.idx {
+    width:600px;
+    margin: 0px auto;
+}
+table.idx td {
+    padding: 8px 0px;
+}
+table.idx td:last-child {
+    text-align: right;
+}
+
+a.idx:link, a.idx:visited, a.idx:active {
+    color: #777; font-weight: 500;
+    text-decoration: none;
+}
+a.idx:hover {
+    color: #14609d;
+}
 
 /* BUTTONS */
 .btn {
