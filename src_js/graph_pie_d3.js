@@ -26,7 +26,7 @@ function mt_db_pieChart( $div_id, $svg_id, $is_pie ){
     var color = d3.scale.ordinal().range( ["#bf2841", "#D95B43", "#ECD078", "#336699", "#20b3c0"] );
 
     // Initialize width, height and radius (function of former two).
-    var width = 340,
+    var width = 390,
         height = 340,
         radius = Math.min( width, height ) / 2,
         radius_inner = ( $is_pie==true ) ? 0 : radius/2,
@@ -42,7 +42,6 @@ function mt_db_pieChart( $div_id, $svg_id, $is_pie ){
     var pie =  d3.layout.pie().value( function(d){ return d.value; } ).sort( null )
                         .startAngle(0*Math.PI)
                         .endAngle(2*Math.PI);
-    //console.log('PIE(dataset): ', pie(dataset) );
     
     // Create an ARC function.
     var arc = d3.svg.arc().innerRadius( radius_inner ).outerRadius( radius_outer );
@@ -53,6 +52,7 @@ function mt_db_pieChart( $div_id, $svg_id, $is_pie ){
         .enter().append("path").attr("class","slice")
         .attr("data-num", function(d){ return d.value; } )
         .attr("data-lbl", function(d){ return d.data.label; } )
+        .attr("data-ctr", function(d){ return arc.centroid(d); } )
         .attr("fill", function(d,i){ return color(i); } );
     
     slices.transition()
@@ -69,6 +69,7 @@ function mt_db_pieChart( $div_id, $svg_id, $is_pie ){
     
     
     $('.btn_pie').click( func_change );
+    $('.slice').each( func_label );
     
     // function to change.
     function func_change(){
@@ -96,6 +97,7 @@ function mt_db_pieChart( $div_id, $svg_id, $is_pie ){
             slices.enter().append("path").attr("class","slice")
                 .attr("data-num", function(d){ return d.value; } )
                 .attr("data-lbl", function(d){ return d.data.label; } )
+                .attr("data-ctr", function(d){ return arc.centroid(d); } )
                 .attr("fill", function(d,i){ return color(i); } )
                 .each( function(d,i){ this._current = d; } );
             
@@ -129,5 +131,26 @@ function mt_db_pieChart( $div_id, $svg_id, $is_pie ){
 			return arc(i(t));
 		};
 	}
+	
+	// Function to use for the label
+	function func_label(){
+        
+        $(this).on('mouseenter', function(event){
+            
+            var xy = d3.select(this).attr("data-ctr").split(','),
+                xPos = parseFloat( width/2 + 1*xy[0] - 40 ),
+                yPos = parseFloat( height/2 + 1*xy[1] - 54 );
+            
+            d3.select("#svg_label_donut")
+                .style( "left", xPos + "px" ).style( "top", yPos + "px" ).style("display","block" )
+                .select("#value").text( Math.round(d3.select(this).attr("data-num")/1000000) );
+                
+            d3.select("#svg_label_donut").select("#label").text( d3.select(this).attr("data-lbl") );
+            
+        }).on('mouseleave', function(event){
+            d3.select("#svg_label_donut").style({"display":"none"});
+        });
+        
+    }
    
 }
