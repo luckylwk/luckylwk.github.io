@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="author" content="Luuk Derksen - lwky-lab - github.com/luckylwk">
+	
+	<title>luckylwk.github.io</title>
+	
+	<link href='https://raw.github.com/necolas/normalize.css/master/normalize.css' rel='stylesheet' type='text/css'>
+	
+	<link href='http://fonts.googleapis.com/css?family=Roboto:400,300,100,500' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Raleway:400,300,500,600,700' rel='stylesheet' type='text/css'>
+	
+	<link href='src_css/design.css' rel='stylesheet' type='text/css'>
+	
+	<style type="text/css">
+        html, body {
+            margin: 0px;
+        }
+        body {
+            font-family: 'Open Sans', sans-serif;
+            font-size: 16px; line-height: 1em;
+        }
+    	
+    	#container {
+        	width: 90%;
+        	margin: 0 auto;
+    	}
+    	.panel {
+    	    box-sizing: border-box;
+        	width: 20%;
+        	float: left;
+    	}
+    	
+    	span {
+            display: inline-block;	
+    	}
+    	
+    	.fact {
+            margin: 5px;
+            padding: 5px 10px;
+            background: blue;
+            color: white;	
+    	}
+    	.fact.not {
+        	background: red;
+    	}
+	</style>
+	
+	
+	
+	<!-- JAVASCRIPT -->
+	<script src="src_js/jquery.js"></script>
+
+
+    <!-- JAVASCRIPT -->
+	
+	
+</head>
+
+<body>
+    
+    <div id="container">
+    
+        <section class="panel">
+            <button onClick="factorise_time( 28, 1 );">Factorise 28</button>
+            <div id="fact_time_1"></div>
+            <div id="fact_yes_1"></div>
+            <div id="fact_not_1"></div>
+        </section>
+        
+        <section class="panel">
+            <button onClick="factorise_time( 187, 2 );">Factorise 187</button>
+            <div id="fact_time_2"></div>
+            <div id="fact_yes_2"></div>
+            <div id="fact_not_2"></div>
+        </section>
+        
+        <section class="panel">
+            <button onClick="factorise_time( 1056, 3 );">Factorise 1056</button>
+            <div id="fact_time_3"></div>
+            <div id="fact_yes_3"></div>
+            <div id="fact_not_3"></div>
+        </section>
+        
+        <section class="panel">
+            <button onClick="factorise_time( 7234, 4 );">Factorise 7234</button>
+            <div id="fact_time_4"></div>
+            <div id="fact_yes_4"></div>
+            <div id="fact_not_4"></div>
+        </section>
+        
+        <section class="panel">
+            <button onClick="factorise_time( 13012, 5 );">Factorise 13012</button>
+            <div id="fact_time_5"></div>
+            <div id="fact_yes_5"></div>
+            <div id="fact_not_5"></div>
+        </section>
+        
+    </div>
+    <div style="clear:both;"></div>
+    
+    <script>
+        function factorise( val, num ){
+            var steps = [1,2,2,4,2,4,2,4,6,2,6];
+            var n = val;
+            // Start with divisor 2.
+            var d = 2;
+            // Set wheels next step-index.
+            var next = 0;
+            while( n > 1 ){
+                if( n % d != 0 ){
+                    $('#fact_not_' + num).append('<span class="fact not">' + d + '</span>');
+                }
+                while( n % d == 0 ){
+                    $('#fact_yes_' + num).append('<span class="fact">' + d + '</span>'); //console.log(d);
+                    n /= d;
+                }
+                d += steps[next];
+                next++;
+                if( next == steps.length ){
+                    next = 3;
+                }
+            }
+        }
+        
+        function factorise_time( val, num ){
+            // Clean divs.
+            $('#fact_yes_' + num + ', #fact_not_' + num + ', #fact_time_' + num).html('');
+            // Start timing.
+            var startTime = new Date();
+            factorise( val, num );
+            var endTime = new Date();
+            var timeDiff = ( endTime - startTime ) / 1000;
+            var seconds = Math.round(timeDiff % 60);
+            $('#fact_time_' + num).html( seconds + ' sec.');
+        }
+
+
+
+        
+
+    </script>
+
+</body>
+
+</html>
