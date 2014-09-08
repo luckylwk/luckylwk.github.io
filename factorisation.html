@@ -31,10 +31,10 @@
     	}
     	.panel {
     	    box-sizing: border-box;
-        	width: 20%;
+        	width: 16%;
         	float: left;
+            margin: 0 2%;
             margin-top:40px;
-            border-right: 3px dotted #aaa;
     	}
     	
     	span {
@@ -46,6 +46,7 @@
             padding: 5px 10px;
             background: blue;
             color: white;	
+            border: 0px; border-radius: 3px;
     	}
     	.fact.not {
         	background: red;
@@ -54,7 +55,8 @@
         button {
             padding: 5px 10px;
             background: yellow;
-            border: 0px; border-radius: 3px;
+            border: 0px; border-radius: 0px;
+            font-weight: 500;
         }
 	</style>
 	
@@ -146,11 +148,6 @@
             var seconds = Math.round(timeDiff % 60);
             $('#fact_time_' + num).html( seconds + ' sec.');
         }
-
-
-
-        
-
     </script>
 
 </body>
