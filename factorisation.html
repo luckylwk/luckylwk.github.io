@@ -44,12 +44,12 @@
     	.fact {
             margin: 5px;
             padding: 5px 10px;
-            background: blue;
+            background: rgba(0,255,0,0.75);
             color: white;	
             border: 0px; border-radius: 3px;
     	}
     	.fact.not {
-        	background: red;
+        	background: rgba(255,0,0,0.75);
     	}
 
         button {
@@ -57,6 +57,12 @@
             background: yellow;
             border: 0px; border-radius: 0px;
             font-weight: 500;
+        }
+
+        #fact_time_1, #fact_time_2, #fact_time_3, #fact_time_4, #fact_time_5 {
+            font-size: 12px;
+            text-align: center;
+            color: #aaa;
         }
 	</style>
 	
@@ -83,28 +89,28 @@
         </section>
         
         <section class="panel">
-            <button onClick="factorise_time( 187, 2 );">Factorise 187</button>
+            <button onClick="factorise_time( 364, 2 );">Factorise 364</button>
             <div id="fact_time_2"></div>
             <div id="fact_yes_2"></div>
             <div id="fact_not_2"></div>
         </section>
         
         <section class="panel">
-            <button onClick="factorise_time( 1056, 3 );">Factorise 1056</button>
+            <button onClick="factorise_time( 1029, 3 );">Factorise 1029</button>
             <div id="fact_time_3"></div>
             <div id="fact_yes_3"></div>
             <div id="fact_not_3"></div>
         </section>
         
         <section class="panel">
-            <button onClick="factorise_time( 7234, 4 );">Factorise 7234</button>
+            <button onClick="factorise_time( 13012, 4 );">Factorise 13012</button>
             <div id="fact_time_4"></div>
             <div id="fact_yes_4"></div>
             <div id="fact_not_4"></div>
         </section>
         
         <section class="panel">
-            <button onClick="factorise_time( 13012, 5 );">Factorise 13012</button>
+            <button onClick="factorise_time( 981617, 5 );">Factorise 981617</button>
             <div id="fact_time_5"></div>
             <div id="fact_yes_5"></div>
             <div id="fact_not_5"></div>
