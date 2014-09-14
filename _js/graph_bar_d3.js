@@ -34,10 +34,9 @@ function mt_db_barChart( $div_id, $svg_id ){
                 }; 
     var dataset = func_get_dataset(); // Get starting dataset. Always an ARRAY with OBJECTS.
     
-    
     // Set width, height and margins.
     var margin = { top:10, right:10, bottom:20, left:40 },
-        width = 710 - margin.left - margin.right,
+        width = $($div_id).width() - margin.left - margin.right,
         height = 380 - margin.top - margin.bottom;
 
     // Create an svg object.
@@ -152,6 +151,7 @@ function mt_db_barChart( $div_id, $svg_id ){
        
     }
     
+    // Function to change between datasets.
     function func_get_dataset(){
         tmp_data = data[data.label];
         if( data.sort==true ){
@@ -163,6 +163,7 @@ function mt_db_barChart( $div_id, $svg_id ){
         return tmp_data;
     }
     
+    // Function to show the tooltip.
     function func_label(){
     
         $(this).on('mouseenter', function(event){
@@ -177,7 +178,9 @@ function mt_db_barChart( $div_id, $svg_id ){
             d3.select("#svg_label").select("#label").text( d3.select(this).attr("data-lab") );
             
         }).on('mouseleave', function(event){
+            
             d3.select("#svg_label").style({"display":"none"});
+            
         });
         
     }    

@@ -9,7 +9,7 @@
 	
 	<title>luckylwk.github.io</title>
 	
-	<link href='https://raw.github.com/necolas/normalize.css/master/normalize.css' rel='stylesheet' type='text/css'>
+	<link href='_css/normalize.css' rel='stylesheet' type='text/css'>
 	
 	<!--
 	<link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,500italic,400,300,500' rel='stylesheet' type='text/css'>
@@ -18,9 +18,9 @@
 	
 	<link href='http://fonts.googleapis.com/css?family=Lato:400,400italic,300,300italic,500,500italic,600,600italic,700,700italic' rel='stylesheet' type='text/css'>
 	-->
-	<link href='http://fonts.googleapis.com/css?family=Merriweather:400,300,500,600,700' rel='stylesheet' type='text/css'>
+	<link href='//fonts.googleapis.com/css?family=Merriweather:400,300,500,600,700' rel='stylesheet' type='text/css'>
 	
-	<link href='src_css/design.css' rel='stylesheet' type='text/css'>
+	<link href='_css/design.css' rel='stylesheet' type='text/css'>
 	
 	<style type="text/css">
 		
@@ -48,17 +48,17 @@
 		        
 	</style>
 	
-	<link href='src_css/graph_kmeans.css' rel='stylesheet' type='text/css'>
-	<link href='src_css/graph_bar.css' rel='stylesheet' type='text/css'>
+	<link href='_css/graph_kmeans.css' rel='stylesheet' type='text/css'>
+	<link href='_css/graph_bar.css' rel='stylesheet' type='text/css'>
 	
 	
 	<!-- JAVASCRIPT -->
-	<script src="src_js/jquery.v1.9.0.min.js"></script>
-    <script src="src_js/d3.v3.4.3.min.js"></script>
+	<script src="_js/jquery-1.11.1.min.js"></script>
+    <script src="_js/d3.v3.4.3.min.js"></script>
     <!-- JAVASCRIPT -->
-    <script type='text/javascript' src='src_js/graph_kmeans_d3.js'></script>
-    <script type='text/javascript' src='src_js/graph_bar_d3.js'></script>
-    <script type='text/javascript' src='src_js/graph_pie_d3.js'></script>
+    <script type='text/javascript' src='_js/graph_kmeans_d3.js'></script>
+    <script type='text/javascript' src='_js/graph_bar_d3.js'></script>
+    <script type='text/javascript' src='_js/graph_pie_d3.js'></script>
 	<!-- JAVASCRIPT -->
 	<script type='text/javascript'>
 	    function reset_graph(){
@@ -85,15 +85,15 @@
         <div class="wrapper" style="padding:60px 0px 80px 0px; text-align:center;">
             <header>LWKY</header>
             <div>
-                <img src="src_img/icon_linkedin.png" height="40" class="icon">
-                <a href="https://twitter.com/luckylwk" target="_blank"><img src="src_img/icon_twitter.png" height="40" class="icon"></a>
-                <a href="https://github.com/luckylwk" target="_blank"><img src="src_img/icon_github.png" height="40" class="icon"></a>
+                <img src="_img/icon_linkedin.png" height="40" class="icon">
+                <a href="https://twitter.com/luckylwk" target="_blank"><img src="_img/icon_twitter.png" height="40" class="icon"></a>
+                <a href="https://github.com/luckylwk" target="_blank"><img src="_img/icon_github.png" height="40" class="icon"></a>
             </div>
         </div>
     </section>
 
     
-    <section>
+    <section class="odd">
         <div class="wrapper">
     	    <h1> K-MEANS CLUSTERING ALGORITHM (D3) </h1>
     	    <p>Basic implementation of the K-Means clustering algorithm. Uses Voronoi Tessalation mapping to display the cluster area's.<br/><br/>Performance of the clustering algorithm is heavily dependent on the location of both the randomized pivots (used for generation of the datapoints) and the randomized cluster pivots.</p>
@@ -134,7 +134,7 @@
 	</section>
 	
 	
-	<section>
+	<section  class="odd">
 	    <div class="wrapper">
     	    <h1> SORTABLE BAR-CHART (D3) </h1>
     	    <p> Bar chart that has the ability to switch (animated) between two different datasets. It also has the option to toggle between sorting the dataset on its labels (x-axis) and the values. The value-sorting is now based on the sum of the two values per x-label.</p>
@@ -153,7 +153,7 @@
 	</section>
 	
 
-    <script type='text/javascript' src='src_js/ga.js'></script>
+    <script type='text/javascript' src='_js/ga.js'></script>
 
 </body>
 

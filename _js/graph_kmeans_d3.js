@@ -16,7 +16,7 @@ function start_kmeans( $div_id, $svg_id ){
     // Width and height
     var margin = { 'random':50 },
         padding = { 'top':10, 'bottom':30, 'left':30, 'right':10 };
-	var width = 710, // Chart width. Includes axis.
+	var width = $('#' + $div_id).width(), // Chart width. Includes axis.
 	    height = 400; // Chart height. Includes axis.
 
     

@@ -26,7 +26,7 @@ function mt_db_pieChart( $div_id, $svg_id, $is_pie ){
     var color = d3.scale.ordinal().range( ["#bf2841", "#D95B43", "#ECD078", "#336699", "#20b3c0"] );
 
     // Initialize width, height and radius (function of former two).
-    var width = 390,
+    var width = $($div_id).parent().width()/2-10,
         height = 340,
         radius = Math.min( width, height ) / 2,
         radius_inner = ( $is_pie==true ) ? 0 : radius/2,
