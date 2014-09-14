@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>D3 Map of London</title>
+
+        <link href="../_css/normalize.css" rel="stylesheet">
+
+        <link rel="stylesheet" href="style.css" title="Main CSS Stylesheet" type="text/css" media="screen" charset="utf-8">
+        
+        <script src="../_js/d3.v3.4.3.min.js" charset="utf-8"></script>
+        <script src="../_js/topojson.v1.min.js" charset="utf-8"></script>
+        
+    </head>
+    <body>
+        
+        <div class="container-fluid" style="padding:10px;">
+            
+            <div class="row-fluid">
+                <div id="viz" class="span8">
+                    <div id="stats" style="padding:10px;">
+    
+                        <script src="script.js" charset="utf-8"></script>
+	
+                    </div>
+                </div>
+
+                <div class="span4">
+
+
+                    Click the buttons below to change the color density mapping, and hover over each borough to see statistics.</p><p><br>
+
+                    <button class="btn btn-primary btn-small" onclick="update(0)">Average House Price</button> 
+                    <button class="btn btn-primary btn-small" onclick="update(1)">Population</button> 
+                    <button class="btn btn-primary btn-small" onclick="update(2)">People Per New House</button>
+                    
+                </div>
+            </div>
+        </div>
+        
+        <script src="script_new.js" charset="utf-8"></script>
+
+    </body>
+</html>
