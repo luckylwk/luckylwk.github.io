@@ -11,7 +11,7 @@ html, body {
 }
 
 body {
-    font-family: 'Hind', sans-serif;
+    font-family: 'Lato', 'Hind', sans-serif;
     font-size: 16px;
     line-height: 1.6;
     font-weight: 300;
@@ -19,7 +19,8 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 { 
-    font-size: 100%; font-weight: 400; 
+    font-size: 100%; 
+    font-weight: 400; 
 }
 
 a         { color: #2a7ae2; text-decoration: none; }
@@ -45,20 +46,18 @@ a:visited { color: #205caa; }
 /* Site header */
 
 .site-header {
-    padding:20px 10px;
+    padding: 20px 10px;
     border-bottom: 2px solid #ddd;
 }
 
 .site-title,
 .site-title:hover,
 .site-title:visited {
-    display: block;
-    color: #333;
-    font-size: 26px;
-    letter-spacing: -1px;
-    float: left;
-    line-height: 56px;
     position: relative;
+    display: block;
+    float: left;
+    color: steelblue;
+    font-size: 2.5em; line-height:1em;
     z-index: 1;
 }
 
@@ -230,7 +229,7 @@ a:visited { color: #205caa; }
 .post pre,
 .post code {
     padding: 10px 15px;
-    background-color: #e7e7e7;
+    background-color: #eee;
     border: 1px solid #bbb;
     border-radius: 3px; -webkit-border-radius: 3px; -moz-border-radius: 3px;
     font-size: 14px;
