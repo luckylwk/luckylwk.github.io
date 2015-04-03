@@ -1,0 +1,12 @@
+# Site settings
+title: luckylwk
+email: 
+description: "Some thoughts and writeups."
+baseurl: ""
+url: "http://luckylwk.github.io"
+twitter_username: luckylwk
+github_username:  luckylwk
+
+# Build settings
+markdown: redcarpet
+permalink: pretty

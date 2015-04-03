@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="author" content="Luuk Derksen - lwkylab - github.com/luckylwk">
+	
+	<title>luckylwk.github.io</title>
+	
+	<link href='../_css/normalize.css' rel='stylesheet' type='text/css'>
+	<link href='https://fonts.googleapis.com/css?family=Hind:300,400,500,600' rel='stylesheet' type='text/css'>   
+	<link href='../_css/design.css' rel='stylesheet' type='text/css'>
+	
+	
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/default.min.css">
+
+	
+	
+	<!-- JAVASCRIPT -->
+	<!-- <script src="../_js/jquery-1.11.1.min.js"></script> -->
+    <!-- <script src="../_js/d3.v3.4.3.min.js"></script> -->
+    <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script>
+    <script type="text/javascript"
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+	
+	<style>
+	    pre {
+	        margin: 10px 0px;
+	        padding: 10px 50px;
+	    }
+	    code {
+    	    border: 1px solid #aaa;
+    	    border-radius: 4px;
+    	    font-size:14px; line-height: 1.6em;
+	    }
+	</style>
+	
+	
+</head>
+
+<body>
+
+    <header style="padding:20px 10px;">
+        <div class="left">
+            <span class="name">luckylwk</span>
+        </div>
+        <div class="right">
+            <img src="../_img/icon_linkedin.png" height="40" class="icon">
+            <a href="https://twitter.com/luckylwk" target="_blank"><img src="../_img/icon_twitter.png" height="40" class="icon"></a>
+            <a href="https://github.com/luckylwk" target="_blank"><img src="../_img/icon_github.png" height="40" class="icon"></a>
+        </div>
+        <div class="clear"></div>
+    </header>
+	
+	
+	<section class="odd">
+	    <div class="wrapper">
+	        <article>
+	            <h1>Image Recognition on Handwritten Digits</h1>
+	            <p>Description of Kaggle MNIST knowledge competition</p>
+	            
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. When $a \ne 0$, there are two solutions to \(ax^2 + bx + c = 0\) and they are
+$$x = {-b \pm \sqrt{b^2-4ac} \over 2a}.$$</p>
+	            
+	            <h2>Dataset</h2>
+	            <p>xxx</p>
+	            <p>load and standardize</p>
+	            <pre><code class="python">import numpy as np
+import pandas as pd
+
+# Read the data into pandas DataFrames
+df_train = pd.read_csv('train.csv') 
+df_test = pd.read_csv('test.csv') 
+
+y_train = df_train.values[:, 0]
+X_train = df_train.values[:, 1:]
+X_test = df_test.values
+
+# Standardize the data.
+X_max = np.max(X_train)
+X_min = np.min(X_train)
+X_train = X_train / ( X_max - X_min )
+X_test = X_test / ( X_max - X_min )
+
+X_train = X_train.astype(np.float)
+y_train = y_train.astype(np.int32)</code></pre>
+                <p>Cross validation and data-sizes.</p>
+                <pre><code class="python">from sklearn.cross_validation import train_test_split
+
+X_train, X_cv, y_train, y_cv = train_test_split( 
+    X_train, 
+    y_train, 
+    test_size=0.20, 
+    random_state=42 
+)</code></pre>
+
+                <p>Cross validation and data-sizes.</p>
+                <pre><code class="python">print X_train.shape
+(33600, 784)
+                
+print X_cv.shape
+(8400, 784)
+</code></pre>
+	            
+	            <h2>KNN</h2>
+	            <p><i>In pattern recognition, the k-Nearest Neighbors algorithm (or k-NN for short) is a non-parametric method used for classification and regression.[1] In both cases, the input consists of the k closest training examples in the feature space. In k-NN classification, the output is a class membership. An object is classified by a majority vote of its neighbors, with the object being assigned to the class most common among its k nearest neighbors (k is a positive integer, typically small). If k = 1, then the object is simply assigned to the class of that single nearest neighbor.</i> Source: <a href="http://en.wikipedia.org/wiki/K-nearest_neighbors_algorithm" target="_blank">Wikipedia</a></p>
+	            <pre><code class="python">from sklearn.neighbors import KNeighborsClassifier
+	            
+KNN = KNeighborsClassifier( n_neighbors=6 )
+KNN.fit( X_train, Y_train )
+
+X_cv_pred = KNN.predict( X_cv )</code></pre>
+	            <p>xxx</p>
+	            
+	            <h2>(Deep) Neural Network</h2>
+	            <p>xxx</p>
+	            <p>xxx</p>
+	            
+	            <h2>Convolutional Neural Network</h2>
+	            <p>xxx</p>
+	            <p>xxx</p>
+	            
+	        </article>
+	    </div>
+	</section>
+	
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
+	
+
+    <!-- <script type='text/javascript' src='_js/ga.js'></script> -->
+
+</body>
+
+</html>

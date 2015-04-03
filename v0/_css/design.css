@@ -1,0 +1,127 @@
+/* GENERAL DESIGN CSS */
+
+html, body, nav, header, section, article, div, h1, h2, h3, p, a, ul, li { 
+    margin:0px; padding:0px; 
+}
+		
+body { 
+    background: white; 
+	font-family: 'Hind', sans-serif; 
+	font-weight: 300; 
+	font-size: 16px; 
+	line-height: 1em;
+}
+
+strong {
+    font-weight: 500;
+}
+
+h1 {
+    padding: 20px 25px; 
+    padding-bottom: 50px;
+    font-size: 2.5em; line-height:1em; 
+    font-weight: 400;
+    color: steelblue;
+    text-align:center; 
+    text-shadow: 0px 1px 2px #ddd;
+}
+h2 {
+    margin: 40px 50px 0px 50px;
+    padding: 20px 0px;
+    font-weight: 400;
+    color: steelblue;
+    border-top: 1px solid #eee;
+}
+p {
+    padding: 10px 50px; 
+    margin-top: 20px;
+    font-size:1.1em; 
+    line-height: 1.6em;
+    color: #666;
+}
+
+.left { float:left; }
+.right { float:right; }
+.clear { clear:both; }
+
+
+section {
+    border-bottom: 2px solid #eee;
+}
+section.odd {
+    background-color: #f7f7f7;
+}
+
+.wrapper {
+    width: 800px;
+    margin:0px auto; 
+    padding: 60px 0px;
+}
+
+
+/*
+    PAGE HEADER.
+*/
+header {
+    border-bottom: 2px solid #ddd;
+}
+img.icon { 
+    opacity: 0.3;
+    border: 0px;
+    cursor: pointer;
+	transition: transform 2s; -webkit-transition: -webkit-transform 2s; -moz-transition: -moz-transform 2s; 
+}
+img.icon:hover { 
+    transform: rotate(360deg); -webkit-transform: rotate(360deg); -moz-transform: rotate(360deg); 
+}
+span.name {
+    display:block;
+    padding: 10px 0px;
+    font-size: 20px; line-height: 1em;
+    font-weight: 400;
+    color: steelblue;
+}
+
+
+/*
+    LINKS    
+*/
+ul.notes {
+    display: block;
+    padding: 0px 10px;
+    list-style: none;
+}
+li {}
+a.notes {
+    position: relative;
+    display: block;
+    padding: 18px 10px;
+    color: #6f6f6f;
+    text-decoration: none;
+}
+a.notes:hover {
+    background: #eee;
+    color: #0b4d83;
+}
+h3 {
+    display: inline-block;
+    font-size: 1em; line-height: 1em;
+    font-weight: 400;
+}
+span.label {
+    margin: 0px 4px;
+    padding: 4px 8px;
+    background: #d5dee6;
+    font-size: 0.875em;
+    font-weight: 300;
+    color: steelblue;
+    border-radius: 3px;
+}
+span.date {
+    position: absolute;
+    right: 0px; top: 14px;
+    padding: 4px 8px;
+    font-size: 0.875em;
+    font-weight: 300;
+    color: #bbb;
+}
