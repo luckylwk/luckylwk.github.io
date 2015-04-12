@@ -1,9 +1,23 @@
 ---
 layout: default
 ---
-
-            <div class="home">
+        <div class="home">
+            <div class="wrap">
                 
+                <ul class="notes">
+                {% for post in site.posts %}
+                    <li>
+                        <a href="{{ post.url | prepend: site.baseurl }}" class="notes">
+                            <h3>{{ post.title }}</h3>
+                            <!-- <span class="label">ML</span> -->
+                            <span class="date">{{ post.date | date: "%b %-d, %Y" }}</span>
+                        </a><br/>
+                        {{ post.excerpt }}
+                    </li>
+                {% endfor %}
+                </ul>
+
+                <!-- 
                 <ul class="posts">
                     {% for post in site.posts %}
                         <li>
@@ -13,6 +27,8 @@ layout: default
                             {{ post.excerpt }}
                         </li>
                     {% endfor %}
-                </ul>
+                </ul> 
+                -->
 
             </div>
+        </div>
