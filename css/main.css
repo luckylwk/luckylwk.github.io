@@ -48,20 +48,19 @@ a:visited { color: #205caa; }
 }
 .wrap {
     max-width: 800px;
-    padding: 0 30px;
+    padding: 60px 30px;
     margin: 0 auto;
     zoom: 1;
 }
 
 
-/* Layout Styles */
-/* ----------------------------------------------------------*/
+
 
 /* 
     Site HEADER 
 */
 header {
-    padding: 20px 10px;
+    padding: 10px 20px;
     border-bottom: 2px solid #ddd;
 }
 img.icon { 
@@ -75,8 +74,8 @@ img.icon:hover {
 }
 span.name {
     display:block;
-    padding: 10px 0px;
-    font-size: 20px; line-height: 1em;
+    padding: 12px 0px;
+    font-size: 1em; line-height: 1em;
     font-weight: 400;
     color: steelblue;
 }
@@ -90,7 +89,7 @@ span.name {
     font-size: 2.5em; line-height:1em;
     z-index: 1;
 }*/
-.site-nav {
+/*.site-nav {
     float: right;
     line-height: 56px;
 }
@@ -99,7 +98,7 @@ span.name {
     margin-left: 20px;
     color: #727272;
     letter-spacing: -.5px;
-}
+}*/
 
 
 /* 
