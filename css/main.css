@@ -163,10 +163,55 @@ span.name {
 }
 
 
-/* Home styles */
-/* ----------------------------------------------------------*/
+/*
+    HOME - LINKS    
+*/
+ul.notes {
+    display: block;
+    padding: 0px 10px;
+    list-style: none;
+}
+li {}
+a.notes {
+    position: relative;
+    display: block;
+    padding: 18px 10px;
+    color: #6f6f6f;
+    text-decoration: none;
+}
+a.notes:hover {
+    background: #eee;
+    color: #0b4d83;
+}
+h3 {
+    display: inline-block;
+    font-size: 1em; line-height: 1em;
+    font-weight: 400;
+}
+span.label {
+    margin: 0px 4px;
+    padding: 4px 8px;
+    background: #d5dee6;
+    font-size: 0.875em;
+    font-weight: 300;
+    color: steelblue;
+    border-radius: 3px;
+}
+span.date {
+    position: absolute;
+    right: 0px; top: 14px;
+    padding: 4px 8px;
+    font-size: 0.875em;
+    font-weight: 300;
+    color: #bbb;
+}
 
-.home h1 { margin-bottom: 25px; }
+.home {
+    border-bottom: 2px solid #eee;
+    background-color: #f7f7f7;
+}
+
+/*.home h1 { margin-bottom: 25px; }
 
 .posts { list-style-type: none; }
 
@@ -182,7 +227,9 @@ span.name {
     display: block;
     font-size: 15px;
     color: #818181;
-}
+}*/
+
+
 
 
 /* Post styles */
