@@ -1,0 +1,164 @@
+---
+layout: post
+comments: true
+title:  "Lua & Torch Tutorial"
+excerpt: "Getting started with Lua and Torch (on Mac OSX). A promising new language in Machine Learning"
+date:   2015-05-23 20:00:00
+mathjax: true
+---
+
+### Install LuaJIT
+
+Download current LuaJIT from http://luajit.org/download.html. For the installation of LuaJIT I mainly followed the instructions on http://luajit.org/install.html#posix
+
+~~~bash
+$ tar zxf LuaJIT-2.0.4.tar.gz
+$ cd LuaJIT-2.0.4
+
+$ make
+==== Building LuaJIT 2.0.4 ====
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -C src
+... 
+OK        Successfully built LuaJIT
+==== Successfully built LuaJIT 2.0.4 ====
+
+$ sudo make install
+...
+==== Successfully installed LuaJIT 2.0.4 to /usr/local ====
+~~~
+
+
+### Install Torch
+
+http://torch.ch/docs/getting-started.html
+
+Install all the dependencies.
+
+~~~bash
+$ curl -sk https://raw.githubusercontent.com/torch/ezinstall/master/install-deps | bash
+==> This script will install:
+/usr/local/bin/brew
+...
+==> Torch7's dependencies have been installed
+~~~
+
+To install in `~/torch`
+
+~~~bash
+$ git clone https://github.com/torch/distro.git ~/torch --recursive
+Cloning into '/Users/XXX/torch'...
+remote: Counting objects: 448, done.
+...
+Checking connectivity... done.
+Submodule path 'pkg/xlua': checked out '775ed6c39195470da876ab111bf02cc6b790e04e'
+
+$ cd ~/torch; ./install.sh
+...
+Updating manifest for /Users/XXX/torch/install/lib/luarocks/rocks
+itorch scm-1 is now built and installed in /Users/XXX/torch/install/ (license: BSD)
+
+
+
+Not updating your shell profile.
+You might want to
+add the following lines to your shell profile:
+
+export PATH=/Users/XXX/torch/install/bin:$PATH
+export LD_LIBRARY_PATH=/Users/XXX/torch/install/lib:$LD_LIBRARY_PATH
+export DYLD_LIBRARY_PATH=/Users/XXX/torch/install/lib:$DYLD_LIBRARY_PATH
+~~~
+
+Both **Torch** and **LuaJIT** are now installed.
+
+### Torch Packages
+
+New packages can be installed using **Luarocks** from the command-line:
+
+~~~bash
+$ luarocks install image
+Installing https://raw.githubusercontent.com/torch/rocks/master/image-1.1.alpha-0.rockspec...
+...
+image 1.1.alpha-0 is now built and installed in /Users/lrwderksen/torch/install/ (license: BSD)
+
+
+$ luarocks list
+image
+   1.1.alpha-0 (installed) - /Users/lrwderksen/torch/install/lib/luarocks/rocks
+~~~
+
+### Torch Shell
+
+To enter the Torch shell type `th`
+
+~~~torch
+$ th
+
+  ______             __   |  Torch7
+ /_  __/__  ________/ /   |  Scientific computing for Lua.
+  / / / _ \/ __/ __/ _ \  |  Type ? for help
+ /_/  \___/_/  \__/_//_/  |  https://github.com/torch
+                          |  http://torch.ch
+
+th>
+~~~
+
+~~~th
+th> a = 10
+                                                                      [0.0000s]
+th> print(a)
+10
+                                                                      [0.0000s]
+~~~
+
+### Torch Script
+
+~~~bash
+$ th -h
+Usage: th [options] [script.lua [arguments]]
+
+Options:
+  -l name            load library name
+  -e statement       execute statement
+  -h,--help          print this help
+  -a,--async         preload async (libuv) and start async repl (BETA)
+  -g,--globals       monitor global variables (print a warning on creation/access)
+  -gg,--gglobals     monitor global variables (throw an error on creation/access)
+  -x,--gfx           start gfx server and load gfx env
+  -i,--interactive   enter the REPL after executing a script
+~~~
+
+Run a script using the first set of the [Torch Tutorials](https://github.com/torch/tutorials/blob/master/1_getstarted/getstarted.lua)
+
+~~~torch
+print('basic printing')
+a = 10
+print(a)
+print 'something'
+print(type(a))
+print(type('something'))
+~~~
+
+~~~bash
+$ th tutorial-1.lua
+basic printing
+10
+something
+number
+string
+~~~
+
+
+### Running iTorch
+
+Based on **IPython** there is a notebook version for Torch provided by Facebook. For more information see [https://github.com/facebook/iTorch](https://github.com/facebook/iTorch).
+
+You can start the notebook by typing `itorch notebook` in the console. You can also enter the shell using `itorch`.
+
+~~~bash
+$ itorch notebook
+[I 20:13:27.920 NotebookApp] Using existing profile dir: u'/Users/lrwderksen/.ipython/profile_default'
+[I 20:13:27.927 NotebookApp] Using MathJax from CDN: https://cdn.mathjax.org/mathjax/latest/MathJax.js
+[W 20:13:27.961 NotebookApp] Terminals not available (error was No module named terminado)
+~~~
+
+

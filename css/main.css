@@ -13,7 +13,7 @@ html, body {
 body {
     font-family: 'Hind', sans-serif;
     font-size: 16px;
-    line-height: 1.6;
+    line-height: 1.75;
     font-weight: 300;
     background-color: white;
 }
@@ -47,10 +47,11 @@ a:visited { color: #205caa; }
     clear: both; 
 }
 .wrap {
-    max-width: 800px;
+    max-width: 700px;
     padding: 60px 30px;
     margin: 0 auto;
     zoom: 1;
+    background: #f7f7f7;
 }
 
 
@@ -74,7 +75,7 @@ img.icon:hover {
 }
 span.name {
     display:block;
-    padding: 12px 0px;
+    padding: 7px 0px;
     font-size: 16px; 
     line-height: 1em;
     font-weight: 400;
@@ -175,7 +176,7 @@ ul.notes {
     padding: 0px 10px;
     list-style: none;
 }
-li {}
+li { margin: 20px 0px; }
 a.notes {
     position: relative;
     display: block;
@@ -202,12 +203,13 @@ span.label {
     border-radius: 3px;
 }
 span.date {
-    position: absolute;
-    right: 0px; top: 14px;
     padding: 4px 8px;
     font-size: 0.875em;
     font-weight: 300;
     color: #bbb;
+}
+p.description {
+    color: #666;
 }
 
 .home {
@@ -249,18 +251,22 @@ span.date {
     font-size: 36px;
     letter-spacing: -1.75px;
     line-height: 1;
-    font-weight: 300;
+    font-weight: 400;
 }
 
 .post-header .meta {
-    font-size: 15px;
+    font-size: 16px;
     color: #818181;
     margin-top: 5px;
 }
 
-.post-content { margin: 0 0 30px; }
+.post-content { 
+    margin: 0 0 30px; 
+}
 
-.post-content > * { margin: 20px 0; }
+.post-content > * { 
+    margin: 20px 0; 
+}
 
 
 .post-content h1,
@@ -300,7 +306,9 @@ span.date {
 }
 
 .post-content ul,
-.post-content ol { padding-left: 20px; }
+.post-content ol { 
+    padding-left: 20px; 
+}
 
 .post pre,
 .post code {
