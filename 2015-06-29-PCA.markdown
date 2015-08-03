@@ -1,0 +1,181 @@
+# PCA & ZCA in R, Python and Torch
+
+Introduction.
+
+The main purposes of a principal component analysis are the analysis of data to identify patterns and finding patterns to reduce the dimensions of the dataset with minimal loss of information.
+
+Here, our desired outcome of the principal component analysis is to project a feature space (our dataset consisting of n d-dimensional samples) onto a smaller subspace that represents our data "well". A possible application would be a pattern classification task, where we want to reduce the computational costs and the error of parameter estimation by reducing the number of dimensions of our feature space by extracting a subspace that describes our data "best".
+
+
+
+What is PCA
+
+What is ZCA
+
+When is it useful - Images, visualisation.
+
+When is it not? - Variable scaling impacts the principal components, hence it should be used with caution in collected datasets (not necessarily directly related variables).
+
+Useful links
+http://bugra.github.io/work/notes/2014-09-27/geometric-take-on-pca/
+http://sebastianraschka.com/Articles/2014_pca_step_by_step.html
+http://www.r-bloggers.com/computing-and-visualizing-pca-in-r/
+http://gastonsanchez.com/blog/how-to/2012/06/17/PCA-in-R.html
+http://ufldl.stanford.edu/wiki/index.php/Implementing_PCA/Whitening
+http://ufldl.stanford.edu/wiki/index.php/Whitening
+
+http://statmath.wu.ac.at/~hornik/QFS1/principal_component-vignette.pdf
+
+### Data: Iris dataset
+
+~~~python
+from matplotlib import pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+from mpl_toolkits.mplot3d import proj3d
+
+import numpy as np
+
+from sklearn import datasets
+~~~
+
+~~~python
+iris = datasets.load_iris()
+
+X = iris.data
+y = iris.target
+colors = ["blue","red","green"]
+color = [ colors[yy] for yy in y ]
+
+print 'Data (X) dimensions: ', X.shape
+print 'Data (y) dimensions: ', y.shape
+~~~
+~~~
+Data (X) dimensions:  (150, 4)
+Data (y) dimensions:  (150,)
+~~~
+
+~~~python
+import pandas as pd
+
+df = pd.DataFrame(X)
+pd.tools.plotting.scatter_matrix(df, c=color, alpha=0.4, figsize=(15, 8), diagonal='kde')
+~~~
+
+<img src="assets/iris---scattermatrix.png"/>
+
+~~~python
+fig = plt.figure(figsize=(15,9))
+ax = fig.add_subplot(111, projection='3d',elev=48, azim=134)
+plt.rcParams['legend.fontsize'] = 10   
+ax.plot( X[y==0,0], X[y==0,1], X[y==0,2], 'o', markersize=8, color='blue', alpha=0.5, label=iris.target_names[0])
+ax.plot( X[y==1,0], X[y==1,1], X[y==1,2], '^', markersize=8, alpha=0.5, color='red', label=iris.target_names[1])
+ax.plot( X[y==2,0], X[y==2,1], X[y==2,2], '.', markersize=8, alpha=0.5, color='green', label=iris.target_names[2])
+plt.title('Samples for class 1 and class 2')
+ax.legend(loc='upper right')
+plt.show()
+~~~
+
+
+### PCA on the Iris-dataset
+
+Let's assume that our goal is to reduce the dimensions of a d-dimensional dataset by projecting it onto a (k)-dimensional subspace (where k<d). So, how do we know what size we should choose for k, and how do we know if we have a feature space that represents our data "well"?
+Later, we will compute eigenvectors (the components) from our data set and collect them in a so-called scatter-matrix (or alternatively calculate them from the covariance matrix). Each of those eigenvectors is associated with an eigenvalue, which tell us about the "length" or "magnitude" of the eigenvectors. If we observe that all the eigenvalues are of very similar magnitude, this is a good indicator that our data is already in a "good" subspace. Or if some of the eigenvalues are much much higher than others, we might be interested in keeping only those eigenvectors with the much larger eigenvalues, since they contain more information about our data distribution. Vice versa, eigenvalues that are close to 0 are less informative and we might consider in dropping those when we construct the new feature subspace.
+
+In other words, via PCA, we are projecting the entire set of data (without class labels) onto a different subspace. In PCA we are trying to find the axes with maximum variances where the data is most spread (within a class, since PCA treats the whole data set as one class).
+
+~~~python
+# Manual calculation of the covariance matrix.
+Xcovm = np.dot( (X-X.mean(axis=0)).transpose(), (X-X.mean(axis=0)) ) / (X.shape[0]-1)
+# Numpy calculation of the covariance matrix.
+Xcov = np.cov(X.transpose())
+assert Xcovm.all() == Xcov.all()
+print Xcov
+~~~
+~~~
+[[ 0.68569351 -0.03926846  1.27368233  0.5169038 ]
+ [-0.03926846  0.18800403 -0.32171275 -0.11798121]
+ [ 1.27368233 -0.32171275  3.11317942  1.29638747]
+ [ 0.5169038  -0.11798121  1.29638747  0.58241432]]
+~~~
+
+
+
+
+
+
+### Three languages: R, Python, Torch
+
+~~~r
+library(scatterplot3d)
+
+data(iris)
+
+head(iris,3)
+
+iris$color[iris$Species=="virginica"] <- "red"
+iris$color[iris$Species=="versicolor"] <- "blue"
+iris$color[iris$Species=="sentosa"] <- "green"
+
+scatterplot3d(iris$Sepal.Length, iris$Sepal.Width, iris$Petal.Length, color=iris$color, pch=19)
+~~~
+
+~~~r
+pca = princomp(iris[,c(1,2,3,4)])
+
+summary(pca)
+
+names(pca)
+
+pca$loadings
+pca$scores
+
+plot(pca$scores[,1], pca$scores[,2], col=iris$color)
+
+scatterplot3d(pca$scores[,1],pca$scores[,2],pca$scores[,3],color=iris$color)
+
+> prcomp(iris[,c(1,2,3,4)], scale=FALSE)
+Standard deviations:
+[1] 2.0562689 0.4926162 0.2796596 0.1543862
+
+Rotation:
+                     PC1         PC2         PC3        PC4
+Sepal.Length  0.36138659 -0.65658877  0.58202985  0.3154872
+Sepal.Width  -0.08452251 -0.73016143 -0.59791083 -0.3197231
+Petal.Length  0.85667061  0.17337266 -0.07623608 -0.4798390
+Petal.Width   0.35828920  0.07548102 -0.54583143  0.7536574
+
+> pca2$sdev^2
+[1] 4.22824171 0.24267075 0.07820950 0.02383509
+
+> pca$sdev^2
+    Comp.1     Comp.2     Comp.3     Comp.4 
+4.20005343 0.24105294 0.07768810 0.02367619 
+
+> cov(iris[,c(1,2,3,4)])
+             Sepal.Length Sepal.Width Petal.Length Petal.Width
+Sepal.Length    0.6856935  -0.0424340    1.2743154   0.5162707
+Sepal.Width    -0.0424340   0.1899794   -0.3296564  -0.1216394
+Petal.Length    1.2743154  -0.3296564    3.1162779   1.2956094
+Petal.Width     0.5162707  -0.1216394    1.2956094   0.5810063
+
+> eigen(iris[,c(1,2,3,4)])$values
+[1] 4.22824171 0.24267075 0.07820950 0.02383509
+
+> eigen(iris[,c(1,2,3,4)])$vectors
+            [,1]        [,2]        [,3]       [,4]
+[1,]  0.36138659 -0.65658877 -0.58202985  0.3154872
+[2,] -0.08452251 -0.73016143  0.59791083 -0.3197231
+[3,]  0.85667061  0.17337266  0.07623608 -0.4798390
+[4,]  0.35828920  0.07548102  0.54583143  0.7536574
+~~~
+
+
+
+
+
+
+
+### Generating Data
+
+Three dimensional dataset. Two classes.
+
