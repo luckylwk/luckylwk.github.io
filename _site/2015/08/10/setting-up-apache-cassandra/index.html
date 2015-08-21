@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+
+        <head>
+        
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        
+        <title>Setting up Apache Cassandra</title>
+        
+        <meta name="viewport" content="width=device-width">
+        <meta name="description" content="Some thoughts and writeups.">
+        
+        <link href='//fonts.googleapis.com/css?family=Hind:300,400,500,600' rel='stylesheet' type='text/css'>
+        <!-- <link href='//fonts.googleapis.com/css?family=Lato:300,400,700' rel='stylesheet' type='text/css'> -->
+
+        <link rel="canonical" href="http://luckylwk.github.io/2015/08/10/setting-up-apache-cassandra/">
+
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="/css/main.css">
+
+    </head>
+
+
+    <body>
+
+                <header class="site-header">
+
+            <div class="left">
+                <span class="name">LUCKYLWK</span>
+            </div>
+
+            <div class="right">
+                <img src="/assets/icon_linkedin.png" height="30" class="icon">
+                <a href="https://twitter.com/luckylwk" target="_blank" style="line-height:1em;">
+                    <img src="/assets/icon_twitter.png" height="30" class="icon">
+                </a>
+                <a href="https://github.com/luckylwk" target="_blank" style="line-height:1em;">
+                    <img src="/assets/icon_github.png" height="30" class="icon">
+                </a>
+            </div>
+            <div class="clear"></div>
+
+        </header>
+
+
+        <div class="page-content">
+                    <div class="wrap">
+            <div class="post">
+
+                <header class="post-header">
+                    <h1>Setting up Apache Cassandra</h1>
+                    <p class="meta">Aug 10, 2015</p>
+                </header>
+
+                <article class="post-content">
+                <h3>Installing Apache Cassandra</h3>
+
+<ul>
+<li>https://www.digitalocean.com/community/tutorials/how-to-install-cassandra-and-run-a-single-node-cluster-on-a-ubuntu-vps</li>
+</ul>
+
+<p>Cassandra (as well as Spark) requires Java to be installed. See the Spark installation documents to install Java.</p>
+
+<h3>Install &amp; Setup Cassandra</h3>
+
+<p>Download the tarball and unzip it.</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>wget http://www.mirrorservice.org/sites/ftp.apache.org/cassandra/2.1.6/apache-cassandra-2.1.6-bin.tar.gz
+
+<span class="nv">$ </span>tar -xvzf apache-cassandra-2.1.6-bin.tar.gz
+</code></pre></div>
+<p>Next, make sure that the folders Cassandra accesses, such as the log folder, exists and that Cassandra has the right to write on it:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>sudo mkdir /var/lib/cassandra
+<span class="nv">$ </span>sudo mkdir /var/log/cassandra
+<span class="nv">$ </span>sudo chown -R <span class="nv">$USER</span>:<span class="nv">$GROUP</span> /var/lib/cassandra
+<span class="nv">$ </span>sudo chown -R <span class="nv">$USER</span>:<span class="nv">$GROUP</span> /var/log/cassandra
+</code></pre></div>
+<p>In the <code>.bash_profile</code> add the following two lines:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>nano ~/.bash_profile
+
+<span class="c"># APACHE CASSANDRA Config.</span>
+<span class="nb">export </span><span class="nv">CASSANDRA_HOME</span><span class="o">=</span>~/cassandra
+<span class="nb">export </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:<span class="nv">$CASSANDRA_HOME</span>/bin
+</code></pre></div>
+<p>Make sure to <code>source ~/.bash_profile</code> after this for the changes to take effect.</p>
+
+<h3>Running Cassandra on a single machine</h3>
+
+<p>To start Cassandra now we can use:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c"># Starting it as a standalone process</span>
+<span class="nv">$ </span>sudo sh ~/apache-cassandra-2.1.6/bin/cassandra
+</code></pre></div>
+<p>This will start it in the foreground. Lets quit this using <code>CTRL+C</code>. To make sure we don&#39;t have it running in the foreground we can add two additional parameters <code>nohup</code> (disable all the stdout output) and <code>&amp;</code> (push to background):</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>sudo nohup sh ~/apache-cassandra-2.1.6/bin/cassandra <span class="p">&amp;</span>
+<span class="c"># Output looks something like:</span>
+<span class="o">[</span>1<span class="o">]</span> 1642
+nohup: ignoring input and appending output to ‘nohup.out’
+</code></pre></div>
+<p>To stop it we first need to find out the process-id. We can do this using:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>ps aux <span class="p">|</span> grep cassandra
+root      <span class="m">1704</span> 36.5 29.8 <span class="m">1329036</span> <span class="m">1235776</span> pts/0 SLl  11:30   0:10 java -ea -javaagent:/home/fiordland/apache-cassandra-2.1.6/bin/../lib/jamm-0.3.0.jar -XX:+CMSClassUnloadingEnabled -XX:+UseThreadPriorities <span class="o">[</span>...<span class="o">]</span>
+</code></pre></div>
+<p>To kill this process use <code>sudo kill -9 &lt;PID&gt;</code> where the <PID> is 1704 in the example here.</p>
+
+<p>While it is still running, lets connect locally using the CLI (command line interface):</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c"># Starting the command-line-interface</span>
+<span class="nv">$ </span>sudo sh ~/apache-cassandra-2.1.6/bin/cassandra-cli
+Connected to: <span class="s2">&quot;Test Cluster&quot;</span> on 127.0.0.1/9160
+Welcome to Cassandra CLI version 2.1.6
+
+The CLI is deprecated and will be removed in Cassandra 2.2.  Consider migrating to cqlsh.
+</code></pre></div>
+<p>Since this is depreciated we&#39;ll move to the new interface. Exit the CLI using <code>exit;</code>. Now start the CQLSH using:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c"># Starting the cassandra-query-language shell</span>
+<span class="nv">$ </span>sudo sh ~/apache-cassandra-2.1.6/bin/cqlsh
+Connected to Test Cluster at 127.0.0.1:9042.
+<span class="o">[</span>cqlsh 5.0.1 <span class="p">|</span> Cassandra 2.1.6 <span class="p">|</span> CQL spec 3.2.0 <span class="p">|</span> Native protocol v3<span class="o">]</span>
+</code></pre></div><div class="highlight"><pre><code class="language-text" data-lang="text">cqlsh&gt; describe cluster;
+
+Cluster: Test Cluster
+Partitioner: Murmur3Partitioner
+
+cqlsh&gt; describe schema;
+
+cqlsh&gt; describe keyspaces;
+
+system_traces  system
+
+cqlsh&gt; describe tables;
+
+Keyspace system_traces
+----------------------
+events  sessions
+
+Keyspace system
+---------------
+peers             schema_triggers   batchlog                 local
+range_xfers       sstable_activity  size_estimates           hints
+schema_keyspaces  peer_events       compaction_history
+schema_columns    schema_usertypes  compactions_in_progress
+&quot;IndexInfo&quot;       paxos             schema_columnfamilies
+</code></pre></div>
+<h3>CQL - Cassandra Query Language?</h3>
+
+<ul>
+<li>http://www.planetcassandra.org/create-a-keyspace-and-table/</li>
+<li>http://docs.datastax.com/en/cql/3.0/cql/cql<em>reference/insert</em>r.html</li>
+<li>http://docs.datastax.com/en/cql/3.0/cql/cql_reference/cqlsh.html</li>
+</ul>
+
+<p>So there is nothing there. Lets quickly check out how to create a keyspace and tables and insert some data before moving on the setting up other nodes and initialising a cluster.</p>
+
+<p>Creating a keyspace with the name <code>demo</code>:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">cqlsh&gt; CREATE KEYSPACE demo WITH REPLICATION = { &#39;class&#39; : &#39;SimpleStrategy&#39;, &#39;replication_factor&#39; : 1 };
+
+cqlsh&gt; describe keyspaces;
+
+system_traces  system  demo
+</code></pre></div>
+<p>We can now use this keyspace and create some tables there</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">cqlsh&gt; use demo;
+cqlsh:demo&gt;
+</code></pre></div><div class="highlight"><pre><code class="language-text" data-lang="text">cqlsh&gt; CREATE TABLE users (
+firstname text,
+lastname text,
+age int,
+email text,
+city text,
+PRIMARY KEY (lastname));
+</code></pre></div><div class="highlight"><pre><code class="language-text" data-lang="text">cqlsh:demo&gt; describe schema
+
+CREATE KEYSPACE demo WITH replication = {&#39;class&#39;: &#39;SimpleStrategy&#39;, &#39;replication_factor&#39;: &#39;1&#39;}  AND durable_writes = true;
+
+CREATE TABLE demo.users (
+    lastname text PRIMARY KEY,
+    age int,
+    city text,
+    email text,
+    firstname text
+) WITH bloom_filter_fp_chance = 0.01
+    AND caching = &#39;{&quot;keys&quot;:&quot;ALL&quot;, &quot;rows_per_partition&quot;:&quot;NONE&quot;}&#39;
+    AND comment = &#39;&#39;
+    AND compaction = {&#39;min_threshold&#39;: &#39;4&#39;, &#39;class&#39;: &#39;org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy&#39;, &#39;max_threshold&#39;: &#39;32&#39;}
+    AND compression = {&#39;sstable_compression&#39;: &#39;org.apache.cassandra.io.compress.LZ4Compressor&#39;}
+    AND dclocal_read_repair_chance = 0.1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND read_repair_chance = 0.0
+    AND speculative_retry = &#39;99.0PERCENTILE&#39;;
+</code></pre></div>
+<p><a href="http://www.planetcassandra.org/insert-select-records/">Insert a record</a>. Please not that for this table the <code>lastname</code> is the primary-key, so we cannot have more than 1 person with the same lastname.</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">cqlsh&gt; INSERT INTO users (firstname, lastname, age, email, city) VALUES (&#39;John&#39;, &#39;Smith&#39;, 46, &#39;johnsmith@email.com&#39;, &#39;Sacramento&#39;);
+</code></pre></div>
+<h3>Setting up the Cluster</h3>
+
+<p>First thing we need to do is generate <code>tokens</code> for all machines in the cluster. Create a new python file to do this (following <a href="http://www.datastax.com/2012/01/how-to-set-up-and-monitor-a-multi-node-cassandra-cluster-on-linux">these</a> instructions):</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>nano apache-cassandra-2.1.6/tokens.py
+</code></pre></div>
+<p>Paste in the following python code <a href="http://stackoverflow.com/questions/22006186/cassandra-tokens-and-org-apache-cassandra-exceptions-configurationexception-fo">Note: Murmur3 codes</a>.</p>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="c">#! /usr/bin/python</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">num</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">num</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="nb">raw_input</span><span class="p">(</span><span class="s">&quot;How many nodes are in your cluster? &quot;</span><span class="p">))</span>
+<span class="c"># for i in range(0, num):</span>
+    <span class="c"># print &#39;token %d: %d&#39; % (i, (i*(2**127)/num))</span>
+<span class="k">print</span> <span class="p">[</span><span class="nb">str</span><span class="p">(((</span><span class="mi">2</span><span class="o">**</span><span class="mi">64</span> <span class="o">/</span> <span class="n">num</span><span class="p">)</span> <span class="o">*</span> <span class="n">i</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span><span class="o">**</span><span class="mi">63</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num</span><span class="p">)]</span>
+</code></pre></div>
+<p>Run it to generate X-number of tokens.</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>python apache-cassandra-2.1.6/tokens.py
+
+How many nodes are in your cluster? 2
+token 0: 0
+token 1: 4611686018427387904
+</code></pre></div>
+<p>Now we need to configure both machines so they recognize each other and there is one lead, or <code>seed</code> machine.</p>
+
+<p>On both machines open the cassandra configuration file using</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>nano apache-cassandra-2.1.6/conf/cassandra.yaml
+</code></pre></div>
+<p><strong>MACHINE 1 (IP: 172.16.0.223)</strong></p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">initial_token: 0
+
+- seeds: 172.16.0.223 # ip address of &#39;seed node&#39;
+
+listen_address: 172.16.0.223
+</code></pre></div>
+<p><strong>MACHINE 2 (IP: 172.16.0.221)</strong></p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">initial_token: 4611686018427387904
+
+- seed: 172.16.0.223
+
+listen_address: 172.16.0.221
+</code></pre></div>
+<p>Once you have saved both files. Start cassandra on both machines (maybe best to start machine 1 (seed-machine) first).</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>sudo nohup sh ~/apache-cassandra-2.1.6/bin/cassandra <span class="p">&amp;</span>
+</code></pre></div>
+<p>Check on both if the process is actually running and it did not error out somehow.</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>ps aux <span class="p">|</span> grep cassandra
+</code></pre></div>
+<p>On Machine-1 now run the following command to see if it has picked up the other node in its network.</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>./apache-cassandra-2.1.6/bin/nodetool status
+
+Datacenter: <span class="nv">datacenter1</span>
+<span class="o">=======================</span>
+<span class="nv">Status</span><span class="o">=</span>Up/Down
+<span class="p">|</span>/ <span class="nv">State</span><span class="o">=</span>Normal/Leaving/Joining/Moving
+--  Address       Load       Tokens  Owns    Host ID                               Rack
+UN  172.16.0.223  210.88 KB  <span class="m">256</span>     ?       329edf4b-89b0-4d0d-bbbb-dd5f1962e936  rack1
+UJ  172.16.0.221  46.81 KB   <span class="m">1</span>       ?       6071a3bf-6dc3-4667-807e-925c2649d3e9  rack1
+
+Note: Non-system keyspaces don<span class="err">&#39;</span>t have the same replication settings, effective ownership information is meaningless
+</code></pre></div>
+<h3>TO DO</h3>
+
+<p>To check if it is actually working... create a keyspace,table,insert on one and check on the other. (using the <code>cqlsh</code> cli)</p>
+
+<p>Notes on keyspaces and replication/networktopology: 
+http://docs.datastax.com/en/cassandra/1.2/cassandra/architecture/architectureDataDistributeReplication_c.html</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">CREATE KEYSPACE &quot;demoShared&quot; WITH REPLICATION = {&#39;class&#39; : &#39;NetworkTopologyStrategy&#39;, &#39;172.16.0.223&#39;: 2, &#39;172.16.0.221&#39;: 3};
+</code></pre></div>
+<h3>NOT DONE</h3>
+
+<ul>
+<li>SSL connection between databases? Connections are now plaintext? Or at least some default networking setting.</li>
+<li><a href="https://github.com/TargetHolding/pyspark-cassandra">PySpark-Cassandra Connector</a></li>
+<li><a href="https://github.com/datastax/python-driver">Python-Cassandra</a></li>
+</ul>
+
+<h3>Other</h3>
+
+<p>From the <a href="https://wiki.apache.org/cassandra/FAQ#gui">DOCs</a></p>
+
+<p>Is there a GUI admin tool for Cassandra?</p>
+
+<ul>
+<li>DataStax Opscenter, a management and monitoring tool for Cassandra with a web-based UI.</li>
+<li>Cassandra Cluster Admin, a PHP-based web UI.</li>
+<li>Toad for Cloud Databases, a desktop application and Eclipse plugin which support Cassandra.</li>
+<li>DBeaver, a desktop application, support Cassandra using JDBC driver.</li>
+</ul>
+
+                </article>
+
+                <!-- mathjax -->
+                
+                <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+                
+                
+                <!-- disqus comments -->
+             <!--
+             
+             <div id="disqus_thread"></div>
+                <script type="text/javascript">
+                        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+                        var disqus_shortname = 'karpathyblog'; // required: replace example with your forum shortname
+
+                        /* * * DON'T EDIT BELOW THIS LINE * * */
+                        (function() {
+                                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                        })();
+                </script>
+                <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+                
+                -->
+                
+            </div>
+        </div>
+        </div>
+
+        <footer class="site-footer">
+
+  <!-- <div class="wrap">
+
+    <h2 class="footer-heading">luckylwk</h2>
+
+    <div class="footer-col-1 column">
+      <ul>
+        <li>luckylwk</li>
+        <li><a href="mailto:"></a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col-2 column">
+      <ul>
+        <li>
+          <a href="https://github.com/luckylwk">
+            <span class="icon github">
+              <svg version="1.1" class="github-icon-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                 viewBox="0 0 16 16" enable-background="new 0 0 16 16" xml:space="preserve">
+                <path fill-rule="evenodd" clip-rule="evenodd" fill="#C2C2C2" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761
+                c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32
+                c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472
+                c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037
+                C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65
+                c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261
+                c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082
+                c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129
+                c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/>
+              </svg>
+            </span>
+            <span class="username">luckylwk</span>
+          </a>
+        </li>
+        <li>
+          <a href="https://twitter.com/luckylwk">
+            <span class="icon twitter">
+              <svg version="1.1" class="twitter-icon-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                 viewBox="0 0 16 16" enable-background="new 0 0 16 16" xml:space="preserve">
+                <path fill="#C2C2C2" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809
+                c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27
+                c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767
+                c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206
+                C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271
+                c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469
+                c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/>
+              </svg>
+            </span>
+            <span class="username">luckylwk</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="footer-col-3 column">
+      <p class="text">Some thoughts and writeups.</p>
+    </div>
+
+  </div> -->
+
+</footer>
+
+
+    </body>
+</html>

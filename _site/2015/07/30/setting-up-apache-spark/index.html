@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html>
+
+        <head>
+        
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        
+        <title>Setting up Apache Spark and IPython</title>
+        
+        <meta name="viewport" content="width=device-width">
+        <meta name="description" content="Some thoughts and writeups.">
+        
+        <link href='//fonts.googleapis.com/css?family=Hind:300,400,500,600' rel='stylesheet' type='text/css'>
+        <!-- <link href='//fonts.googleapis.com/css?family=Lato:300,400,700' rel='stylesheet' type='text/css'> -->
+
+        <link rel="canonical" href="http://luckylwk.github.io/2015/07/30/setting-up-apache-spark/">
+
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="/css/main.css">
+
+    </head>
+
+
+    <body>
+
+                <header class="site-header">
+
+            <div class="left">
+                <span class="name">LUCKYLWK</span>
+            </div>
+
+            <div class="right">
+                <img src="/assets/icon_linkedin.png" height="30" class="icon">
+                <a href="https://twitter.com/luckylwk" target="_blank" style="line-height:1em;">
+                    <img src="/assets/icon_twitter.png" height="30" class="icon">
+                </a>
+                <a href="https://github.com/luckylwk" target="_blank" style="line-height:1em;">
+                    <img src="/assets/icon_github.png" height="30" class="icon">
+                </a>
+            </div>
+            <div class="clear"></div>
+
+        </header>
+
+
+        <div class="page-content">
+                    <div class="wrap">
+            <div class="post">
+
+                <header class="post-header">
+                    <h1>Setting up Apache Spark and IPython</h1>
+                    <p class="meta">Jul 30, 2015</p>
+                </header>
+
+                <article class="post-content">
+                <h3>Installing Spark/pySpark</h3>
+
+<p>To ensure that all the setup work can easily be replicated in a cloud-environment I have chosen to set everything up inside a Virtual Machine. For this we use <a href="https://www.vagrantup.com/">Vagrant</a> and <a href="https://www.virtualbox.org/">VirtualBox</a>. In this post I will not go into too much detail on how both of these work or how they can be configured. I recommend you read some of the <strong>Vagrant</strong> documentation to learn more about how to, for example, assign more RAM or shared folders with your host machine.</p>
+
+<h3>Setting up a Virtual Machine using Vagrant</h3>
+
+<p>Create a new folder on your machine that will be the home of your Vagrant file. Once the folder has been created cd into it and initialize a vagrant virtual machine. In this case I have chosen for a standard Ubuntu 14.04 distribution.</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>mkdir vagrant-spark
+<span class="nv">$ </span><span class="nb">cd </span>vagrant-spark/
+
+<span class="nv">$ </span>vagrant init ubuntu/trusty64
+</code></pre></div>
+<p>The <code>Vagrantfile</code> has been created and can now be edited to change any configurations is you want to. We are going to change two small things in the <code>Vagrantfile</code> to ensure the rest of these notes will work. Open the Vagrantfile in a text editor, delete everything and paste in the following:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text"># -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+
+  config.vm.box = &quot;ubuntu/trusty64&quot;
+
+  # To share a folder on your drive add the following:
+  # config.vm.synced_folder &quot;&lt;SYSTEM-PATH TO YOUR FOLDER&gt;&quot;, &quot;/home/vagrant/shared&quot;
+
+  config.vm.provider &quot;virtualbox&quot; do |vb|
+      # Customize the amount of memory on the VM:
+      vb.memory = &quot;2048&quot;
+  end
+
+  # Create a forwarded port mapping which allows access to a specific port
+  # within the machine from a port on the host machine. In the example below,
+  # accessing &quot;localhost:8080&quot; will access port 80 on the guest machine.
+  # config.vm.network &quot;forwarded_port&quot;, guest: 80, host: 8080
+
+  # Port forwarding for the IPython port
+  config.vm.network &quot;forwarded_port&quot;, guest: 8001, host: 8001
+
+  # Spark port forwarding
+  config.vm.network &quot;forwarded_port&quot;, guest: 8080, host: 8080
+  config.vm.network &quot;forwarded_port&quot;, guest: 4040, host: 4040
+
+end
+</code></pre></div>
+<p>To now start the VM we can use the command</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>vagrant up --provider<span class="o">=</span>virtualbox
+</code></pre></div>
+<p>This will bring up the VM. To stop it when you want to you can use the <code>vagrant halt</code> command. For now, obviously, we will need to keep it up to make sure we can start setting it up and install Spark.</p>
+
+<p>To do this we will need to work from within the VM itself, so now SSH in to the machine using</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>vagrant ssh
+</code></pre></div>
+<h3>Setting up (VM) Ubuntu</h3>
+
+<p>Install some basic things for Ubuntu to make sure some Python libraries will work.</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>sudo apt-get install git htop python-dev build-essential libatlas-base-dev gfortran libevent-dev libpng-dev libjpeg8-dev libfreetype6-dev
+</code></pre></div>
+<h3>Install Java</h3>
+
+<p>Make sure to install Java on the machine to enable Spark.</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>sudo apt-add-repository ppa:webupd8team/java
+<span class="nv">$ </span>sudo apt-get update
+<span class="nv">$ </span>sudo apt-get install oracle-java7-installer
+
+<span class="nv">$ </span>java -version
+</code></pre></div>
+<h3>Install Scala (Optional)</h3>
+
+<p>Some of Spark&#39;s options are not available yet to be accessed and used through Python (e.g., GraphX and some MLLib modules), so we&#39;ll install Scala as well so we can work with those features at a later stage.</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c"># Download the Scala tarball.</span>
+<span class="nv">$ </span>wget http://www.scala-lang.org/files/archive/scala-2.11.6.tgz
+
+<span class="c"># Create a new folder to place the scala-installation in.</span>
+<span class="nv">$ </span>sudo mkdir /usr/local/src/scala
+
+<span class="c"># Extract the contents into the newly created directory.</span>
+<span class="nv">$ </span>sudo tar xvf scala-2.11.6.tgz -C /usr/local/src/scala/
+
+<span class="c"># Remove the tarball</span>
+<span class="nv">$ </span>rm scala-2.11.6.tgz
+</code></pre></div>
+<p>Open your bash-profile using <code>nano ~/.bash_profile</code> and add the following two lines:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c"># Scala environment variable and path.</span>
+<span class="nb">export </span><span class="nv">SCALA_HOME</span><span class="o">=</span>/usr/local/src/scala/scala-2.11.6
+<span class="nb">export </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$SCALA_HOME</span>/bin:<span class="nv">$PATH</span>
+</code></pre></div>
+<h3>Download and Install Apache Spark</h3>
+
+<p>First download and extract the Spark tarball.</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">cd</span> <span class="nv">$HOME</span>
+
+<span class="c"># Download the pre-built Spark tarball.</span>
+<span class="nv">$ </span>wget http://mirror.ox.ac.uk/sites/rsync.apache.org/spark/spark-1.4.0/spark-1.4.0-bin-hadoop2.6.tgz 
+
+<span class="c"># Extract the contents to your HOME folder.</span>
+<span class="nv">$ </span>tar -xvf spark-1.4.0-bin-hadoop2.6.tgz
+
+<span class="c"># Remove the tarball.</span>
+<span class="nv">$ </span>rm spark-1.4.0-bin-hadoop2.6.tgz
+</code></pre></div>
+<p>Since this is a pre-built version we should be able to run it out-of-the-box now.</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">cd </span>spark-1.4.0-bin-hadoop2.6
+<span class="nv">$ </span>./bin/run-example SparkPi 10
+</code></pre></div>
+<p>This should give you some output like:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">Using Spark&#39;s default log4j profile: org/apache/spark/log4j-defaults.properties
+15/08/21 10:52:56 INFO SparkContext: Running Spark version 1.4.0
+...
+15/08/21 10:53:02 INFO Executor: Finished task 0.0 in stage 0.0 (TID 0). 736 bytes result sent to driver
+15/08/21 10:53:02 INFO TaskSetManager: Starting task 1.0 in stage 0.0 (TID 1, localhost, PROCESS_LOCAL, 1446 bytes)
+15/08/21 10:53:02 INFO Executor: Running task 1.0 in stage 0.0 (TID 1)
+15/08/21 10:53:02 INFO TaskSetManager: Finished task 0.0 in stage 0.0 (TID 0) in 953 ms on localhost (1/10)
+15/08/21 10:53:03 INFO Executor: Finished task 1.0 in stage 0.0 (TID 1). 736 bytes result sent to driver
+...
+15/08/21 10:53:03 INFO Executor: Running task 9.0 in stage 0.0 (TID 9)
+15/08/21 10:53:03 INFO Executor: Finished task 9.0 in stage 0.0 (TID 9). 736 bytes result sent to driver
+15/08/21 10:53:03 INFO TaskSetManager: Finished task 9.0 in stage 0.0 (TID 9) in 16 ms on localhost (10/10)
+15/08/21 10:53:03 INFO DAGScheduler: ResultStage 0 (reduce at SparkPi.scala:35) finished in 1.457 s
+15/08/21 10:53:03 INFO TaskSchedulerImpl: Removed TaskSet 0.0, whose tasks have all completed, from pool
+15/08/21 10:53:03 INFO DAGScheduler: Job 0 finished: reduce at SparkPi.scala:35, took 1.991463 s
+</code></pre></div>
+<p>Assuming you got the output like the above your Spark configuration is working and we are ready to get going with Spark.</p>
+
+<p>Before we continue to configure PySpark, Python and IPython we will add some environment variables to our system that tell it where Spark is installed and what its default configuration is.</p>
+
+<p>Open your bash-profile using <code>nano ~/.bash_profile</code> and add the following two lines:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c"># Set the Spark Home as an environment variable.</span>
+<span class="nb">export </span><span class="nv">SPARK_HOME</span><span class="o">=</span><span class="s2">&quot;$HOME/spark-1.4.0-bin-hadoop2.6&quot;</span>
+
+<span class="c"># Define your Spark arguments for when running Spark.</span>
+<span class="nb">export </span><span class="nv">PYSPARK_SUBMIT_ARGS</span><span class="o">=</span><span class="s2">&quot;--master local[2]&quot;</span>
+</code></pre></div>
+<h3>PySpark - Shell</h3>
+
+<p>Now that we have Spark working we can use Python to actually give it our instructions. Spark comes with a <code>pySpark</code> shell that we can use for that. Launch the shell using:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>./bin/pyspark
+</code></pre></div><div class="highlight"><pre><code class="language-text" data-lang="text">Python 2.7.6 (default, Mar 22 2014, 22:59:56)
+[GCC 4.8.2] on linux2
+Type &quot;help&quot;, &quot;copyright&quot;, &quot;credits&quot; or &quot;license&quot; for more information.
+...
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  &#39;_/
+   /__ / .__/\_,_/_/ /_/\_\   version 1.4.0
+      /_/
+
+Using Python version 2.7.6 (default, Mar 22 2014 22:59:56)
+SparkContext available as sc, HiveContext available as sqlContext.
+&gt;&gt;&gt; 
+</code></pre></div>
+<p>This brings you into the pySpark. You can now use python to use Spark. It has already created a <code>SparkContext</code> to work with/from.</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">&gt;&gt;&gt; sc
+&lt;pyspark.context.SparkContext object at 0x7f05502a1750&gt;
+</code></pre></div><div class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>
+<span class="n">dataRDD</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">parallelize</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</code></pre></div><div class="highlight"><pre><code class="language-bash" data-lang="bash">&gt;&gt;&gt; dataRDD
+ParallelCollectionRDD<span class="o">[</span>0<span class="o">]</span> at parallelize at PythonRDD.scala:396
+</code></pre></div>
+<h3>PySpark - IPython Configuration</h3>
+
+<p>First install <code>virtualenv</code> to allow us to work in a virtual environment.</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c"># Install pip, the python package manager.</span>
+<span class="nv">$ </span>sudo apt-get install python-pip
+
+<span class="c"># Install virtualenv</span>
+<span class="nv">$ </span>sudo pip install virtualenv
+
+<span class="c"># Create a virtual environment.</span>
+<span class="nv">$ </span>virtualenv pyEnv
+</code></pre></div>
+<p>Now we will activate this environment so that we can install our Python libraries inside the virtual environment.</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">source </span>pyEnv/bin/activate
+</code></pre></div>
+<p>Now we can install <code>IPython</code> within the virtual environment <code>pyEnv</code>. To install use the following command.</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>sudo pip install <span class="s2">&quot;ipython[notebook]&quot;</span>
+</code></pre></div>
+<p>We now have IPython installed within our virtual environment. The next thing is to configure IPython such that it runs with a pySpark kernel and we can actually start using Spark from within IPython. We are going to attempt doing this by creating an IPython profile specifically for Spark.</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c"># Create a new IPython profile.</span>
+<span class="nv">$ </span>ipython profile create pyspark
+</code></pre></div>
+<p>Now that we have created the actual <code>pyspark</code> profile for IPython we will need to configure it. Most of the configurations can be done in the file <code>ipython_notebook_config.py</code>. Open this file (I am using <code>nano</code> for the editing):</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>nano ~/.ipython/profile_pyspark/ipython_notebook_config.py
+</code></pre></div>
+<p>It will have a long list of comments and configuration lines that are most likely commented out. We are going to change 3 specific configuration elements. The first we will change is the broadcasting ip-address. We will tell it to broadcast on any IP-address (mind: this is not secure for production environments!). To do this add the following line:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text"># c.NotebookApp.ip = &#39;localhost&#39;
+c.NotebookApp.ip = &#39;*&#39;
+</code></pre></div>
+<p>Since we are working on a (virtual) server we don&#39;t want IPython to open a browser as its default setting. To disable this add the following line:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text"># c.NotebookApp.open_browser = True
+c.NotebookApp.open_browser = False
+</code></pre></div>
+<p>IPython has a default port it is always opening up for connection. We have chosen to use a different port. You can change this by adding the following line:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text"># c.NotebookApp.port = 8888
+c.NotebookApp.port = 8001
+</code></pre></div>
+<p>Please mind, the above setting means that you have to have added port-forwarding to your <code>Vagrantfile</code> (we did in the beginning of this post). Your local system will actually need a port to forward to the IPython port to be able to see the notebooks.</p>
+
+<p>The configuration of IPython is now done, but we need to make sure it actually creates a <code>SparkContext</code> on startup. We can do this by changing the IPython profile&#39;s setup file: <code>00-pyspark-setup.py</code>. Open this file in a text-editor:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>nano ~/.ipython/profile_pyspark/startup/00-pyspark-setup.py
+</code></pre></div>
+<p>and paste the following Python script and save the contents afterwards.</p>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="c"># Configure the necessary Spark environment</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="c"># Set the spark_home variable</span>
+<span class="n">SPARKHOME</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;SPARK_HOME&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">SPARKHOME</span> <span class="o">+</span> <span class="s">&quot;/python&quot;</span><span class="p">)</span>
+
+<span class="c"># Add the py4j to the path.</span>
+<span class="c"># You may need to change the version number to match your install</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">SPARKHOME</span><span class="p">,</span> <span class="s">&#39;python/lib/py4j-0.8.2.1-src.zip&#39;</span><span class="p">))</span>
+
+<span class="c"># Initialize PySpark to predefine the SparkContext variable &#39;sc&#39;</span>
+<span class="nb">execfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">SPARKHOME</span><span class="p">,</span> <span class="s">&#39;python/pyspark/shell.py&#39;</span><span class="p">))</span>
+</code></pre></div>
+<p>To start IPython and have it use Spark we need to use quite a large command, so we&#39;ll create an alias for this in our <code>.bash_profile</code>. Open your bash-profile using <code>nano ~/.bash_profile</code> and add the following two lines:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c"># IPython alias for the use with SPARK.</span>
+<span class="nb">alias </span><span class="nv">IPYSPARK</span><span class="o">=</span><span class="s1">&#39;PYSPARK_DRIVER_PYTHON=ipython PYSPARK_DRIVER_PYTHON_OPTS=&quot;notebook --profile=pyspark --ip=0.0.0.0&quot; $SPARK_HOME/bin/pyspark&#39;</span>
+</code></pre></div>
+<p>After saving and closing make sure to reload the profile using <code>source ~/.bash_profile</code> so that all changes have taken effect. Now we can start IPython (using the Spark shell) using the just created alias:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">cd</span> <span class="nv">$HOME</span>
+<span class="nv">$ </span>IPYSPARK
+</code></pre></div>
+<p>Now, on your local machine, open your webbrowser and navigate to <code>localhost:8001</code> and it should show the IPython notebook server. You are now good to go!</p>
+
+<p>Some useful links:</p>
+
+<ul>
+<li>https://spark.apache.org/documentation.html</li>
+<li>https://spark.apache.org/docs/latest/programming-guide.html</li>
+<li>https://spark.apache.org/docs/latest/api/python/index.html</li>
+<li>http://blog.cloudera.com/blog/2014/08/how-to-use-ipython-notebook-with-apache-spark/</li>
+<li>http://ramhiser.com/2015/02/01/configuring-ipython-notebook-support-for-pyspark/</li>
+<li>http://ipython.org/ipython-doc/1/interactive/public_server.html</li>
+<li>https://docs.prediction.io/datacollection/analytics-ipynb/</li>
+<li>Scala &amp; IPython (not working yet): https://github.com/alexarchambault/jupyter-scala</li>
+<li>Scala &amp; IPython (not working yet): https://github.com/hohonuuli/sparknotebook</li>
+</ul>
+
+                </article>
+
+                <!-- mathjax -->
+                
+                <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+                
+                
+                <!-- disqus comments -->
+             <!--
+             
+             <div id="disqus_thread"></div>
+                <script type="text/javascript">
+                        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+                        var disqus_shortname = 'karpathyblog'; // required: replace example with your forum shortname
+
+                        /* * * DON'T EDIT BELOW THIS LINE * * */
+                        (function() {
+                                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                        })();
+                </script>
+                <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+                
+                -->
+                
+            </div>
+        </div>
+        </div>
+
+        <footer class="site-footer">
+
+  <!-- <div class="wrap">
+
+    <h2 class="footer-heading">luckylwk</h2>
+
+    <div class="footer-col-1 column">
+      <ul>
+        <li>luckylwk</li>
+        <li><a href="mailto:"></a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col-2 column">
+      <ul>
+        <li>
+          <a href="https://github.com/luckylwk">
+            <span class="icon github">
+              <svg version="1.1" class="github-icon-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                 viewBox="0 0 16 16" enable-background="new 0 0 16 16" xml:space="preserve">
+                <path fill-rule="evenodd" clip-rule="evenodd" fill="#C2C2C2" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761
+                c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32
+                c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472
+                c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037
+                C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65
+                c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261
+                c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082
+                c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129
+                c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/>
+              </svg>
+            </span>
+            <span class="username">luckylwk</span>
+          </a>
+        </li>
+        <li>
+          <a href="https://twitter.com/luckylwk">
+            <span class="icon twitter">
+              <svg version="1.1" class="twitter-icon-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                 viewBox="0 0 16 16" enable-background="new 0 0 16 16" xml:space="preserve">
+                <path fill="#C2C2C2" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809
+                c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27
+                c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767
+                c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206
+                C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271
+                c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469
+                c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/>
+              </svg>
+            </span>
+            <span class="username">luckylwk</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="footer-col-3 column">
+      <p class="text">Some thoughts and writeups.</p>
+    </div>
+
+  </div> -->
+
+</footer>
+
+
+    </body>
+</html>

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html>
+
+        <head>
+        
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        
+        <title>Setting up an Apache Spark Cluster</title>
+        
+        <meta name="viewport" content="width=device-width">
+        <meta name="description" content="Some thoughts and writeups.">
+        
+        <link href='//fonts.googleapis.com/css?family=Hind:300,400,500,600' rel='stylesheet' type='text/css'>
+        <!-- <link href='//fonts.googleapis.com/css?family=Lato:300,400,700' rel='stylesheet' type='text/css'> -->
+
+        <link rel="canonical" href="http://luckylwk.github.io/2015/08/21/setting-up-apache-spark-cluster/">
+
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="/css/main.css">
+
+    </head>
+
+
+    <body>
+
+                <header class="site-header">
+
+            <div class="left">
+                <span class="name">LUCKYLWK</span>
+            </div>
+
+            <div class="right">
+                <img src="/assets/icon_linkedin.png" height="30" class="icon">
+                <a href="https://twitter.com/luckylwk" target="_blank" style="line-height:1em;">
+                    <img src="/assets/icon_twitter.png" height="30" class="icon">
+                </a>
+                <a href="https://github.com/luckylwk" target="_blank" style="line-height:1em;">
+                    <img src="/assets/icon_github.png" height="30" class="icon">
+                </a>
+            </div>
+            <div class="clear"></div>
+
+        </header>
+
+
+        <div class="page-content">
+                    <div class="wrap">
+            <div class="post">
+
+                <header class="post-header">
+                    <h1>Setting up an Apache Spark Cluster</h1>
+                    <p class="meta">Aug 21, 2015</p>
+                </header>
+
+                <article class="post-content">
+                <h3>Installing Spark/pySpark</h3>
+
+<p>We will not deal with the actual setup of Spark and IPython on each machine in this post. To get that done you can follow the <a href="http://luckylwk.github.io/2015/07/30/setting-up-apache-spark/">instructions in this blog-post</a></p>
+
+<h3>Configuring the Spark Cluster Manager</h3>
+
+<p>The first thing we will need is for the <strong>manager</strong> machine to be able to SSH into the <strong>worker</strong> machines. To do this we need to create an SSH-keypair.</p>
+
+<h5>1. Create SSH Keypair</h5>
+
+<p>Create an <a href="https://golog.co/blog/article/SSH_-_Creating_and_using_SSH-keys">SSH-keypair</a> using the following commands:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c"># Move into the .ssh folder</span>
+<span class="nv">$ </span><span class="nb">cd</span> ~/.ssh
+
+<span class="c"># Create a keypair.</span>
+<span class="nv">$ </span>ssh-keygen -t rsa
+</code></pre></div>
+<p>When asked for a name, name it something appropriate, like: <code>sparkManagerKey</code></p>
+
+<h5>2. Worker Shortcuts</h5>
+
+<p>Open the SSH config file using <code>nano ~/.ssh/config</code> and paste the following configuration settings for the penguins:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">Host worker.one
+        HostName XXX.XXX.XXX.XXX
+        Port 22
+        User &lt;USERNAME HERE&gt;
+        IdentityFile ~/.ssh/sparkManagerKey
+
+Host worker.two
+        HostName XXX.XXX.XXX.XXX
+        Port 22
+        User &lt;USERNAME HERE&gt;
+        IdentityFile ~/.ssh/sparkManagerKey   
+</code></pre></div>
+<p>The benefit of doing this is that you can now refer to the worker machines using their given names. So if you want to SSH into one of the machines from your manager machine all you need to do is <code>ssh worker.one</code>. However, this will not work now as the worker machine does not accept any incoming SSH-connections from this machine yet. We&#39;ll deal with this in a second, first we&#39;ll finish setting up the manager machine.</p>
+
+<h5>3. Configure the Spark Manager</h5>
+
+<p>Now we will need to configure the <strong>manager</strong> machine to know about its <strong>workers</strong>. Navigate into the spark installation folder and then go to the conf-directory (<code>cd $SPARK_HOME/conf</code>). There are a number of files present here with the extension <code>.template</code>. To look at the contents of the directory:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>ls -la
+
+drwxr-xr-x  <span class="m">2</span> spark.manager spark.manager <span class="m">4096</span> Jun <span class="m">19</span> 17:06 .
+drwxr-xr-x <span class="m">13</span> spark.manager spark.manager <span class="m">4096</span> Jun <span class="m">19</span> 17:06 ..
+-rw-r--r--  <span class="m">1</span> spark.manager spark.manager  <span class="m">202</span> Jun  <span class="m">3</span> 02:30 docker.properties.template
+-rw-r--r--  <span class="m">1</span> spark.manager spark.manager  <span class="m">303</span> Jun  <span class="m">3</span> 02:30 fairscheduler.xml.template
+-rw-r--r--  <span class="m">1</span> spark.manager spark.manager  <span class="m">632</span> Jun  <span class="m">3</span> 02:30 log4j.properties.template
+-rw-r--r--  <span class="m">1</span> spark.manager spark.manager <span class="m">5565</span> Jun  <span class="m">3</span> 02:30 metrics.properties.template
+-rw-r--r--  <span class="m">1</span> spark.manager spark.manager   <span class="m">80</span> Jun  <span class="m">3</span> 02:30 slaves.template
+-rw-r--r--  <span class="m">1</span> spark.manager spark.manager  <span class="m">507</span> Jun  <span class="m">3</span> 02:30 spark-defaults.conf.template
+-rwxr-xr-x  <span class="m">1</span> spark.manager spark.manager <span class="m">3318</span> Jun  <span class="m">3</span> 02:30 spark-env.sh.template
+</code></pre></div>
+<p>We&#39;ll copy the one named <code>slaves.template</code> and configure the workers there.</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>cp slaves.template slaves
+
+<span class="nv">$ </span>nano slaves
+</code></pre></div>
+<p>When opened paste the following configuration.</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c"># Slaves file.</span>
+worker.one
+worker.two
+</code></pre></div>
+<p>Here you can see how nice it is to have &#39;shortcut&#39; names for the workers. If we every want to change something about their configuration we only need to change the SSH config file and Spark will know instantly.</p>
+
+<p>Next copy the <strong>manager</strong> <code>spark-env.sh</code> file and open it using </p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>cp spark-env.sh.template spark-env.sh
+
+<span class="nv">$ </span>nano spark-env.sh
+</code></pre></div>
+<p>In this file there are a lot of configuration parameters that can be set. We only need a few for this specific occasion. Set the following parameters and make sure to replace <code>&lt;MANAGER_IP_ADDRESS&gt;</code> with the IP-address of your Spark <strong>manager</strong> machine:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">SPARK_LOCAL_IP</span><span class="o">=</span>&lt;MANAGER_IP_ADDRESS&gt;
+<span class="nv">SPARK_MASTER_IP</span><span class="o">=</span>&lt;MANAGER_IP_ADDRESS&gt;
+<span class="nv">SPARK_WORKER_CORES</span><span class="o">=</span>1
+<span class="nv">SPARK_WORKER_MEMORY</span><span class="o">=</span>1000m
+</code></pre></div>
+<p>Note: The IP-address used here is the IP-address of the <strong>manager</strong> (or master) machine.</p>
+
+<p>The last thing to do on the <strong>manager</strong> machine is changing the IPython startup command slightly. When starting IPython/Spark as the <strong>master/manager</strong>, the command is slightly different as we have to tell it that we are running it as a manager and not a standalone instance. Open up the <code>.bash_profile</code>:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>nano ~/.bash_profile
+</code></pre></div>
+<p>and add the following line to it:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nb">alias </span><span class="nv">IPYSPARKMASTER</span><span class="o">=</span><span class="s1">&#39;MASTER=spark://&lt;MANAGER_IP_ADDRESS&gt;:7077 PYSPARK_DRIVER_PYTHON=ipython PYSPARK_DRIVER_PYTHON_OPTS=&quot;notebook --profile=pyspark --ip=0.0.0.0&quot; $SPARK_HOME/bin/pyspark&#39;</span>
+</code></pre></div>
+<p>Note: here again we are using the IP address of the <strong>master/manager</strong> where it states <code>&lt;MANAGER_IP_ADDRESS&gt;</code>.</p>
+
+<p>Therefore rather than typing <code>IPYSPARK</code> (because this is the shortcut in the bash profile), we can later on start IPython in Spark-cluster mode using <code>IPYSPARKMASTER</code>.</p>
+
+<p>These were all the configurations that need to be setup for the <strong>master/manager</strong>. We now need to configure the <strong>workers</strong> so they know what their role is and who is managing them.</p>
+
+<h3>Configuring Spark Workers</h3>
+
+<p>The following instructions will deal with setting up the <strong>worker</strong> machines. Note that its best to complete the above instructions before setting up the workers as you will need bits and pieces from the above here.</p>
+
+<h5>1. Add the Manager&#39;s SSH-Keypair</h5>
+
+<p>For the <strong>manager</strong> machine to be able to SSH into the <strong>worker</strong> machine the worker needs to first have its SSH key listed as an authorized key.</p>
+
+<p>On the <strong>manager</strong> machine print the contents of the public key using</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>cat ~/.ssh/sparkManagerKey.pub
+</code></pre></div>
+<p>Copy the contents and, on the <strong>worker</strong> machine open the <code>authorized_keys</code> file in a text-editor</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>nano ~/.ssh/authorized_keys
+</code></pre></div>
+<p>Paste in the contents of the public-key you just copied on a new line and save-and-close the file.</p>
+
+<p>Now your <strong>worker</strong> machine will accept SSH connections from the <strong>manager</strong> machine. You can try this by trying to connect from the manager machine using <code>ssh worker.one</code>.</p>
+
+<h5>2. Create an alias for the Manager Machine</h5>
+
+<p>Add the IP address of the <strong>manager</strong> machine to the <code>.bash_profile</code> file</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>nano ~/.bash_profile
+</code></pre></div>
+<p>and paste in the following</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c"># paste in the following:</span>
+<span class="nb">alias </span><span class="nv">SPARK_MANAGER_IP</span><span class="o">=</span><span class="s1">&#39;&lt;MANAGER_IP_ADDRESS&gt;&#39;</span>
+</code></pre></div>
+<p>Note: here again we are using the IP address of the <strong>master/manager</strong> where it states <code>&lt;MANAGER_IP_ADDRESS&gt;</code>.</p>
+
+<h5>3. Configuring the Spark Worker</h5>
+
+<p>On the <strong>worker</strong> machine navigate into the Spark configuration folder (<code>cd $SPARK_HOME/conf</code>).</p>
+
+<p>Just like with the <strong>manager</strong> machine we need to configure the Spark environment for this <strong>worker</strong> machine. Copy the <code>spark-env.sh</code> and open it using a text-editor</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>cp spark-env.sh.template spark-env.sh
+
+<span class="nv">$ </span>nano spark-env.sh
+</code></pre></div>
+<p>Now we need to add some configurations to this file so the <strong>worker</strong> machine knows about who to report to. Add the following lines</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">SPARK_MASTER_IP</span><span class="o">=</span>SPARK_MANAGER_IP 
+<span class="nv">SPARK_WORKER_CORES</span><span class="o">=</span>1
+<span class="nv">SPARK_WORKER_MEMORY</span><span class="o">=</span>1000m
+</code></pre></div>
+<p>Note: the <code>SPARK_MANAGER_IP</code> alias was added before in the <code>~/.bash_profile</code>.</p>
+
+<h5>4. Spark Worker Path</h5>
+
+<p>Since we are working from a <strong>Vagrant</strong> virtual machine this is where we run into a complication. The workers have a Spark installation similar to <code>/home/&lt;MACHINE_NAME&gt;/spark_installation</code>. However the <strong>manager</strong> machine is SSH-ing in as vagrant (or some other username) and is looking for <code>home/vagrant/spark_installation</code>. To work around this we will create a symbolic link inside the <strong>worker</strong> machine that reflects the <strong>manager</strong> machine&#39;s login and points to the actual installation path. So, in the workers create symbolic links for whatever the manager will do. </p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>sudo mkdir /home/&lt;MANAGER_NAME&gt;
+
+<span class="nv">$ </span>sudo ln -s /home/&lt;WORKER_NAME&gt;/spark-1.4.0-bin-hadoop2.6/ /home/&lt;MANAGER_NAME&gt;/spark-1.4.0-bin-hadoop2.6
+</code></pre></div>
+<p>Note: in a production environment, make sure the same user is configured in all machines (this is the problem here)?</p>
+
+<h3>Start the Cluster and use IPython</h3>
+
+<p>To run the cluster we need to go to the <strong>manager</strong> machine and run the following command from within the Spark folder <code>$SPARK_HOME</code>.</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c"># Start the master and worker...</span>
+<span class="nv">$ </span>.sbin/start-all.sh
+</code></pre></div>
+<p>Now to start IPython we will want to nagivate to the folder we will want to start it from.</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c"># Navigate to the HOME folder...</span>
+<span class="nv">$ </span><span class="nb">cd</span> <span class="nv">$HOME</span>
+
+<span class="c"># Start IPython.</span>
+<span class="nv">$ </span>IPYSPARKMASTER
+</code></pre></div>
+<ol>
+<li>go to <code>http://&lt;master_ip_address or 127.0.0.1&gt;:8001/tree</code> for pynotebooks</li>
+<li>go to <code>http://&lt;master_ip_address or 127.0.0.1&gt;:8080</code> for overview GUI (starts working after start all)</li>
+<li>go to <code>http://&lt;master_ip_address or 127.0.0.1&gt;:4040</code> to see jobs (starts working after the python kernel has started up)</li>
+</ol>
+
+<p>When finished, quit the notebook and don&#39;t forget to stop all the services using: </p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">cd</span> <span class="nv">$SPARK_HOME</span>
+
+<span class="nv">$ </span>.sbin/stop-all.sh
+</code></pre></div>
+                </article>
+
+                <!-- mathjax -->
+                
+                <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+                
+                
+                <!-- disqus comments -->
+             <!--
+             
+             <div id="disqus_thread"></div>
+                <script type="text/javascript">
+                        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+                        var disqus_shortname = 'karpathyblog'; // required: replace example with your forum shortname
+
+                        /* * * DON'T EDIT BELOW THIS LINE * * */
+                        (function() {
+                                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                        })();
+                </script>
+                <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+                
+                -->
+                
+            </div>
+        </div>
+        </div>
+
+        <footer class="site-footer">
+
+  <!-- <div class="wrap">
+
+    <h2 class="footer-heading">luckylwk</h2>
+
+    <div class="footer-col-1 column">
+      <ul>
+        <li>luckylwk</li>
+        <li><a href="mailto:"></a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col-2 column">
+      <ul>
+        <li>
+          <a href="https://github.com/luckylwk">
+            <span class="icon github">
+              <svg version="1.1" class="github-icon-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                 viewBox="0 0 16 16" enable-background="new 0 0 16 16" xml:space="preserve">
+                <path fill-rule="evenodd" clip-rule="evenodd" fill="#C2C2C2" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761
+                c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32
+                c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472
+                c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037
+                C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65
+                c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261
+                c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082
+                c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129
+                c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/>
+              </svg>
+            </span>
+            <span class="username">luckylwk</span>
+          </a>
+        </li>
+        <li>
+          <a href="https://twitter.com/luckylwk">
+            <span class="icon twitter">
+              <svg version="1.1" class="twitter-icon-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                 viewBox="0 0 16 16" enable-background="new 0 0 16 16" xml:space="preserve">
+                <path fill="#C2C2C2" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809
+                c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27
+                c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767
+                c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206
+                C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271
+                c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469
+                c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/>
+              </svg>
+            </span>
+            <span class="username">luckylwk</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="footer-col-3 column">
+      <p class="text">Some thoughts and writeups.</p>
+    </div>
+
+  </div> -->
+
+</footer>
+
+
+    </body>
+</html>
