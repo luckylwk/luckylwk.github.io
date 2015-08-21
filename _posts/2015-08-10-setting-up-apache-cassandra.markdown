@@ -13,7 +13,7 @@ mathjax: true
 
 Cassandra (as well as Spark) requires Java to be installed. See the Spark installation documents to install Java.
 
--
+
 ### Install & Setup Cassandra
 
 Download the tarball and unzip it.
@@ -46,7 +46,7 @@ export PATH=$PATH:$CASSANDRA_HOME/bin
 Make sure to `source ~/.bash_profile` after this for the changes to take effect.
 
 
--
+
 ### Running Cassandra on a single machine
 
 To start Cassandra now we can use:
@@ -122,7 +122,7 @@ schema_columns    schema_usertypes  compactions_in_progress
 ~~~
 
 
--
+
 ### CQL - Cassandra Query Language?
 
 * http://www.planetcassandra.org/create-a-keyspace-and-table/
@@ -191,7 +191,7 @@ cqlsh> INSERT INTO users (firstname, lastname, age, email, city) VALUES ('John',
 ~~~
 
 
--
+
 ### Setting up the Cluster
 
 First thing we need to do is generate `tokens` for all machines in the cluster. Create a new python file to do this (following [these](http://www.datastax.com/2012/01/how-to-set-up-and-monitor-a-multi-node-cassandra-cluster-on-linux) instructions):
@@ -280,7 +280,7 @@ UJ  172.16.0.221  46.81 KB   1       ?       6071a3bf-6dc3-4667-807e-925c2649d3e
 Note: Non-system keyspaces don't have the same replication settings, effective ownership information is meaningless
 ~~~
 
--
+
 ### TO DO
 
 To check if it is actually working... create a keyspace,table,insert on one and check on the other. (using the `cqlsh` cli)
@@ -294,7 +294,7 @@ CREATE KEYSPACE "demoShared" WITH REPLICATION = {'class' : 'NetworkTopologyStrat
 
 
 
--
+
 ### NOT DONE
 
 * SSL connection between databases? Connections are now plaintext? Or at least some default networking setting.
@@ -302,7 +302,7 @@ CREATE KEYSPACE "demoShared" WITH REPLICATION = {'class' : 'NetworkTopologyStrat
 * [Python-Cassandra](https://github.com/datastax/python-driver)
 
 
--
+
 ### Other
 
 
