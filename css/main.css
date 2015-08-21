@@ -184,7 +184,7 @@ ul.notes {
     padding: 0px 10px;
     list-style: none;
 }
-li { margin: 20px 0px; }
+li { margin: 0; }
 a.notes {
     position: relative;
     display: block;
@@ -212,7 +212,7 @@ span.label {
 }
 span.date {
     display: block;
-    padding: 4px 8px;
+    padding: 4px 0px;
     font-size: 0.875em;
     font-weight: 300;
     color: #bbb;
