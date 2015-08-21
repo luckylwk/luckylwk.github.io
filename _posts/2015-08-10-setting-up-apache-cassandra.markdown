@@ -94,7 +94,7 @@ Connected to Test Cluster at 127.0.0.1:9042.
 [cqlsh 5.0.1 | Cassandra 2.1.6 | CQL spec 3.2.0 | Native protocol v3]
 ~~~
 
-~~~cql
+~~~
 cqlsh> describe cluster;
 
 Cluster: Test Cluster
@@ -133,7 +133,7 @@ So there is nothing there. Lets quickly check out how to create a keyspace and t
 
 Creating a keyspace with the name `demo`:
 
-~~~cql
+~~~
 cqlsh> CREATE KEYSPACE demo WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
 
 cqlsh> describe keyspaces;
@@ -143,12 +143,12 @@ system_traces  system  demo
 
 We can now use this keyspace and create some tables there
 
-~~~cql
+~~~
 cqlsh> use demo;
 cqlsh:demo>
 ~~~
 
-~~~cql
+~~~
 cqlsh> CREATE TABLE users (
 firstname text,
 lastname text,
@@ -158,7 +158,7 @@ city text,
 PRIMARY KEY (lastname));
 ~~~
 
-~~~cql
+~~~
 cqlsh:demo> describe schema
 
 CREATE KEYSPACE demo WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'}  AND durable_writes = true;
@@ -186,7 +186,7 @@ CREATE TABLE demo.users (
 
 [Insert a record](http://www.planetcassandra.org/insert-select-records/). Please not that for this table the `lastname` is the primary-key, so we cannot have more than 1 person with the same lastname.
 
-~~~cql
+~~~
 cqlsh> INSERT INTO users (firstname, lastname, age, email, city) VALUES ('John', 'Smith', 46, 'johnsmith@email.com', 'Sacramento');
 ~~~
 
