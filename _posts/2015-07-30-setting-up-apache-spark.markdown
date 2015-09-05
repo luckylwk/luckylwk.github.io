@@ -4,7 +4,12 @@ comments: true
 title:  "Setting up Apache Spark and IPython"
 excerpt: "Some notes on how to get started with Apache Spark on Ubuntu. It includes configuring IPython to run using a standalone pySpark."
 date:   2015-07-30 20:00:00
-mathjax: true
+author: Luuk Derksen
+mathjax: false
+tags:
+  - python
+  - apache-spark
+  - machine-learning
 ---
 
 

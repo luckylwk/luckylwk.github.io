@@ -5,6 +5,10 @@ title:  "Setting up an Apache Spark Cluster"
 excerpt: "Some notes on how to set up an Apache Spark cluster across machines. It deals with the setup of the master/manager and worker machines."
 date:   2015-08-21 20:00:00
 mathjax: true
+tags:
+  - python
+  - machine-learning
+  - apache-spark
 ---
 
 ### Installing Spark/pySpark

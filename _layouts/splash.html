@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+
+        {% include head.html %}
+        
+        <style>
+            .lwk-main-container {
+                background: #0C103D;
+            }
+            .lwk-main-container .mdl-layout__header,
+            .lwk-main-container .mdl-layout__drawer-button {
+                color: white;
+            }
+            .mdl-layout__header--transparent {
+                background: rgba(0,0,0,0.6);
+            }
+
+            .splash {
+                display: block;
+                margin: 100px auto;
+                padding: 25px;
+                font-family: 'Merriweather', serif;
+                font-size: 5em;
+                line-height: 1.6em;
+                color: white;
+                background-color: rgba(0,0,0,0.25);
+                text-align: center;
+                text-shadow: 0px 2px 8px #222;
+            }
+
+            .particles-container {
+                position: fixed;
+                width: 100%;
+                height: 100%;
+                left: 0;
+                top: 0;
+                z-index: 1;
+            }
+        </style>
+
+    </head>
+
+    <body>
+
+        <div class="lwk-main-container mdl-layout mdl-js-layout">
+
+            <div id="particles-js" class="particles-container"></div>
+            <script src="{{ "/js/particles.min.js" | prepend: site.baseurl }}"></script>
+            <script src="{{ "/js/app.js" | prepend: site.baseurl }}"></script>
+
+            {% include nav-transparent.html %}
+
+            <main class="mdl-layout__content">
+
+                <span class="splash">Something here... About...</span>
+            
+            </main>
+
+        </div>
+
+        {% include footer.html %}
+
+    </body>
+
+</html>

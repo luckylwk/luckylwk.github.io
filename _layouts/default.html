@@ -1,17 +1,45 @@
 <!DOCTYPE html>
 <html>
 
-    {% include head.html %}
+    <head>
+
+        {% include head.html %}
+        
+        <style>
+            .lwk-main-container {
+                background: #f7f7f7;
+            }
+            .lwk-main-container .mdl-layout__header,
+            .lwk-main-container .mdl-layout__drawer-button {
+                color: white;
+            }
+            .mdl-layout__header {
+                background: rgba(12,16,61,1);
+            }
+        </style>
+
+    </head>
 
     <body>
 
-        {% include header.html %}
+        <div class="lwk-main-container mdl-layout mdl-js-layout">
 
-        <div class="page-content">
-            {{ content }}
+            <!-- <div id="particles-js" class="particles-container"></div> -->
+            <!-- // <script src="../js/particles.min.js"></script> -->
+            <!-- // <script src="../js/app.js"></script> -->
+
+            {% include nav.html %}
+
+            <main class="mdl-layout__content">
+
+                {{ content }}
+            
+            </main>
+
         </div>
 
         {% include footer.html %}
 
     </body>
+
 </html>

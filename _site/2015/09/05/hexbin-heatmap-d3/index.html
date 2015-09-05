@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+
+                
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        
+        <title>Hexbin Heatmap using D3</title>
+        
+        <meta name="viewport" content="width=device-width">
+        <meta name="description" content="Some thoughts and writeups.">
+        
+        <link rel="stylesheet" href="//storage.googleapis.com/code.getmdl.io/1.0.4/material.indigo-pink.min.css">
+        <script src="//storage.googleapis.com/code.getmdl.io/1.0.4/material.min.js"></script>
+        <!-- Icon-font -->
+        <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+        <!-- Fonts -->
+        <link href='//fonts.googleapis.com/css?family=Merriweather:400,300,700' rel='stylesheet' type='text/css'>
+        <link href='//fonts.googleapis.com/css?family=Hind:300,400,500,600' rel='stylesheet' type='text/css'>
+
+        <link rel="canonical" href="http://luckylwk.github.io/2015/09/05/hexbin-heatmap-d3/">
+
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="/css/main.css">
+
+        
+        <style>
+            .lwk-main-container {
+                background: #f7f7f7;
+            }
+            .lwk-main-container .mdl-layout__header,
+            .lwk-main-container .mdl-layout__drawer-button {
+                color: white;
+            }
+            .mdl-layout__header {
+                background: rgba(12,16,61,1);
+            }
+        </style>
+
+    </head>
+
+    <body>
+
+        <div class="lwk-main-container mdl-layout mdl-js-layout">
+
+            <!-- <div id="particles-js" class="particles-container"></div> -->
+            <!-- // <script src="../js/particles.min.js"></script> -->
+            <!-- // <script src="../js/app.js"></script> -->
+
+                                
+
+            <header class="mdl-layout__header mdl-layout__header">
+                <div class="mdl-layout__header-row">
+                    <!-- Title -->
+                    <span class="mdl-layout-title">luckylwk</span>
+                    <!-- Add spacer, to align navigation to the right -->
+                    <div class="mdl-layout-spacer"></div>
+                    <!-- Navigation -->
+                    <nav class="mdl-navigation">
+                        <a class="mdl-navigation__link" href="/machine-learning/">Machine Learning</a>
+                        <a class="mdl-navigation__link" href="/data-visualisation/">Data Visualisation</a>
+                        <a class="mdl-navigation__link" href="/about/">About</a>
+                    </nav>
+                </div>
+            </header>
+            <div class="mdl-layout__drawer">
+                <span class="mdl-layout-title">luckylwk</span>
+                <nav class="mdl-navigation">
+                    <a class="mdl-navigation__link" href="/machine-learning/">Machine Learning</a>
+                    <a class="mdl-navigation__link" href="/data-visualisation/">Data Visualisation</a>
+                    <a class="mdl-navigation__link" href="/about/">About</a>
+                    <a class="mdl-navigation__link" href="https://www.twitter.com/luckylwk" target="_blank">Twitter</a>
+                    <a class="mdl-navigation__link" href="https://uk.linkedin.com/pub/luuk-derksen/a/80/956" target="_blank">LinkedIn</a>
+                    <a class="mdl-navigation__link" href="https://github.com/luckylwk" target="_blank">Github</a>
+                </nav>
+            </div>
+
+            <main class="mdl-layout__content">
+
+                        <div class="wrap">
+            <div class="post">
+
+                <header class="post-header">
+                    <h1>Hexbin Heatmap using D3</h1>
+                    <p class="meta">Sep 5, 2015 • Luuk Derksen</p>
+                    <a href="https://twitter.com/share" class="twitter-share-button" data-text="Check out Hexbin Heatmap using D3" data-via="luckylwk">Tweet</a>
+                    <script>
+                        !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+                    </script>
+                </header>
+
+                <article class="post-content">
+                <div id="div-hexbin-hist"></div>
+
+<script src="/js/d3.v3.5.5.min.js"></script>
+
+<script src="/js/d3.hexbin.v0.min.js"></script>
+
+<script src="/js-blogs/hexbin-heatmap-d3.js"></script>
+
+<p>The code for this visualisation.</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// Set the initial width, height and margins.</span>
+<span class="kd">var</span> <span class="nx">margin</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">top</span><span class="o">:</span> <span class="mi">20</span><span class="p">,</span> <span class="nx">right</span><span class="o">:</span> <span class="mi">20</span><span class="p">,</span> <span class="nx">bottom</span><span class="o">:</span> <span class="mi">20</span><span class="p">,</span> <span class="nx">left</span><span class="o">:</span> <span class="mi">30</span> <span class="p">},</span>
+    <span class="nx">histogram</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">height</span><span class="o">:</span><span class="mi">100</span> <span class="p">}</span>
+    <span class="nx">width</span> <span class="o">=</span> <span class="mi">700</span> <span class="o">-</span> <span class="nx">margin</span><span class="p">.</span><span class="nx">left</span> <span class="o">-</span> <span class="nx">margin</span><span class="p">.</span><span class="nx">right</span><span class="p">,</span>
+    <span class="nx">height</span> <span class="o">=</span> <span class="mi">700</span> <span class="o">-</span> <span class="nx">margin</span><span class="p">.</span><span class="nx">top</span> <span class="o">-</span> <span class="nx">margin</span><span class="p">.</span><span class="nx">bottom</span><span class="p">;</span>
+
+
+<span class="c1">// Generate random datapoints.</span>
+<span class="kd">var</span> <span class="nx">randomX</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">random</span><span class="p">.</span><span class="nx">normal</span><span class="p">(</span><span class="nx">width</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span>
+    <span class="nx">randomY</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">random</span><span class="p">.</span><span class="nx">normal</span><span class="p">(</span><span class="nx">height</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span>
+    <span class="nx">points</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">range</span><span class="p">(</span><span class="mi">20000</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="p">[</span> <span class="nx">randomX</span><span class="p">(),</span> <span class="nx">randomY</span><span class="p">()</span> <span class="p">];</span> <span class="p">}</span> <span class="p">);</span>
+
+
+<span class="c1">// Set the color-scale.</span>
+<span class="kd">var</span> <span class="nx">color</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">scale</span><span class="p">.</span><span class="nx">linear</span><span class="p">()</span>
+    <span class="p">.</span><span class="nx">domain</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">])</span>
+    <span class="p">.</span><span class="nx">range</span><span class="p">([</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="s2">&quot;steelblue&quot;</span><span class="p">])</span>
+    <span class="p">.</span><span class="nx">interpolate</span><span class="p">(</span><span class="nx">d3</span><span class="p">.</span><span class="nx">interpolateLab</span><span class="p">);</span>
+
+
+<span class="c1">// Create the hexbin.</span>
+<span class="kd">var</span> <span class="nx">hexbin</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">hexbin</span><span class="p">().</span><span class="nx">size</span><span class="p">([</span><span class="nx">width</span><span class="p">,</span> <span class="nx">height</span><span class="p">]).</span><span class="nx">radius</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
+
+
+<span class="c1">// Create axis scales.</span>
+<span class="kd">var</span> <span class="nx">xScale</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">scale</span><span class="p">.</span><span class="nx">identity</span><span class="p">().</span><span class="nx">domain</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="nx">width</span><span class="p">]);</span>
+<span class="kd">var</span> <span class="nx">yScale</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">scale</span><span class="p">.</span><span class="nx">linear</span><span class="p">().</span><span class="nx">domain</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="nx">height</span><span class="p">]).</span><span class="nx">range</span><span class="p">([</span><span class="nx">height</span><span class="p">,</span> <span class="mi">0</span><span class="p">]);</span>
+
+
+<span class="c1">// Create axis functions.</span>
+<span class="kd">var</span> <span class="nx">xAxis</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">svg</span><span class="p">.</span><span class="nx">axis</span><span class="p">()</span>
+    <span class="p">.</span><span class="nx">scale</span><span class="p">(</span><span class="nx">xScale</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">orient</span><span class="p">(</span><span class="s2">&quot;bottom&quot;</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">tickSize</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="nx">height</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">yAxis</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">svg</span><span class="p">.</span><span class="nx">axis</span><span class="p">()</span>
+    <span class="p">.</span><span class="nx">scale</span><span class="p">(</span><span class="nx">yScale</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">orient</span><span class="p">(</span><span class="s2">&quot;left&quot;</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">tickSize</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="nx">width</span><span class="p">);</span>
+
+
+<span class="c1">// Create and append the svg-element to the div.</span>
+<span class="kd">var</span> <span class="nx">svg</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s2">&quot;#div-hexbin-hist&quot;</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span><span class="s2">&quot;svg&quot;</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span><span class="s2">&quot;hexbin-hist&quot;</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;width&quot;</span><span class="p">,</span> <span class="nx">width</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="nx">margin</span><span class="p">.</span><span class="nx">left</span> <span class="o">+</span> <span class="nx">margin</span><span class="p">.</span><span class="nx">right</span> <span class="o">+</span> <span class="nx">histogram</span><span class="p">.</span><span class="nx">height</span> <span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;height&quot;</span><span class="p">,</span> <span class="nx">height</span> <span class="o">+</span> <span class="nx">margin</span><span class="p">.</span><span class="nx">top</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="nx">margin</span><span class="p">.</span><span class="nx">bottom</span> <span class="o">+</span> <span class="nx">histogram</span><span class="p">.</span><span class="nx">height</span> <span class="p">);</span>
+
+
+<span class="kd">var</span> <span class="nx">gHex</span> <span class="o">=</span> <span class="nx">svg</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s2">&quot;g&quot;</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;class&quot;</span><span class="p">,</span><span class="s2">&quot;hexbin&quot;</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;transform&quot;</span><span class="p">,</span> <span class="s2">&quot;translate(&quot;</span> <span class="o">+</span> <span class="nx">margin</span><span class="p">.</span><span class="nx">left</span> <span class="o">+</span> <span class="s2">&quot;,&quot;</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="nx">margin</span><span class="p">.</span><span class="nx">bottom</span> <span class="o">+</span> <span class="nx">histogram</span><span class="p">.</span><span class="nx">height</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">);</span>
+
+<span class="c1">// Create clippath to clip the hexbins that fall outside the gHex.</span>
+<span class="nx">gHex</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s2">&quot;clipPath&quot;</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;clip&quot;</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s2">&quot;rect&quot;</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;class&quot;</span><span class="p">,</span> <span class="s2">&quot;mesh&quot;</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;width&quot;</span><span class="p">,</span> <span class="nx">width</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;height&quot;</span><span class="p">,</span> <span class="nx">height</span><span class="p">);</span>
+
+<span class="nx">gHex</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s2">&quot;g&quot;</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;clip-path&quot;</span><span class="p">,</span> <span class="s2">&quot;url(#clip)&quot;</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="s2">&quot;.hexagon&quot;</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">data</span><span class="p">(</span> <span class="nx">hexbin</span><span class="p">(</span><span class="nx">points</span><span class="p">)</span> <span class="p">)</span>
+    <span class="p">.</span><span class="nx">enter</span><span class="p">().</span><span class="nx">append</span><span class="p">(</span><span class="s2">&quot;path&quot;</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;class&quot;</span><span class="p">,</span> <span class="s2">&quot;hexagon&quot;</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="nx">hexbin</span><span class="p">.</span><span class="nx">hexagon</span><span class="p">())</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;transform&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="s2">&quot;translate(&quot;</span> <span class="o">+</span> <span class="nx">d</span><span class="p">.</span><span class="nx">x</span> <span class="o">+</span> <span class="s2">&quot;,&quot;</span> <span class="o">+</span> <span class="nx">d</span><span class="p">.</span><span class="nx">y</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">;</span> <span class="p">}</span> <span class="p">)</span>
+    <span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="s2">&quot;fill&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">color</span><span class="p">(</span><span class="nx">d</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span> <span class="p">}</span> <span class="p">);</span>
+
+<span class="c1">// Append the yAxis &amp; xAxis.</span>
+<span class="nx">gHex</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s2">&quot;g&quot;</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;class&quot;</span><span class="p">,</span> <span class="s2">&quot;y axis&quot;</span><span class="p">).</span><span class="nx">call</span><span class="p">(</span><span class="nx">yAxis</span><span class="p">);</span>
+<span class="nx">gHex</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s2">&quot;g&quot;</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;class&quot;</span><span class="p">,</span> <span class="s2">&quot;x axis&quot;</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;transform&quot;</span><span class="p">,</span> <span class="s2">&quot;translate(0,&quot;</span> <span class="o">+</span> <span class="nx">height</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">xAxis</span><span class="p">);</span>
+
+
+<span class="c1">// Create histograms</span>
+<span class="kd">var</span> <span class="nx">xScaleRight</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">scale</span><span class="p">.</span><span class="nx">linear</span><span class="p">()</span>
+    <span class="p">.</span><span class="nx">domain</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="nx">width</span><span class="p">])</span>
+    <span class="p">.</span><span class="nx">range</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="nx">height</span><span class="p">]);</span>
+<span class="c1">// Create axis functions.</span>
+<span class="kd">var</span> <span class="nx">xAxisRight</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">svg</span><span class="p">.</span><span class="nx">axis</span><span class="p">()</span>
+    <span class="p">.</span><span class="nx">scale</span><span class="p">(</span><span class="nx">xScaleRight</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">orient</span><span class="p">(</span><span class="s2">&quot;bottom&quot;</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">tickSize</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+
+<span class="c1">// Add top histogram axis</span>
+<span class="kd">var</span> <span class="nx">gHistTop</span> <span class="o">=</span> <span class="nx">svg</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s2">&quot;g&quot;</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;class&quot;</span><span class="p">,</span><span class="s2">&quot;hist top&quot;</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;transform&quot;</span><span class="p">,</span> <span class="s2">&quot;translate(&quot;</span> <span class="o">+</span> <span class="nx">margin</span><span class="p">.</span><span class="nx">left</span> <span class="o">+</span> <span class="s2">&quot;,&quot;</span> <span class="o">+</span> <span class="nx">margin</span><span class="p">.</span><span class="nx">top</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">);</span>
+<span class="nx">gHistTop</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s2">&quot;g&quot;</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;class&quot;</span><span class="p">,</span> <span class="s2">&quot;hist x axis&quot;</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;transform&quot;</span><span class="p">,</span> <span class="s2">&quot;translate(0,&quot;</span> <span class="o">+</span> <span class="nx">histogram</span><span class="p">.</span><span class="nx">height</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">call</span><span class="p">(</span> <span class="nx">xAxis</span><span class="p">.</span><span class="nx">tickSize</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="p">);</span>
+
+<span class="c1">// Add bottom histogram axis.</span>
+<span class="kd">var</span> <span class="nx">gHistRight</span> <span class="o">=</span> <span class="nx">svg</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s2">&quot;g&quot;</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;class&quot;</span><span class="p">,</span><span class="s2">&quot;hist right&quot;</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;transform&quot;</span><span class="p">,</span> <span class="s2">&quot;translate(&quot;</span> <span class="o">+</span> <span class="p">(</span><span class="nx">width</span> <span class="o">+</span> <span class="nx">margin</span><span class="p">.</span><span class="nx">left</span> <span class="o">+</span> <span class="nx">margin</span><span class="p">.</span><span class="nx">right</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;,&quot;</span> <span class="o">+</span> <span class="p">(</span><span class="nx">histogram</span><span class="p">.</span><span class="nx">height</span> <span class="o">+</span> <span class="nx">margin</span><span class="p">.</span><span class="nx">top</span> <span class="o">+</span> <span class="nx">margin</span><span class="p">.</span><span class="nx">bottom</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">);</span>
+<span class="nx">gHistRight</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s2">&quot;g&quot;</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;class&quot;</span><span class="p">,</span> <span class="s2">&quot;hist x axis&quot;</span><span class="p">)</span>
+    <span class="c1">//.attr(&quot;transform&quot;, &quot;translate(0,&quot; + (histogram.height) + &quot;)rotate(90)&quot;)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;transform&quot;</span><span class="p">,</span> <span class="s2">&quot;rotate(90)&quot;</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">call</span><span class="p">(</span> <span class="nx">xAxisRight</span> <span class="p">);</span>
+
+<span class="c1">// Create histograms using d3.layout.histogram()</span>
+<span class="kd">var</span> <span class="nx">histTop</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">layout</span><span class="p">.</span><span class="nx">histogram</span><span class="p">()</span>
+    <span class="p">.</span><span class="nx">bins</span><span class="p">(</span> <span class="nx">xScale</span><span class="p">.</span><span class="nx">ticks</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span> <span class="p">)</span>
+    <span class="p">(</span> <span class="nx">points</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span> <span class="p">}</span> <span class="p">)</span> <span class="p">);</span>
+<span class="kd">var</span> <span class="nx">histRight</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">layout</span><span class="p">.</span><span class="nx">histogram</span><span class="p">()</span>
+    <span class="p">.</span><span class="nx">bins</span><span class="p">(</span> <span class="nx">xScale</span><span class="p">.</span><span class="nx">ticks</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span> <span class="p">)</span>
+    <span class="p">(</span> <span class="nx">points</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span> <span class="p">}</span> <span class="p">)</span> <span class="p">);</span>
+
+<span class="c1">// Create scale for each hist.</span>
+<span class="kd">var</span> <span class="nx">yScaleTop</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">scale</span><span class="p">.</span><span class="nx">linear</span><span class="p">()</span>
+    <span class="p">.</span><span class="nx">domain</span><span class="p">([</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span> <span class="nx">histTop</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">y</span><span class="p">;</span> <span class="p">}</span> <span class="p">)</span> <span class="p">])</span>
+    <span class="p">.</span><span class="nx">range</span><span class="p">([</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">histogram</span><span class="p">.</span><span class="nx">height</span> <span class="p">]);</span>
+<span class="kd">var</span> <span class="nx">yScaleRight</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">scale</span><span class="p">.</span><span class="nx">linear</span><span class="p">()</span>
+    <span class="p">.</span><span class="nx">domain</span><span class="p">([</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span> <span class="nx">histRight</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">y</span><span class="p">;</span> <span class="p">}</span> <span class="p">)</span> <span class="p">])</span>
+    <span class="p">.</span><span class="nx">range</span><span class="p">([</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">histogram</span><span class="p">.</span><span class="nx">height</span> <span class="p">]);</span>
+
+<span class="c1">// Draw top histogram.</span>
+<span class="kd">var</span> <span class="nx">g1</span> <span class="o">=</span> <span class="nx">gHistTop</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s2">&quot;g&quot;</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;class&quot;</span><span class="p">,</span><span class="s2">&quot;hist chart&quot;</span><span class="p">);</span>
+<span class="nx">g1</span><span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="s2">&quot;.bars&quot;</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">data</span><span class="p">(</span> <span class="nx">histTop</span> <span class="p">)</span>
+    <span class="p">.</span><span class="nx">enter</span><span class="p">().</span><span class="nx">append</span><span class="p">(</span><span class="s2">&quot;rect&quot;</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;class&quot;</span><span class="p">,</span><span class="s2">&quot;bar&quot;</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">x</span><span class="p">;</span> <span class="p">}</span> <span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">histogram</span><span class="p">.</span><span class="nx">height</span> <span class="o">-</span> <span class="nx">yScaleTop</span><span class="p">(</span><span class="nx">d</span><span class="p">.</span><span class="nx">y</span><span class="p">);</span> <span class="p">}</span> <span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;width&quot;</span><span class="p">,</span> <span class="nx">xScale</span><span class="p">(</span> <span class="nx">histTop</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">dx</span> <span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;height&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">yScaleTop</span><span class="p">(</span><span class="nx">d</span><span class="p">.</span><span class="nx">y</span><span class="p">);</span> <span class="p">}</span> <span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">g2</span> <span class="o">=</span> <span class="nx">gHistRight</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s2">&quot;g&quot;</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;class&quot;</span><span class="p">,</span><span class="s2">&quot;hist chart&quot;</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;transform&quot;</span><span class="p">,</span> <span class="s2">&quot;translate(&quot;</span> <span class="o">+</span> <span class="nx">histogram</span><span class="p">.</span><span class="nx">height</span> <span class="o">+</span> <span class="s2">&quot;,0)rotate(90)&quot;</span><span class="p">);</span>
+<span class="nx">g2</span><span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="s2">&quot;.bars&quot;</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">data</span><span class="p">(</span> <span class="nx">histRight</span> <span class="p">)</span>
+    <span class="p">.</span><span class="nx">enter</span><span class="p">().</span><span class="nx">append</span><span class="p">(</span><span class="s2">&quot;rect&quot;</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;class&quot;</span><span class="p">,</span><span class="s2">&quot;bar&quot;</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">xScaleRight</span><span class="p">(</span><span class="nx">d</span><span class="p">.</span><span class="nx">x</span><span class="p">);</span> <span class="p">}</span> <span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">histogram</span><span class="p">.</span><span class="nx">height</span> <span class="o">-</span> <span class="nx">yScaleRight</span><span class="p">(</span><span class="nx">d</span><span class="p">.</span><span class="nx">y</span><span class="p">);</span> <span class="p">}</span> <span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;width&quot;</span><span class="p">,</span> <span class="nx">xScaleRight</span><span class="p">(</span> <span class="nx">histRight</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">dx</span> <span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;height&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">yScaleRight</span><span class="p">(</span><span class="nx">d</span><span class="p">.</span><span class="nx">y</span><span class="p">);</span> <span class="p">}</span> <span class="p">);</span>
+</code></pre></div>
+<script>drawGraph();</script>
+
+                </article>
+
+                <!-- mathjax -->
+                
+                
+            </div>
+        </div>
+            
+            </main>
+
+        </div>
+
+        <footer class="site-footer">
+
+    <!-- Google Analytics -->
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-47414860-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+</footer>
+
+
+    </body>
+
+</html>

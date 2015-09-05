@@ -4,7 +4,11 @@ comments: true
 title:  "Setting up Apache Cassandra"
 excerpt: "Some notes on how to get started with Apache Cassandra on Ubuntu. Both as a standalone database and as a replicated cluster."
 date:   2015-08-10 20:00:00
-mathjax: true
+author: Luuk Derksen
+mathjax: false
+tags:
+  - apache-cassandra
+  - machine-learning
 ---
 
 ### Installing Apache Cassandra

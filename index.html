@@ -1,22 +1,4 @@
 ---
-layout: default
+layout: index
+title: Welcome!
 ---
-        <div class="home">
-            <div class="wrap">
-                
-                <ul class="notes">
-                {% for post in site.posts %}
-                    <li>
-                        <a href="{{ post.url | prepend: site.baseurl }}" class="notes">
-                            <span class="date">{{ post.date | date: "%b %-d, %Y" }}</span>
-                            <h3>{{ post.title }}</h3>
-                            <!-- <span class="label">ML</span> -->
-                            <p class="description">{{ post.excerpt }}</p>
-                        </a><br/>
-                        
-                    </li>
-                {% endfor %}
-                </ul>
-
-            </div>
-        </div>

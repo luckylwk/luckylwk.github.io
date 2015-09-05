@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         
-        <title>Welcome!</title>
+        <title>Machine Learning posts</title>
         
         <meta name="viewport" content="width=device-width">
         <meta name="description" content="Some thoughts and writeups.">
@@ -20,7 +20,7 @@
         <link href='//fonts.googleapis.com/css?family=Merriweather:400,300,700' rel='stylesheet' type='text/css'>
         <link href='//fonts.googleapis.com/css?family=Hind:300,400,500,600' rel='stylesheet' type='text/css'>
 
-        <link rel="canonical" href="http://luckylwk.github.io/">
+        <link rel="canonical" href="http://luckylwk.github.io/machine-learning/">
 
         <!-- Custom CSS -->
         <link rel="stylesheet" href="/css/main.css">
@@ -28,36 +28,14 @@
         
         <style>
             .lwk-main-container {
-                background: #0C103D;
+                background: #f7f7f7;
             }
             .lwk-main-container .mdl-layout__header,
             .lwk-main-container .mdl-layout__drawer-button {
                 color: white;
             }
-            .mdl-layout__header--transparent {
-                background: rgba(0,0,0,0.6);
-            }
-
-            .splash {
-                display: block;
-                margin: 100px auto;
-                padding: 25px;
-                font-family: 'Merriweather', serif;
-                font-size: 5em;
-                line-height: 1.6em;
-                color: white;
-                background-color: rgba(0,0,0,0.25);
-                text-align: center;
-                text-shadow: 0px 2px 8px #222;
-            }
-
-            .particles-container {
-                position: fixed;
-                width: 100%;
-                height: 100%;
-                left: 0;
-                top: 0;
-                z-index: 1;
+            .mdl-layout__header {
+                background: rgba(12,16,61,1);
             }
         </style>
 
@@ -67,13 +45,13 @@
 
         <div class="lwk-main-container mdl-layout mdl-js-layout">
 
-            <div id="particles-js" class="particles-container"></div>
-            <script src="/js/particles.min.js"></script>
-            <script src="/js/app.js"></script>
+            <!-- <div id="particles-js" class="particles-container"></div> -->
+            <!-- // <script src="../js/particles.min.js"></script> -->
+            <!-- // <script src="../js/app.js"></script> -->
 
                                 
 
-            <header class="mdl-layout__header mdl-layout__header--transparent">
+            <header class="mdl-layout__header mdl-layout__header">
                 <div class="mdl-layout__header-row">
                     <!-- Title -->
                     <span class="mdl-layout-title">luckylwk</span>
@@ -101,7 +79,59 @@
 
             <main class="mdl-layout__content">
 
-                <span class="splash">Just a place to<br/>dump thoughts<br/>on data.</span>
+                                <div class="wrap">
+                        
+                    <ul class="notes">
+                    
+                        
+                    
+                        
+                        <li>
+                            <a href="/2015/08/21/setting-up-apache-spark-cluster/" class="notes">
+                                <span class="date">Aug 21, 2015</span>
+                                <h3>Setting up an Apache Spark Cluster</h3>
+                                <!-- <span class="label">ML</span> -->
+                                <p class="description">Some notes on how to set up an Apache Spark cluster across machines. It deals with the setup of the master/manager and worker machines.</p>
+                            </a><br/>
+                        </li>
+                        
+                    
+                        
+                        <li>
+                            <a href="/2015/08/10/setting-up-apache-cassandra/" class="notes">
+                                <span class="date">Aug 10, 2015</span>
+                                <h3>Setting up Apache Cassandra</h3>
+                                <!-- <span class="label">ML</span> -->
+                                <p class="description">Some notes on how to get started with Apache Cassandra on Ubuntu. Both as a standalone database and as a replicated cluster.</p>
+                            </a><br/>
+                        </li>
+                        
+                    
+                        
+                        <li>
+                            <a href="/2015/07/30/setting-up-apache-spark/" class="notes">
+                                <span class="date">Jul 30, 2015</span>
+                                <h3>Setting up Apache Spark and IPython</h3>
+                                <!-- <span class="label">ML</span> -->
+                                <p class="description">Some notes on how to get started with Apache Spark on Ubuntu. It includes configuring IPython to run using a standalone pySpark.</p>
+                            </a><br/>
+                        </li>
+                        
+                    
+                        
+                        <li>
+                            <a href="/2015/05/23/lua-torch/" class="notes">
+                                <span class="date">May 23, 2015</span>
+                                <h3>Lua & Torch Tutorial</h3>
+                                <!-- <span class="label">ML</span> -->
+                                <p class="description">Getting started with Lua and Torch (on Mac OSX). A promising new language in Machine Learning</p>
+                            </a><br/>
+                        </li>
+                        
+                    
+                    </ul>
+
+                </div>
             
             </main>
 

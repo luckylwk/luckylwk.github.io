@@ -4,7 +4,11 @@ comments: true
 title:  "Lua & Torch Tutorial"
 excerpt: "Getting started with Lua and Torch (on Mac OSX). A promising new language in Machine Learning"
 date:   2015-05-23 20:00:00
-mathjax: true
+author: Luuk Derksen
+mathjax: false
+tags:
+  - torch
+  - machine-learning
 ---
 
 ### Install LuaJIT
