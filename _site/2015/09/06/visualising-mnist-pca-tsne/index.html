@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+
+                
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        
+        <title>Visualising high-dimensional datasets using PCA and tSNE</title>
+        
+        <meta name="viewport" content="width=device-width">
+        <meta name="description" content="Some thoughts and writeups.">
+        
+        <link rel="stylesheet" href="//storage.googleapis.com/code.getmdl.io/1.0.4/material.indigo-pink.min.css">
+        <script src="//storage.googleapis.com/code.getmdl.io/1.0.4/material.min.js"></script>
+        <!-- Icon-font -->
+        <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+        <!-- Fonts -->
+        <link href='//fonts.googleapis.com/css?family=Merriweather:400,300,700' rel='stylesheet' type='text/css'>
+        <link href='//fonts.googleapis.com/css?family=Hind:300,400,500,600' rel='stylesheet' type='text/css'>
+
+        <link rel="canonical" href="http://luckylwk.github.io/2015/09/06/visualising-mnist-pca-tsne/">
+
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="/css/main.css">
+
+        
+        <style>
+            .lwk-main-container {
+                background: #f7f7f7;
+            }
+            .lwk-main-container .mdl-layout__header,
+            .lwk-main-container .mdl-layout__drawer-button {
+                color: white;
+            }
+            .mdl-layout__header {
+                background: rgba(12,16,61,1);
+            }
+        </style>
+
+    </head>
+
+    <body>
+
+        <div class="lwk-main-container mdl-layout mdl-js-layout">
+
+            <!-- <div id="particles-js" class="particles-container"></div> -->
+            <!-- // <script src="../js/particles.min.js"></script> -->
+            <!-- // <script src="../js/app.js"></script> -->
+
+                                
+
+            <header class="mdl-layout__header mdl-layout__header">
+                <div class="mdl-layout__header-row">
+                    <!-- Title -->
+                    <span class="mdl-layout-title">luckylwk</span>
+                    <!-- Add spacer, to align navigation to the right -->
+                    <div class="mdl-layout-spacer"></div>
+                    <!-- Navigation -->
+                    <nav class="mdl-navigation">
+                        <a class="mdl-navigation__link" href="/machine-learning/">Machine Learning</a>
+                        <a class="mdl-navigation__link" href="/data-visualisation/">Data Visualisation</a>
+                        <a class="mdl-navigation__link" href="/about/">About</a>
+                    </nav>
+                </div>
+            </header>
+            <div class="mdl-layout__drawer">
+                <span class="mdl-layout-title">luckylwk</span>
+                <nav class="mdl-navigation">
+                    <a class="mdl-navigation__link" href="/machine-learning/">Machine Learning</a>
+                    <a class="mdl-navigation__link" href="/data-visualisation/">Data Visualisation</a>
+                    <a class="mdl-navigation__link" href="/about/">About</a>
+                    <a class="mdl-navigation__link" href="https://www.twitter.com/luckylwk" target="_blank">Twitter</a>
+                    <a class="mdl-navigation__link" href="https://uk.linkedin.com/pub/luuk-derksen/a/80/956" target="_blank">LinkedIn</a>
+                    <a class="mdl-navigation__link" href="https://github.com/luckylwk" target="_blank">Github</a>
+                </nav>
+            </div>
+
+            <main class="mdl-layout__content">
+
+                        <div class="wrap">
+            <div class="post">
+
+                <header class="post-header">
+                    <h1>Visualising high-dimensional datasets using PCA and tSNE</h1>
+                    <p class="meta">Sep 6, 2015 • Luuk Derksen</p>
+                    <a href="https://twitter.com/share" class="twitter-share-button" data-text="Check out Visualising high-dimensional datasets using PCA and tSNE" data-via="luckylwk">Tweet</a>
+                    <script>
+                        !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+                    </script>
+                </header>
+
+                <article class="post-content">
+                <p>The first step around any data related challenge is to start by exploring the data itself. This could be by looking at, for example, the distributions of certain variables or correlations between variables. </p>
+
+<p>The problem nowadays is that most datasets have a large number of variables. In other words, they have a high number of dimensions along which the data is distributed. Visually exploring the data can then become challenging and most of the time even practically impossible to do manually. However, such visual exploration however is incredibly important in any data-related problem. Therefore it is key to understand how to visualise high-dimensional datasets using a technique known as dimensionality reduction. This post will focus on two techniques that will allow us to do this: PCA and t-SNE. </p>
+
+<p>However, more about that later. Lets first get some (high-dimensional) data to work with.</p>
+
+<h3>MNIST dataset</h3>
+
+<p>python code...</p>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">fetch_mldata</span>
+
+<span class="n">mnist</span> <span class="o">=</span> <span class="n">fetch_mldata</span><span class="p">(</span><span class="s">&quot;MNIST original&quot;</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">mnist</span><span class="o">.</span><span class="n">data</span> <span class="o">/</span> <span class="mf">255.0</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">mnist</span><span class="o">.</span><span class="n">target</span>
+
+<span class="k">print</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span>
+</code></pre></div>
+<pre class="python-output">
+(70000, 784) (70000,)
+</pre>
+
+<p>We are going to convert the matrix and vector to a Pandas DataFrame. This is very similar to the DataFrames used in R and will make it easier for us to plot it later on.</p>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+
+<span class="n">feat_cols</span> <span class="o">=</span> <span class="p">[</span> <span class="s">&#39;pixel&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="p">]</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">columns</span><span class="o">=</span><span class="n">feat_cols</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s">&#39;label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span>
+<span class="n">df</span><span class="p">[</span><span class="s">&#39;label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">&#39;label&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span>
+
+<span class="k">print</span> <span class="s">&#39;Size of the dataframe: {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</code></pre></div>
+<pre class="python-output">
+Size of the dataframe: (70000, 785)
+</pre>
+
+<p>Print the first three rows of the dataset.</p>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">print</span> <span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</code></pre></div>
+<pre class="python-output">
+   pixel0  pixel1  pixel2  pixel3  pixel4  pixel5  pixel6  pixel7  pixel8  \
+0       0       0       0       0       0       0       0       0       0   
+1       0       0       0       0       0       0       0       0       0   
+2       0       0       0       0       0       0       0       0       0   
+
+   pixel9  ...    pixel775  pixel776  pixel777  pixel778  pixel779  pixel780  \
+0       0  ...           0         0         0         0         0         0   
+1       0  ...           0         0         0         0         0         0   
+2       0  ...           0         0         0         0         0         0   
+
+   pixel781  pixel782  pixel783  label  
+0         0         0         0    0.0  
+1         0         0         0    0.0  
+2         0         0         0    0.0  
+
+[3 rows x 785 columns]
+</pre>
+
+<p>Because we dont want to be using 70,000 digits in some calculations we&#39;ll take a random subset of the digits. The randomisation is important as the dataset is sorted by its label (i.e., the first seven thousand or so are zeros, etc.). To ensure randomisation we&#39;ll create a random permutation of the number 0 to 69,999 which allows us later to select the first five or ten thousand for our calculations and visualisations.</p>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">rndperm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</code></pre></div>
+<p>We now have our dataframe and our randomisation vector. Lets first check what these numbers actually look like. To do this we&#39;ll generate 30 plots of random images.</p>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+
+<span class="c"># Plot the graph</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">gray</span><span class="p">()</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">7</span><span class="p">)</span> <span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">30</span><span class="p">):</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;Digit: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">rndperm</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="s">&#39;label&#39;</span><span class="p">])</span> <span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">matshow</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">rndperm</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">feat_cols</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">28</span><span class="p">,</span><span class="mi">28</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div>
+<p><img src="/assets/mnist-digits.png" /></p>
+
+<p>Now we can start thinking about how we can actually distinguish the zeros from the ones and two&#39;s and so on. The images are all essentially 28-by-28 pixel images and therefore have a total of 784 &#39;dimensions&#39;, each holding the value of one specific pixel.</p>
+
+<p>What we can do is reduce the number of dimensions drastically whilst trying to retain as much of the &#39;variation&#39; in the information as possible. This is where we get to dimensionality reduction. Lets first take a look at something known as <strong>Principal Component Analysis</strong>.</p>
+
+<h3>Dimensionality reduction using PCA</h3>
+
+<p>PCA is a technique for reducing the number of dimensions in a dataset whilst retaining most information. In its essence it is using the correlation between some dimensions and tries to provide a minimum number of variables that keeps the maximum amount of variation or information about how the original data. It does not do this using guesswork but using hard mathematics and it uses the eigenvalues and eigenvectors of the matrix that holds the data.</p>
+
+<p>The eigenvectors of the covariance matrix have the property that they point along the major directions of variation in the data. These are the directions of maximum variation in a dataset.</p>
+
+<p>I am not going to get into the actual derivation and calculation of the principal components - if you want to get into the mathematics see <a href="https://www.math.hmc.edu/calculus/tutorials/eigenstuff/">this</a> great page - instead we&#39;ll use the <a href="http://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html">Scikit-Learn implementation of PCA</a>. </p>
+
+<p>Since we as humans like our two-dimensional plots lets start with that and generate, from the original 784 dimensions, the first two principal components. And we&#39;ll also see how much of the variation in the total dataset they actually account for.</p>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+
+<span class="n">feat_cols</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+
+<span class="n">pca</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">pca_result</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">feat_cols</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+<span class="n">df</span><span class="p">[</span><span class="s">&#39;pca-one&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pca_result</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">df</span><span class="p">[</span><span class="s">&#39;pca-two&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pca_result</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span> 
+<span class="n">df</span><span class="p">[</span><span class="s">&#39;pca-three&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pca_result</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span>
+
+<span class="k">print</span> <span class="s">&#39;Explained variation per principal component: {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pca</span><span class="o">.</span><span class="n">explained_variance_ratio_</span><span class="p">)</span>
+</code></pre></div>
+<pre class="python-output">
+Explained variation per principal component: [ 0.16756229  0.0826886   0.05374424]
+</pre>
+
+<p>Now, given that they hold that much information about the entire dataset lets see if they also hold some information about the individual digits. What we can do is plot the first and second principal components versus each other in a scatter plot and color each of the different types of digits with a different color. If we are lucky the same type of digits will be clustered together which would mean that the first two principal components actually tell us a great deal about the specific types of digits.</p>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">chart</span> <span class="o">=</span> <span class="n">ggplot</span><span class="p">(</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">rndperm</span><span class="p">[:</span><span class="mi">3000</span><span class="p">],:],</span> <span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">&#39;x-pca&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">&#39;y-pca&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;label&#39;</span><span class="p">)</span> <span class="p">)</span> \
+        <span class="o">+</span> <span class="n">geom_point</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">75</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span> \
+        <span class="o">+</span> <span class="n">ggtitle</span><span class="p">(</span><span class="s">&quot;First and Second Principal Components colored by digit&quot;</span><span class="p">)</span>
+<span class="n">chart</span>
+</code></pre></div>
+<p><img src="/assets/mnist-pca.png" style="max-width:600px;" /></p>
+
+<p>So there is some information, especially for specific digits, but clearly not enough to set them apart. Luckily there is another technique that we can use to reduce the number of dimensions that may prove more helpful.</p>
+
+<h3>t-distributed stochastic neighbouring entities (t-SNE)</h3>
+
+<p>t-Distributed Stochastic Neighbor Embedding (t-SNE) is another technique for dimensionality reduction and is particularly well suited for the visualization of high-dimensional datasets. Contrary to PCA its not a mathematical technique but a probablistic one. </p>
+
+<p>WHAT DOES IT DO?</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text"> |  t-SNE [1] is a tool to visualize high-dimensional data. It converts
+ |  similarities between data points to joint probabilities and tries
+ |  to minimize the Kullback-Leibler divergence between the joint
+ |  probabilities of the low-dimensional embedding and the
+ |  high-dimensional data. t-SNE has a cost function that is not convex,
+ |  i.e. with different initializations we can get different results.
+ |  
+ |  It is highly recommended to use another dimensionality reduction
+ |  method (e.g. PCA for dense data or TruncatedSVD for sparse data)
+ |  to reduce the number of dimensions to a reasonable amount (e.g. 50)
+ |  if the number of features is very high. This will suppress some
+ |  noise and speed up the computation of pairwise distances between
+ |  samples. For more tips see Laurens van der Maaten&#39;s FAQ [2].
+</code></pre></div>
+<p><code>t-Distributed stochastic neighbor embedding (t-SNE) minimizes the divergence between two distributions: a distribution that measures pairwise similarities of the input objects and a distribution that measures pairwise similarities of the corresponding low-dimensional points in the embedding.</code></p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">Since t-SNE scales quadratically in the number of objects N, its applicability is limited to data sets with only a few thousand input objects; beyond that, learning becomes too slow to be practical (and the memory requirements become too large).
+</code></pre></div>
+<p><a href="http://lvdmaaten.github.io/tsne/">t-SNE website</a>
+<a href="http://jmlr.org/papers/volume9/vandermaaten08a/vandermaaten08a.pdf">Original Paper</a>
+<a href="http://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html">Scikit-Learn Implementation</a></p>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.manifold</span> <span class="kn">import</span> <span class="n">TSNE</span>
+
+<span class="n">n_sne</span> <span class="o">=</span> <span class="mi">7000</span>
+
+<span class="n">time_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">tsne</span> <span class="o">=</span> <span class="n">TSNE</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">perplexity</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+<span class="n">tsne_results</span> <span class="o">=</span> <span class="n">tsne</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">rndperm</span><span class="p">[:</span><span class="n">n_sne</span><span class="p">],</span><span class="n">feat_cols</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&#39;t-SNE done! Time elapsed: {} seconds&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">time_start</span><span class="p">)</span>
+</code></pre></div>
+<pre class="python-output">
+[t-SNE] Computing pairwise distances...
+[t-SNE] Computed conditional probabilities for sample 1000 / 7000
+[t-SNE] Computed conditional probabilities for sample 2000 / 7000
+[t-SNE] Computed conditional probabilities for sample 3000 / 7000
+[t-SNE] Computed conditional probabilities for sample 4000 / 7000
+[t-SNE] Computed conditional probabilities for sample 5000 / 7000
+[t-SNE] Computed conditional probabilities for sample 6000 / 7000
+[t-SNE] Computed conditional probabilities for sample 7000 / 7000
+[t-SNE] Mean sigma: 2.170716
+[t-SNE] Error after 97 iterations with early exaggeration: 17.891132
+[t-SNE] Error after 300 iterations: 2.206017
+t-SNE done! Time elapsed: 813.213096142 seconds
+</pre>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">df_tsne</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">rndperm</span><span class="p">[:</span><span class="n">n_sne</span><span class="p">],:]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">df_tsne</span><span class="p">[</span><span class="s">&#39;x-tsne&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tsne_results</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">df_tsne</span><span class="p">[</span><span class="s">&#39;y-tsne&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tsne_results</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="n">chart</span> <span class="o">=</span> <span class="n">ggplot</span><span class="p">(</span> <span class="n">df_tsne</span><span class="p">,</span> <span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">&#39;x-tsne&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">&#39;y-tsne&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;label&#39;</span><span class="p">)</span> <span class="p">)</span> \
+        <span class="o">+</span> <span class="n">geom_point</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span> \
+        <span class="o">+</span> <span class="n">ggtitle</span><span class="p">(</span><span class="s">&quot;tSNE dimensions colored by digit&quot;</span><span class="p">)</span>
+<span class="n">chart</span>
+</code></pre></div>
+<p><img src="/assets/mnist-tsne-1.png" style="max-width:600px;" /></p>
+
+<p>lets use a recommended dimensionality reduction before applying t-sne. we&#39;ll try both pca and svd, we&#39;ll start with svd and reduce the number of dimensions to the recommended 50.</p>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">TruncatedSVD</span>
+
+<span class="n">pca_50</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<span class="n">pca_result_50</span> <span class="o">=</span> <span class="n">pca_50</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">feat_cols</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+<span class="n">svd_50</span> <span class="o">=</span> <span class="n">TruncatedSVD</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<span class="n">svd_result_50</span> <span class="o">=</span> <span class="n">svd_50</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+<span class="k">print</span> <span class="s">&#39;Explained variation per principal component (SVD): {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">svd_50</span><span class="o">.</span><span class="n">explained_variance_ratio_</span><span class="p">))</span>
+<span class="k">print</span> <span class="s">&#39;Explained variation per principal component (PCA): {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">pca_50</span><span class="o">.</span><span class="n">explained_variance_ratio_</span><span class="p">))</span>
+</code></pre></div>
+<pre class="python-output">
+Explained variation per principal component (SVD): 86.6181380675%
+Explained variation per principal component (PCA): 84.6676222833%
+</pre>
+
+<p>amazing, first 50 components hold around 85% of the total variation in the data...</p>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">n_sne</span> <span class="o">=</span> <span class="mi">10000</span>
+
+<span class="n">time_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+<span class="n">tsne</span> <span class="o">=</span> <span class="n">TSNE</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">perplexity</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+<span class="n">tsne_svd_results</span> <span class="o">=</span> <span class="n">tsne</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">svd_result_50</span><span class="p">[</span><span class="n">rndperm</span><span class="p">[:</span><span class="n">n_sne</span><span class="p">]])</span>
+
+<span class="k">print</span> <span class="s">&#39;t-SNE done! Time elapsed: {} seconds&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">time_start</span><span class="p">)</span>
+</code></pre></div>
+<pre class="python-output">
+[t-SNE] Computing pairwise distances...
+[t-SNE] Computed conditional probabilities for sample 1000 / 10000
+[t-SNE] Computed conditional probabilities for sample 2000 / 10000
+[t-SNE] Computed conditional probabilities for sample 3000 / 10000
+[t-SNE] Computed conditional probabilities for sample 4000 / 10000
+[t-SNE] Computed conditional probabilities for sample 5000 / 10000
+[t-SNE] Computed conditional probabilities for sample 6000 / 10000
+[t-SNE] Computed conditional probabilities for sample 7000 / 10000
+[t-SNE] Computed conditional probabilities for sample 8000 / 10000
+[t-SNE] Computed conditional probabilities for sample 9000 / 10000
+[t-SNE] Computed conditional probabilities for sample 10000 / 10000
+[t-SNE] Mean sigma: 1.823966
+[t-SNE] Error after 100 iterations with early exaggeration: 18.533819
+[t-SNE] Error after 300 iterations: 2.615558
+t-SNE done! Time elapsed: 1619.55461097 seconds
+</pre>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">df_tsne</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="n">df_tsne</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">rndperm</span><span class="p">[:</span><span class="n">n_sne</span><span class="p">],:]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">df_tsne</span><span class="p">[</span><span class="s">&#39;x-tsne-svd&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tsne_svd_results</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">df_tsne</span><span class="p">[</span><span class="s">&#39;y-tsne-svd&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tsne_svd_results</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="n">chart</span> <span class="o">=</span> <span class="n">ggplot</span><span class="p">(</span> <span class="n">df_tsne</span><span class="p">,</span> <span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">&#39;x-tsne-svd&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">&#39;y-tsne-svd&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;label&#39;</span><span class="p">)</span> <span class="p">)</span> \
+        <span class="o">+</span> <span class="n">geom_point</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span> \
+        <span class="o">+</span> <span class="n">ggtitle</span><span class="p">(</span><span class="s">&quot;tSNE dimensions colored by Digit (SVD)&quot;</span><span class="p">)</span>
+<span class="n">chart</span>
+</code></pre></div>
+<p><img src="/assets/mnist-tsne-svd.png" style="max-width:600px;" /></p>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">n_sne</span> <span class="o">=</span> <span class="mi">10000</span>
+
+<span class="n">time_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+<span class="n">tsne</span> <span class="o">=</span> <span class="n">TSNE</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">perplexity</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+<span class="n">tsne_pca_results</span> <span class="o">=</span> <span class="n">tsne</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">pca_result_50</span><span class="p">[</span><span class="n">rndperm</span><span class="p">[:</span><span class="n">n_sne</span><span class="p">]])</span>
+
+<span class="k">print</span> <span class="s">&#39;t-SNE done! Time elapsed: {} seconds&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">time_start</span><span class="p">)</span>
+</code></pre></div>
+<pre class="python-output">
+[t-SNE] Computing pairwise distances...
+[t-SNE] Computed conditional probabilities for sample 1000 / 10000
+[t-SNE] Computed conditional probabilities for sample 2000 / 10000
+[t-SNE] Computed conditional probabilities for sample 3000 / 10000
+[t-SNE] Computed conditional probabilities for sample 4000 / 10000
+[t-SNE] Computed conditional probabilities for sample 5000 / 10000
+[t-SNE] Computed conditional probabilities for sample 6000 / 10000
+[t-SNE] Computed conditional probabilities for sample 7000 / 10000
+[t-SNE] Computed conditional probabilities for sample 8000 / 10000
+[t-SNE] Computed conditional probabilities for sample 9000 / 10000
+[t-SNE] Computed conditional probabilities for sample 10000 / 10000
+[t-SNE] Mean sigma: 1.814452
+[t-SNE] Error after 100 iterations with early exaggeration: 18.725542
+[t-SNE] Error after 300 iterations: 2.657761
+t-SNE done! Time elapsed: 1620.80310392 seconds
+</pre>
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">df_tsne</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="n">df_tsne</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">rndperm</span><span class="p">[:</span><span class="n">n_sne</span><span class="p">],:]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">df_tsne</span><span class="p">[</span><span class="s">&#39;x-tsne-pca&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tsne_pca_results</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">df_tsne</span><span class="p">[</span><span class="s">&#39;y-tsne-pca&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tsne_pca_results</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="n">chart</span> <span class="o">=</span> <span class="n">ggplot</span><span class="p">(</span> <span class="n">df_tsne</span><span class="p">,</span> <span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">&#39;x-tsne-pca&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">&#39;y-tsne-pca&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;label&#39;</span><span class="p">)</span> <span class="p">)</span> \
+        <span class="o">+</span> <span class="n">geom_point</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span> \
+        <span class="o">+</span> <span class="n">ggtitle</span><span class="p">(</span><span class="s">&quot;tSNE dimensions colored by Digit (PCA)&quot;</span><span class="p">)</span>
+<span class="n">chart</span>
+</code></pre></div>
+<p><img src="/assets/mnist-tsne-pca.png" style="max-width:600px;" /></p>
+
+<p>some conclusion?</p>
+
+                </article>
+
+                <!-- mathjax -->
+                
+                
+            </div>
+        </div>
+            
+            </main>
+
+        </div>
+
+        <footer class="site-footer">
+
+    <!-- Google Analytics -->
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-47414860-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+</footer>
+
+
+    </body>
+
+</html>

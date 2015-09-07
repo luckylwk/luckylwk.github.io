@@ -2,7 +2,7 @@
 layout: post
 comments: true
 title:  "Hexbin Heatmap using D3"
-excerpt: "..."
+excerpt: "Javascript code to generate a hexbin-heatmap in D3 with histograms on both dimensions."
 date:   2015-09-05 14:22:00
 author: Luuk Derksen
 mathjax: false
