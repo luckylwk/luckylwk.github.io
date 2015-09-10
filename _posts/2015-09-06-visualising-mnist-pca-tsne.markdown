@@ -150,11 +150,13 @@ So there is some information, especially for specific digits, but clearly not en
 
 ### t-distributed stochastic neighbouring entities (t-SNE)
 
-t-Distributed Stochastic Neighbor Embedding (t-SNE) is another technique for dimensionality reduction and is particularly well suited for the visualization of high-dimensional datasets. Contrary to PCA its not a mathematical technique but a probablistic one. The [original paper](http://jmlr.org/papers/volume9/vandermaaten08a/vandermaaten08a.pdf) describes the working of t-SNE as:
+t-Distributed Stochastic Neighbor Embedding ([t-SNE](http://lvdmaaten.github.io/tsne/)) is another technique for dimensionality reduction and is particularly well suited for the visualization of high-dimensional datasets. Contrary to PCA its not a mathematical technique but a probablistic one. The [original paper](http://jmlr.org/papers/volume9/vandermaaten08a/vandermaaten08a.pdf) describes the working of t-SNE as:
 
-```t-Distributed stochastic neighbor embedding (t-SNE) minimizes the divergence between two distributions: a distribution that measures pairwise similarities of the input objects and a distribution that measures pairwise similarities of the corresponding low-dimensional points in the embedding.```
+```
+t-Distributed stochastic neighbor embedding (t-SNE) minimizes the divergence between two distributions: a distribution that measures pairwise similarities of the input objects and a distribution that measures pairwise similarities of the corresponding low-dimensional points in the embedding.
+```
 
-Essentially what this means is that it looks at the original data that is entered into the algorithm and looks at how to best represent this data using less dimensions by matching both distributions. The way it does this is computationally quite heavy and therefore there are some (serious) limitations to the use of this technique. For example one of the recommendations is that, in case of very high dimensional data, you may need to apply another dimensionality reduction technique before using t-SNE.
+Essentially what this means is that it looks at the original data that is entered into the algorithm and looks at how to best represent this data using less dimensions by matching both distributions. The way it does this is computationally quite heavy and therefore there are some (serious) limitations to the use of this technique. For example one of the recommendations is that, in case of very high dimensional data, you may need to apply another dimensionality reduction technique before using t-SNE:
 
 
 ```
@@ -164,18 +166,16 @@ Essentially what this means is that it looks at the original data that is entere
  |  if the number of features is very high.
 ```
 
+The other key drawback is that it:
 
 
 ```
 Since t-SNE scales quadratically in the number of objects N, its applicability is limited to data sets with only a few thousand input objects; beyond that, learning becomes too slow to be practical (and the memory requirements become too large).
 ```
 
+We will use the [Scikit-Learn Implementation](http://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html) of the algorithm in the remainder of this writeup.
 
-
-[t-SNE website](http://lvdmaaten.github.io/tsne/)
-
-[Scikit-Learn Implementation](http://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html)
-
+Contrary to the recommendation above we will first try to run the algorithm on the actual dimensions of the data (784) and see how it does. To make sure we don't burden our machine in terms of memory and power/time we will only use the first 7,000 samples to run the algorithm on.
 
 ~~~python
 import time
@@ -204,6 +204,7 @@ print 't-SNE done! Time elapsed: {} seconds'.format(time.time()-time_start)
 t-SNE done! Time elapsed: 813.213096142 seconds
 </pre>
 
+Now what we have the two resulting dimensions we can again visualise it, plot them and color them by their respective label.
 
 ~~~python
 df_tsne = df.loc[rndperm[:n_sne],:].copy()
@@ -217,6 +218,8 @@ chart
 ~~~
 
 <img src="/assets/mnist-tsne-1.png" style="max-width:600px;" />
+
+This is already a significant improvement over the PCA visualisation we used earlier. We can see that the digits are very clearly clustered in their own little group.
 
 lets use a recommended dimensionality reduction before applying t-sne. we'll try both pca and svd, we'll start with svd and reduce the number of dimensions to the recommended 50.
 
