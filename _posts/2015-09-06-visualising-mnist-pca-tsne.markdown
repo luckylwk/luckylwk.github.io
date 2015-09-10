@@ -219,9 +219,9 @@ chart
 
 <img src="/assets/mnist-tsne-1.png" style="max-width:600px;" />
 
-This is already a significant improvement over the PCA visualisation we used earlier. We can see that the digits are very clearly clustered in their own little group.
+This is already a significant improvement over the PCA visualisation we used earlier. We can see that the digits are very clearly clustered in their own little group. If we would now use a clustering algorithm to pick out the seperate clusters we could probably quite accurately assign new points to a label.
 
-lets use a recommended dimensionality reduction before applying t-sne. we'll try both pca and svd, we'll start with svd and reduce the number of dimensions to the recommended 50.
+We'll now take the recommandations to heart and actually reduce the number of dimensions before feeding the data into the t-SNE algorithm. For this we'll use another dimensionality reduction technique named SVD. Using both PCA and SVD we'll reduce the number of dimensions to 50.
 
 ~~~python
 from sklearn.decomposition import TruncatedSVD
@@ -239,7 +239,9 @@ Explained variation per principal component (SVD): 86.6181380675%
 Explained variation per principal component (PCA): 84.6676222833%
 </pre>
 
-amazing, first 50 components hold around 85% of the total variation in the data...
+Amazingly, in both cases the first 50 components roughly hold around 85% of the total variation in the data.
+
+Now lets try and feed this data into the t-SNE algorithm. We'll start with the data that was reduced by SVD. This time we'll use 10,000 samples.
 
 ~~~python
 n_sne = 10000
@@ -269,7 +271,6 @@ print 't-SNE done! Time elapsed: {} seconds'.format(time.time()-time_start)
 t-SNE done! Time elapsed: 1619.55461097 seconds
 </pre>
 
-
 ~~~python
 df_tsne = None
 df_tsne = df.loc[rndperm[:n_sne],:].copy()
@@ -284,7 +285,7 @@ chart
 
 <img src="/assets/mnist-tsne-svd.png" style="max-width:600px;" />
 
-
+Now lets try the data that was reduced using PCA.
 
 ~~~python
 n_sne = 10000
