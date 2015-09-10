@@ -12,11 +12,11 @@ tags:
   - visualisation
 ---
 
-The first step around any data related challenge is to start by exploring the data itself. This could be by looking at, for example, the distributions of certain variables or correlations between variables. 
+The first step around any data related challenge is to start by exploring the data itself. This could be by looking at, for example, the distributions of certain variables or looking at potential correlations between variables. 
 
-The problem nowadays is that most datasets have a large number of variables. In other words, they have a high number of dimensions along which the data is distributed. Visually exploring the data can then become challenging and most of the time even practically impossible to do manually. However, such visual exploration however is incredibly important in any data-related problem. Therefore it is key to understand how to visualise high-dimensional datasets using a technique known as dimensionality reduction. This post will focus on two techniques that will allow us to do this: PCA and t-SNE. 
+The problem nowadays is that most datasets have a large number of variables. In other words, they have a high number of dimensions along which the data is distributed. Visually exploring the data can then become challenging and most of the time even practically impossible to do manually. However, such visual exploration is incredibly important in any data-related problem. Therefore it is key to understand how to visualise high-dimensional datasets. This can be achieved using techniques known as dimensionality reduction. This post will focus on two techniques that will allow us to do this: PCA and t-SNE. 
 
-However, more about that later. Lets first get some (high-dimensional) data to work with.
+More about that later. Lets first get some (high-dimensional) data to work with.
 
 ### MNIST dataset
 
@@ -86,7 +86,7 @@ Because we dont want to be using 70,000 digits in some calculations we'll take a
 rndperm = np.random.permutation(df.shape[0])
 ~~~
 
-We now have our dataframe and our randomisation vector. Lets first check what these numbers actually look like. To do this we'll generate 30 plots of random images.
+We now have our dataframe and our randomisation vector. Lets first check what these numbers actually look like. To do this we'll generate 30 plots of randomly selected images.
 
 ~~~python
 %matplotlib inline
@@ -110,9 +110,7 @@ What we can do is reduce the number of dimensions drastically whilst trying to r
 
 ### Dimensionality reduction using PCA
 
-PCA is a technique for reducing the number of dimensions in a dataset whilst retaining most information. In its essence it is using the correlation between some dimensions and tries to provide a minimum number of variables that keeps the maximum amount of variation or information about how the original data. It does not do this using guesswork but using hard mathematics and it uses the eigenvalues and eigenvectors of the matrix that holds the data.
-
-The eigenvectors of the covariance matrix have the property that they point along the major directions of variation in the data. These are the directions of maximum variation in a dataset.
+PCA is a technique for reducing the number of dimensions in a dataset whilst retaining most information. In its essence it is using the correlation between some dimensions and tries to provide a minimum number of variables that keeps the maximum amount of variation or information about how the original data is distributed. It does not do this using guesswork but using hard mathematics and it uses something known as the eigenvalues and eigenvectors of the data-matrix. These eigenvectors of the covariance matrix have the property that they point along the major directions of variation in the data. These are the directions of maximum variation in a dataset.
 
 I am not going to get into the actual derivation and calculation of the principal components - if you want to get into the mathematics see [this](https://www.math.hmc.edu/calculus/tutorials/eigenstuff/) great page - instead we'll use the [Scikit-Learn implementation of PCA](http://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html). 
 
@@ -152,27 +150,21 @@ So there is some information, especially for specific digits, but clearly not en
 
 ### t-distributed stochastic neighbouring entities (t-SNE)
 
-t-Distributed Stochastic Neighbor Embedding (t-SNE) is another technique for dimensionality reduction and is particularly well suited for the visualization of high-dimensional datasets. Contrary to PCA its not a mathematical technique but a probablistic one. 
+t-Distributed Stochastic Neighbor Embedding (t-SNE) is another technique for dimensionality reduction and is particularly well suited for the visualization of high-dimensional datasets. Contrary to PCA its not a mathematical technique but a probablistic one. The [original paper](http://jmlr.org/papers/volume9/vandermaaten08a/vandermaaten08a.pdf) describes the working of t-SNE as:
 
-WHAT DOES IT DO?
+```t-Distributed stochastic neighbor embedding (t-SNE) minimizes the divergence between two distributions: a distribution that measures pairwise similarities of the input objects and a distribution that measures pairwise similarities of the corresponding low-dimensional points in the embedding.```
+
+Essentially what this means is that it looks at the original data that is entered into the algorithm and looks at how to best represent this data using less dimensions by matching both distributions. The way it does this is computationally quite heavy and therefore there are some (serious) limitations to the use of this technique. For example one of the recommendations is that, in case of very high dimensional data, you may need to apply another dimensionality reduction technique before using t-SNE.
+
 
 ```
- |  t-SNE [1] is a tool to visualize high-dimensional data. It converts
- |  similarities between data points to joint probabilities and tries
- |  to minimize the Kullback-Leibler divergence between the joint
- |  probabilities of the low-dimensional embedding and the
- |  high-dimensional data. t-SNE has a cost function that is not convex,
- |  i.e. with different initializations we can get different results.
- |  
  |  It is highly recommended to use another dimensionality reduction
  |  method (e.g. PCA for dense data or TruncatedSVD for sparse data)
  |  to reduce the number of dimensions to a reasonable amount (e.g. 50)
- |  if the number of features is very high. This will suppress some
- |  noise and speed up the computation of pairwise distances between
- |  samples. For more tips see Laurens van der Maaten's FAQ [2].
+ |  if the number of features is very high.
 ```
 
-```t-Distributed stochastic neighbor embedding (t-SNE) minimizes the divergence between two distributions: a distribution that measures pairwise similarities of the input objects and a distribution that measures pairwise similarities of the corresponding low-dimensional points in the embedding.```
+
 
 ```
 Since t-SNE scales quadratically in the number of objects N, its applicability is limited to data sets with only a few thousand input objects; beyond that, learning becomes too slow to be practical (and the memory requirements become too large).
@@ -181,7 +173,7 @@ Since t-SNE scales quadratically in the number of objects N, its applicability i
 
 
 [t-SNE website](http://lvdmaaten.github.io/tsne/)
-[Original Paper](http://jmlr.org/papers/volume9/vandermaaten08a/vandermaaten08a.pdf)
+
 [Scikit-Learn Implementation](http://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html)
 
 
