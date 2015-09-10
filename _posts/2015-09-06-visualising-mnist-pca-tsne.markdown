@@ -20,8 +20,7 @@ More about that later. Lets first get some (high-dimensional) data to work with.
 
 ### MNIST dataset
 
-python code...
-
+We will use the [MNIST-dataset](http://yann.lecun.com/exdb/mnist/) in this write-up. There is no need to download the dataset manually as we can grab it through using Scikit Learn.
 
 ~~~python
 import numpy as np
@@ -148,13 +147,11 @@ chart
 So there is some information, especially for specific digits, but clearly not enough to set them apart. Luckily there is another technique that we can use to reduce the number of dimensions that may prove more helpful.
 
 
-### t-distributed stochastic neighbouring entities (t-SNE)
+### t-Distributed Stochastic Neighbouring Entities (t-SNE)
 
 t-Distributed Stochastic Neighbor Embedding ([t-SNE](http://lvdmaaten.github.io/tsne/)) is another technique for dimensionality reduction and is particularly well suited for the visualization of high-dimensional datasets. Contrary to PCA its not a mathematical technique but a probablistic one. The [original paper](http://jmlr.org/papers/volume9/vandermaaten08a/vandermaaten08a.pdf) describes the working of t-SNE as:
 
-```
-t-Distributed stochastic neighbor embedding (t-SNE) minimizes the divergence between two distributions: a distribution that measures pairwise similarities of the input objects and a distribution that measures pairwise similarities of the corresponding low-dimensional points in the embedding.
-```
+*t-Distributed stochastic neighbor embedding (t-SNE) minimizes the divergence between two distributions: a distribution that measures pairwise similarities of the input objects and a distribution that measures pairwise similarities of the corresponding low-dimensional points in the embedding.*
 
 Essentially what this means is that it looks at the original data that is entered into the algorithm and looks at how to best represent this data using less dimensions by matching both distributions. The way it does this is computationally quite heavy and therefore there are some (serious) limitations to the use of this technique. For example one of the recommendations is that, in case of very high dimensional data, you may need to apply another dimensionality reduction technique before using t-SNE:
 
@@ -169,9 +166,7 @@ Essentially what this means is that it looks at the original data that is entere
 The other key drawback is that it:
 
 
-```
-Since t-SNE scales quadratically in the number of objects N, its applicability is limited to data sets with only a few thousand input objects; beyond that, learning becomes too slow to be practical (and the memory requirements become too large).
-```
+*Since t-SNE scales quadratically in the number of objects N, its applicability is limited to data sets with only a few thousand input objects; beyond that, learning becomes too slow to be practical (and the memory requirements become too large).*
 
 We will use the [Scikit-Learn Implementation](http://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html) of the algorithm in the remainder of this writeup.
 

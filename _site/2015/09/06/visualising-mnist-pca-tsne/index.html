@@ -92,15 +92,15 @@
                 </header>
 
                 <article class="post-content">
-                <p>The first step around any data related challenge is to start by exploring the data itself. This could be by looking at, for example, the distributions of certain variables or correlations between variables. </p>
+                <p>The first step around any data related challenge is to start by exploring the data itself. This could be by looking at, for example, the distributions of certain variables or looking at potential correlations between variables. </p>
 
-<p>The problem nowadays is that most datasets have a large number of variables. In other words, they have a high number of dimensions along which the data is distributed. Visually exploring the data can then become challenging and most of the time even practically impossible to do manually. However, such visual exploration however is incredibly important in any data-related problem. Therefore it is key to understand how to visualise high-dimensional datasets using a technique known as dimensionality reduction. This post will focus on two techniques that will allow us to do this: PCA and t-SNE. </p>
+<p>The problem nowadays is that most datasets have a large number of variables. In other words, they have a high number of dimensions along which the data is distributed. Visually exploring the data can then become challenging and most of the time even practically impossible to do manually. However, such visual exploration is incredibly important in any data-related problem. Therefore it is key to understand how to visualise high-dimensional datasets. This can be achieved using techniques known as dimensionality reduction. This post will focus on two techniques that will allow us to do this: PCA and t-SNE. </p>
 
-<p>However, more about that later. Lets first get some (high-dimensional) data to work with.</p>
+<p>More about that later. Lets first get some (high-dimensional) data to work with.</p>
 
 <h3>MNIST dataset</h3>
 
-<p>python code...</p>
+<p>We will use the <a href="http://yann.lecun.com/exdb/mnist/">MNIST-dataset</a> in this write-up. There is no need to download the dataset manually as we can grab it through using Scikit Learn.</p>
 <div class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">fetch_mldata</span>
 
@@ -156,7 +156,7 @@ Size of the dataframe: (70000, 785)
 <p>Because we dont want to be using 70,000 digits in some calculations we&#39;ll take a random subset of the digits. The randomisation is important as the dataset is sorted by its label (i.e., the first seven thousand or so are zeros, etc.). To ensure randomisation we&#39;ll create a random permutation of the number 0 to 69,999 which allows us later to select the first five or ten thousand for our calculations and visualisations.</p>
 <div class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">rndperm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </code></pre></div>
-<p>We now have our dataframe and our randomisation vector. Lets first check what these numbers actually look like. To do this we&#39;ll generate 30 plots of random images.</p>
+<p>We now have our dataframe and our randomisation vector. Lets first check what these numbers actually look like. To do this we&#39;ll generate 30 plots of randomly selected images.</p>
 <div class="highlight"><pre><code class="language-python" data-lang="python"><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
 
@@ -176,9 +176,7 @@ Size of the dataframe: (70000, 785)
 
 <h3>Dimensionality reduction using PCA</h3>
 
-<p>PCA is a technique for reducing the number of dimensions in a dataset whilst retaining most information. In its essence it is using the correlation between some dimensions and tries to provide a minimum number of variables that keeps the maximum amount of variation or information about how the original data. It does not do this using guesswork but using hard mathematics and it uses the eigenvalues and eigenvectors of the matrix that holds the data.</p>
-
-<p>The eigenvectors of the covariance matrix have the property that they point along the major directions of variation in the data. These are the directions of maximum variation in a dataset.</p>
+<p>PCA is a technique for reducing the number of dimensions in a dataset whilst retaining most information. In its essence it is using the correlation between some dimensions and tries to provide a minimum number of variables that keeps the maximum amount of variation or information about how the original data is distributed. It does not do this using guesswork but using hard mathematics and it uses something known as the eigenvalues and eigenvectors of the data-matrix. These eigenvectors of the covariance matrix have the property that they point along the major directions of variation in the data. These are the directions of maximum variation in a dataset.</p>
 
 <p>I am not going to get into the actual derivation and calculation of the principal components - if you want to get into the mathematics see <a href="https://www.math.hmc.edu/calculus/tutorials/eigenstuff/">this</a> great page - instead we&#39;ll use the <a href="http://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html">Scikit-Learn implementation of PCA</a>. </p>
 
@@ -210,31 +208,25 @@ Explained variation per principal component: [ 0.16756229  0.0826886   0.0537442
 
 <p>So there is some information, especially for specific digits, but clearly not enough to set them apart. Luckily there is another technique that we can use to reduce the number of dimensions that may prove more helpful.</p>
 
-<h3>t-distributed stochastic neighbouring entities (t-SNE)</h3>
+<h3>t-Distributed Stochastic Neighbouring Entities (t-SNE)</h3>
 
-<p>t-Distributed Stochastic Neighbor Embedding (t-SNE) is another technique for dimensionality reduction and is particularly well suited for the visualization of high-dimensional datasets. Contrary to PCA its not a mathematical technique but a probablistic one. </p>
+<p>t-Distributed Stochastic Neighbor Embedding (<a href="http://lvdmaaten.github.io/tsne/">t-SNE</a>) is another technique for dimensionality reduction and is particularly well suited for the visualization of high-dimensional datasets. Contrary to PCA its not a mathematical technique but a probablistic one. The <a href="http://jmlr.org/papers/volume9/vandermaaten08a/vandermaaten08a.pdf">original paper</a> describes the working of t-SNE as:</p>
 
-<p>WHAT DOES IT DO?</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"> |  t-SNE [1] is a tool to visualize high-dimensional data. It converts
- |  similarities between data points to joint probabilities and tries
- |  to minimize the Kullback-Leibler divergence between the joint
- |  probabilities of the low-dimensional embedding and the
- |  high-dimensional data. t-SNE has a cost function that is not convex,
- |  i.e. with different initializations we can get different results.
- |  
- |  It is highly recommended to use another dimensionality reduction
+<p><em>t-Distributed stochastic neighbor embedding (t-SNE) minimizes the divergence between two distributions: a distribution that measures pairwise similarities of the input objects and a distribution that measures pairwise similarities of the corresponding low-dimensional points in the embedding.</em></p>
+
+<p>Essentially what this means is that it looks at the original data that is entered into the algorithm and looks at how to best represent this data using less dimensions by matching both distributions. The way it does this is computationally quite heavy and therefore there are some (serious) limitations to the use of this technique. For example one of the recommendations is that, in case of very high dimensional data, you may need to apply another dimensionality reduction technique before using t-SNE:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text"> |  It is highly recommended to use another dimensionality reduction
  |  method (e.g. PCA for dense data or TruncatedSVD for sparse data)
  |  to reduce the number of dimensions to a reasonable amount (e.g. 50)
- |  if the number of features is very high. This will suppress some
- |  noise and speed up the computation of pairwise distances between
- |  samples. For more tips see Laurens van der Maaten&#39;s FAQ [2].
+ |  if the number of features is very high.
 </code></pre></div>
-<p><code>t-Distributed stochastic neighbor embedding (t-SNE) minimizes the divergence between two distributions: a distribution that measures pairwise similarities of the input objects and a distribution that measures pairwise similarities of the corresponding low-dimensional points in the embedding.</code></p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">Since t-SNE scales quadratically in the number of objects N, its applicability is limited to data sets with only a few thousand input objects; beyond that, learning becomes too slow to be practical (and the memory requirements become too large).
-</code></pre></div>
-<p><a href="http://lvdmaaten.github.io/tsne/">t-SNE website</a>
-<a href="http://jmlr.org/papers/volume9/vandermaaten08a/vandermaaten08a.pdf">Original Paper</a>
-<a href="http://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html">Scikit-Learn Implementation</a></p>
+<p>The other key drawback is that it:</p>
+
+<p><em>Since t-SNE scales quadratically in the number of objects N, its applicability is limited to data sets with only a few thousand input objects; beyond that, learning becomes too slow to be practical (and the memory requirements become too large).</em></p>
+
+<p>We will use the <a href="http://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html">Scikit-Learn Implementation</a> of the algorithm in the remainder of this writeup.</p>
+
+<p>Contrary to the recommendation above we will first try to run the algorithm on the actual dimensions of the data (784) and see how it does. To make sure we don&#39;t burden our machine in terms of memory and power/time we will only use the first 7,000 samples to run the algorithm on.</p>
 <div class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">time</span>
 
 <span class="kn">from</span> <span class="nn">sklearn.manifold</span> <span class="kn">import</span> <span class="n">TSNE</span>
@@ -260,6 +252,8 @@ Explained variation per principal component: [ 0.16756229  0.0826886   0.0537442
 [t-SNE] Error after 300 iterations: 2.206017
 t-SNE done! Time elapsed: 813.213096142 seconds
 </pre>
+
+<p>Now what we have the two resulting dimensions we can again visualise it, plot them and color them by their respective label.</p>
 <div class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">df_tsne</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">rndperm</span><span class="p">[:</span><span class="n">n_sne</span><span class="p">],:]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 <span class="n">df_tsne</span><span class="p">[</span><span class="s">&#39;x-tsne&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tsne_results</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">df_tsne</span><span class="p">[</span><span class="s">&#39;y-tsne&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tsne_results</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
@@ -271,7 +265,9 @@ t-SNE done! Time elapsed: 813.213096142 seconds
 </code></pre></div>
 <p><img src="/assets/mnist-tsne-1.png" style="max-width:600px;" /></p>
 
-<p>lets use a recommended dimensionality reduction before applying t-sne. we&#39;ll try both pca and svd, we&#39;ll start with svd and reduce the number of dimensions to the recommended 50.</p>
+<p>This is already a significant improvement over the PCA visualisation we used earlier. We can see that the digits are very clearly clustered in their own little group. If we would now use a clustering algorithm to pick out the seperate clusters we could probably quite accurately assign new points to a label.</p>
+
+<p>We&#39;ll now take the recommandations to heart and actually reduce the number of dimensions before feeding the data into the t-SNE algorithm. For this we&#39;ll use another dimensionality reduction technique named SVD. Using both PCA and SVD we&#39;ll reduce the number of dimensions to 50.</p>
 <div class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">TruncatedSVD</span>
 
 <span class="n">pca_50</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
@@ -287,7 +283,9 @@ Explained variation per principal component (SVD): 86.6181380675%
 Explained variation per principal component (PCA): 84.6676222833%
 </pre>
 
-<p>amazing, first 50 components hold around 85% of the total variation in the data...</p>
+<p>Amazingly, in both cases the first 50 components roughly hold around 85% of the total variation in the data.</p>
+
+<p>Now lets try and feed this data into the t-SNE algorithm. We&#39;ll start with the data that was reduced by SVD. This time we&#39;ll use 10,000 samples.</p>
 <div class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">n_sne</span> <span class="o">=</span> <span class="mi">10000</span>
 
 <span class="n">time_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
@@ -325,6 +323,8 @@ t-SNE done! Time elapsed: 1619.55461097 seconds
 <span class="n">chart</span>
 </code></pre></div>
 <p><img src="/assets/mnist-tsne-svd.png" style="max-width:600px;" /></p>
+
+<p>Now lets try the data that was reduced using PCA.</p>
 <div class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">n_sne</span> <span class="o">=</span> <span class="mi">10000</span>
 
 <span class="n">time_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
