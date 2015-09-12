@@ -4,7 +4,7 @@ comments: true
 title:  "Visualising high-dimensional datasets using PCA and tSNE"
 excerpt: "A walkthrough of using PCA and tSNE to perform dimensionality reduction on high-dimensional datasets in order to allow for visual exploration of the data. All code is in Python and uses the Scikit-Learn and GGPlot libraries."
 date:   2015-09-06 11:22:00
-author: Luuk Derksen
+author: Luuk Derksen & Denise Xifara
 mathjax: false
 tags:
   - python
@@ -102,7 +102,9 @@ plt.show()
 
 <img src="/assets/mnist-digits.png" />
 
-Now we can start thinking about how we can actually distinguish the zeros from the ones and two's and so on. The images are all essentially 28-by-28 pixel images and therefore have a total of 784 'dimensions', each holding the value of one specific pixel.
+Now we can start thinking about how we can actually distinguish the zeros from the ones and two's and so on. If you were, for example, a post office such an algorithm could help you read and sort the handwritten envelopes using a machine instead of having humans do that. Obviously nowadays we have very advanced methods to do this, but this dataset still provides a very good testing ground for seeing how specific methods (e.g., such as dimensionality reduction) work and how well they work.
+
+The images are all essentially 28-by-28 pixel images and therefore have a total of 784 'dimensions', each holding the value of one specific pixel.
 
 What we can do is reduce the number of dimensions drastically whilst trying to retain as much of the 'variation' in the information as possible. This is where we get to dimensionality reduction. Lets first take a look at something known as **Principal Component Analysis**.
 
@@ -113,7 +115,7 @@ PCA is a technique for reducing the number of dimensions in a dataset whilst ret
 
 I am not going to get into the actual derivation and calculation of the principal components - if you want to get into the mathematics see [this](https://www.math.hmc.edu/calculus/tutorials/eigenstuff/) great page - instead we'll use the [Scikit-Learn implementation of PCA](http://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html). 
 
-Since we as humans like our two-dimensional plots lets start with that and generate, from the original 784 dimensions, the first two principal components. And we'll also see how much of the variation in the total dataset they actually account for.
+Since we as humans like our two- and three-dimensional plots lets start with that and generate, from the original 784 dimensions, the first three principal components. And we'll also see how much of the variation in the total dataset they actually account for.
 
 ~~~python
 from sklearn.decomposition import PCA
@@ -133,7 +135,7 @@ print 'Explained variation per principal component: {}'.format(pca.explained_var
 Explained variation per principal component: [ 0.16756229  0.0826886   0.05374424]
 </pre>
 
-Now, given that they hold that much information about the entire dataset lets see if they also hold some information about the individual digits. What we can do is plot the first and second principal components versus each other in a scatter plot and color each of the different types of digits with a different color. If we are lucky the same type of digits will be clustered together which would mean that the first two principal components actually tell us a great deal about the specific types of digits.
+Now, given that the first two components account for about 25% of the variation in the entire dataset lets see if that is enough to visually set the different digits apart. What we can do is create a scatterplot of the first and second principal component and color each of the different types of digits with a different color. If we are lucky the same type of digits will be positioned (i.e., clustered) together in groups, which would mean that the first two principal components actually tell us a great deal about the specific types of digits.
 
 ~~~python
 chart = ggplot( df.loc[rndperm[:3000],:], aes(x='x-pca', y='y-pca', color='label') ) \
@@ -144,7 +146,7 @@ chart
 
 <img src="/assets/mnist-pca.png" style="max-width:600px;" />
 
-So there is some information, especially for specific digits, but clearly not enough to set them apart. Luckily there is another technique that we can use to reduce the number of dimensions that may prove more helpful.
+From the graph we can see the two components definitely hold some information, especially for specific digits, but clearly not enough to set all of them apart. Luckily there is another technique that we can use to reduce the number of dimensions that may prove more helpful. In the next few paragraph we are going to take a look at that technique and explore if it gives us a better way of reducing the dimensions for visualisation. The method we will be exploring is known as **t-SNE** (t-Distributed Stochastic Neighbouring Entities).
 
 
 ### t-Distributed Stochastic Neighbouring Entities (t-SNE)
@@ -216,7 +218,7 @@ chart
 
 This is already a significant improvement over the PCA visualisation we used earlier. We can see that the digits are very clearly clustered in their own little group. If we would now use a clustering algorithm to pick out the seperate clusters we could probably quite accurately assign new points to a label.
 
-We'll now take the recommandations to heart and actually reduce the number of dimensions before feeding the data into the t-SNE algorithm. For this we'll use another dimensionality reduction technique named SVD. Using both PCA and SVD we'll reduce the number of dimensions to 50.
+We'll now take the recommandations to heart and actually reduce the number of dimensions before feeding the data into the t-SNE algorithm. For this we'll use another dimensionality reduction technique named SVD as well as the PCA that we used before. We will first create two new datasets, one containing the fifty dimensions generated by the SVD reduction algorithm, the other containing the fifty dimensions generated by the PCA reduction algorithm. We can then use these datasets to perform the t-SNE on at a later stage.
 
 ~~~python
 from sklearn.decomposition import TruncatedSVD
@@ -236,7 +238,27 @@ Explained variation per principal component (PCA): 84.6676222833%
 
 Amazingly, in both cases the first 50 components roughly hold around 85% of the total variation in the data.
 
-Now lets try and feed this data into the t-SNE algorithm. We'll start with the data that was reduced by SVD. This time we'll use 10,000 samples.
+Now lets try and feed this data into the t-SNE algorithm. This time we'll use 10,000 samples out of the 70,000 to make sure the algorithm does not take up too much memory and CPU. Since the code used for this is very similar to the previous t-SNE code I have moved it to the **Appendix: Code** section at the bottom of this post. The code will allow you to run the t-SNE algorithm on both the SVD- and PCA-reduced datasets. The two plots it produced are:
+
+<div style="max-width:720px; margin:30px auto;">
+  <div class="left">
+    <img src="/assets/mnist-tsne-svd.png" style="max-width:350px;" />
+  </div>
+  <div class="left" style="margin-left: 20px;">
+    <img src="/assets/mnist-tsne-pca.png" style="max-width:350px;" />
+  </div>
+  <div class="clear"></div>
+</div>
+
+From these plots we can clearly see how all the samples are nicely spaced apart and grouped together with their respective digits. This could be an amazing starting point to then use a clustering algorithm and try to identify the clusters or two actually use these two dimensions as input to another algorithm (e.g., something like a Neural Network).
+
+So we have explored using various dimensionality reduction techniques to visualise high-dimensional data using a two-dimensional scatter plot. We have not gone into the actual mathematics involved but instead relied on the Scikit-Learn implementations of all algorithms.
+
+
+
+## Appendix: Code
+
+Code: t-SNE on SVD-reduced data
 
 ~~~python
 n_sne = 10000
@@ -251,14 +273,7 @@ print 't-SNE done! Time elapsed: {} seconds'.format(time.time()-time_start)
 <pre class="python-output">
 [t-SNE] Computing pairwise distances...
 [t-SNE] Computed conditional probabilities for sample 1000 / 10000
-[t-SNE] Computed conditional probabilities for sample 2000 / 10000
-[t-SNE] Computed conditional probabilities for sample 3000 / 10000
-[t-SNE] Computed conditional probabilities for sample 4000 / 10000
-[t-SNE] Computed conditional probabilities for sample 5000 / 10000
-[t-SNE] Computed conditional probabilities for sample 6000 / 10000
-[t-SNE] Computed conditional probabilities for sample 7000 / 10000
-[t-SNE] Computed conditional probabilities for sample 8000 / 10000
-[t-SNE] Computed conditional probabilities for sample 9000 / 10000
+[...]
 [t-SNE] Computed conditional probabilities for sample 10000 / 10000
 [t-SNE] Mean sigma: 1.823966
 [t-SNE] Error after 100 iterations with early exaggeration: 18.533819
@@ -278,9 +293,7 @@ chart = ggplot( df_tsne, aes(x='x-tsne-svd', y='y-tsne-svd', color='label') ) \
 chart
 ~~~
 
-<img src="/assets/mnist-tsne-svd.png" style="max-width:600px;" />
-
-Now lets try the data that was reduced using PCA.
+Code: t-SNE on PCA-reduced data
 
 ~~~python
 n_sne = 10000
@@ -295,14 +308,7 @@ print 't-SNE done! Time elapsed: {} seconds'.format(time.time()-time_start)
 <pre class="python-output">
 [t-SNE] Computing pairwise distances...
 [t-SNE] Computed conditional probabilities for sample 1000 / 10000
-[t-SNE] Computed conditional probabilities for sample 2000 / 10000
-[t-SNE] Computed conditional probabilities for sample 3000 / 10000
-[t-SNE] Computed conditional probabilities for sample 4000 / 10000
-[t-SNE] Computed conditional probabilities for sample 5000 / 10000
-[t-SNE] Computed conditional probabilities for sample 6000 / 10000
-[t-SNE] Computed conditional probabilities for sample 7000 / 10000
-[t-SNE] Computed conditional probabilities for sample 8000 / 10000
-[t-SNE] Computed conditional probabilities for sample 9000 / 10000
+[...]
 [t-SNE] Computed conditional probabilities for sample 10000 / 10000
 [t-SNE] Mean sigma: 1.814452
 [t-SNE] Error after 100 iterations with early exaggeration: 18.725542
@@ -322,8 +328,3 @@ chart = ggplot( df_tsne, aes(x='x-tsne-pca', y='y-tsne-pca', color='label') ) \
         + ggtitle("tSNE dimensions colored by Digit (PCA)")
 chart
 ~~~
-
-<img src="/assets/mnist-tsne-pca.png" style="max-width:600px;" />
-
-
-some conclusion?

@@ -84,7 +84,7 @@
 
                 <header class="post-header">
                     <h1>Visualising high-dimensional datasets using PCA and tSNE</h1>
-                    <p class="meta">Sep 6, 2015 • Luuk Derksen</p>
+                    <p class="meta">Sep 6, 2015 • Luuk Derksen & Denise Xifara</p>
                     <a href="https://twitter.com/share" class="twitter-share-button" data-text="Check out Visualising high-dimensional datasets using PCA and tSNE" data-via="luckylwk">Tweet</a>
                     <script>
                         !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
@@ -170,7 +170,9 @@ Size of the dataframe: (70000, 785)
 </code></pre></div>
 <p><img src="/assets/mnist-digits.png" /></p>
 
-<p>Now we can start thinking about how we can actually distinguish the zeros from the ones and two&#39;s and so on. The images are all essentially 28-by-28 pixel images and therefore have a total of 784 &#39;dimensions&#39;, each holding the value of one specific pixel.</p>
+<p>Now we can start thinking about how we can actually distinguish the zeros from the ones and two&#39;s and so on. If you were, for example, a post office such an algorithm could help you read and sort the handwritten envelopes using a machine instead of having humans do that. Obviously nowadays we have very advanced methods to do this, but this dataset still provides a very good testing ground for seeing how specific methods (e.g., such as dimensionality reduction) work and how well they work.</p>
+
+<p>The images are all essentially 28-by-28 pixel images and therefore have a total of 784 &#39;dimensions&#39;, each holding the value of one specific pixel.</p>
 
 <p>What we can do is reduce the number of dimensions drastically whilst trying to retain as much of the &#39;variation&#39; in the information as possible. This is where we get to dimensionality reduction. Lets first take a look at something known as <strong>Principal Component Analysis</strong>.</p>
 
@@ -180,7 +182,7 @@ Size of the dataframe: (70000, 785)
 
 <p>I am not going to get into the actual derivation and calculation of the principal components - if you want to get into the mathematics see <a href="https://www.math.hmc.edu/calculus/tutorials/eigenstuff/">this</a> great page - instead we&#39;ll use the <a href="http://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html">Scikit-Learn implementation of PCA</a>. </p>
 
-<p>Since we as humans like our two-dimensional plots lets start with that and generate, from the original 784 dimensions, the first two principal components. And we&#39;ll also see how much of the variation in the total dataset they actually account for.</p>
+<p>Since we as humans like our two- and three-dimensional plots lets start with that and generate, from the original 784 dimensions, the first three principal components. And we&#39;ll also see how much of the variation in the total dataset they actually account for.</p>
 <div class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
 
 <span class="n">feat_cols</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
@@ -198,7 +200,7 @@ Size of the dataframe: (70000, 785)
 Explained variation per principal component: [ 0.16756229  0.0826886   0.05374424]
 </pre>
 
-<p>Now, given that they hold that much information about the entire dataset lets see if they also hold some information about the individual digits. What we can do is plot the first and second principal components versus each other in a scatter plot and color each of the different types of digits with a different color. If we are lucky the same type of digits will be clustered together which would mean that the first two principal components actually tell us a great deal about the specific types of digits.</p>
+<p>Now, given that the first two components account for about 25% of the variation in the entire dataset lets see if that is enough to visually set the different digits apart. What we can do is create a scatterplot of the first and second principal component and color each of the different types of digits with a different color. If we are lucky the same type of digits will be positioned (i.e., clustered) together in groups, which would mean that the first two principal components actually tell us a great deal about the specific types of digits.</p>
 <div class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">chart</span> <span class="o">=</span> <span class="n">ggplot</span><span class="p">(</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">rndperm</span><span class="p">[:</span><span class="mi">3000</span><span class="p">],:],</span> <span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">&#39;x-pca&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">&#39;y-pca&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;label&#39;</span><span class="p">)</span> <span class="p">)</span> \
         <span class="o">+</span> <span class="n">geom_point</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">75</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span> \
         <span class="o">+</span> <span class="n">ggtitle</span><span class="p">(</span><span class="s">&quot;First and Second Principal Components colored by digit&quot;</span><span class="p">)</span>
@@ -206,7 +208,7 @@ Explained variation per principal component: [ 0.16756229  0.0826886   0.0537442
 </code></pre></div>
 <p><img src="/assets/mnist-pca.png" style="max-width:600px;" /></p>
 
-<p>So there is some information, especially for specific digits, but clearly not enough to set them apart. Luckily there is another technique that we can use to reduce the number of dimensions that may prove more helpful.</p>
+<p>From the graph we can see the two components definitely hold some information, especially for specific digits, but clearly not enough to set all of them apart. Luckily there is another technique that we can use to reduce the number of dimensions that may prove more helpful. In the next few paragraph we are going to take a look at that technique and explore if it gives us a better way of reducing the dimensions for visualisation. The method we will be exploring is known as <strong>t-SNE</strong> (t-Distributed Stochastic Neighbouring Entities).</p>
 
 <h3>t-Distributed Stochastic Neighbouring Entities (t-SNE)</h3>
 
@@ -267,7 +269,7 @@ t-SNE done! Time elapsed: 813.213096142 seconds
 
 <p>This is already a significant improvement over the PCA visualisation we used earlier. We can see that the digits are very clearly clustered in their own little group. If we would now use a clustering algorithm to pick out the seperate clusters we could probably quite accurately assign new points to a label.</p>
 
-<p>We&#39;ll now take the recommandations to heart and actually reduce the number of dimensions before feeding the data into the t-SNE algorithm. For this we&#39;ll use another dimensionality reduction technique named SVD. Using both PCA and SVD we&#39;ll reduce the number of dimensions to 50.</p>
+<p>We&#39;ll now take the recommandations to heart and actually reduce the number of dimensions before feeding the data into the t-SNE algorithm. For this we&#39;ll use another dimensionality reduction technique named SVD as well as the PCA that we used before. We will first create two new datasets, one containing the fifty dimensions generated by the SVD reduction algorithm, the other containing the fifty dimensions generated by the PCA reduction algorithm. We can then use these datasets to perform the t-SNE on at a later stage.</p>
 <div class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">TruncatedSVD</span>
 
 <span class="n">pca_50</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
@@ -285,7 +287,25 @@ Explained variation per principal component (PCA): 84.6676222833%
 
 <p>Amazingly, in both cases the first 50 components roughly hold around 85% of the total variation in the data.</p>
 
-<p>Now lets try and feed this data into the t-SNE algorithm. We&#39;ll start with the data that was reduced by SVD. This time we&#39;ll use 10,000 samples.</p>
+<p>Now lets try and feed this data into the t-SNE algorithm. This time we&#39;ll use 10,000 samples out of the 70,000 to make sure the algorithm does not take up too much memory and CPU. Since the code used for this is very similar to the previous t-SNE code I have moved it to the <strong>Appendix: Code</strong> section at the bottom of this post. The code will allow you to run the t-SNE algorithm on both the SVD- and PCA-reduced datasets. The two plots it produced are:</p>
+
+<div style="max-width:720px; margin:30px auto;">
+  <div class="left">
+    <img src="/assets/mnist-tsne-svd.png" style="max-width:350px;" />
+  </div>
+  <div class="left" style="margin-left: 20px;">
+    <img src="/assets/mnist-tsne-pca.png" style="max-width:350px;" />
+  </div>
+  <div class="clear"></div>
+</div>
+
+<p>From these plots we can clearly see how all the samples are nicely spaced apart and grouped together with their respective digits. This could be an amazing starting point to then use a clustering algorithm and try to identify the clusters or two actually use these two dimensions as input to another algorithm (e.g., something like a Neural Network).</p>
+
+<p>So we have explored using various dimensionality reduction techniques to visualise high-dimensional data using a two-dimensional scatter plot. We have not gone into the actual mathematics involved but instead relied on the Scikit-Learn implementations of all algorithms.</p>
+
+<h2>Appendix: Code</h2>
+
+<p>Code: t-SNE on SVD-reduced data</p>
 <div class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">n_sne</span> <span class="o">=</span> <span class="mi">10000</span>
 
 <span class="n">time_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
@@ -298,14 +318,7 @@ Explained variation per principal component (PCA): 84.6676222833%
 <pre class="python-output">
 [t-SNE] Computing pairwise distances...
 [t-SNE] Computed conditional probabilities for sample 1000 / 10000
-[t-SNE] Computed conditional probabilities for sample 2000 / 10000
-[t-SNE] Computed conditional probabilities for sample 3000 / 10000
-[t-SNE] Computed conditional probabilities for sample 4000 / 10000
-[t-SNE] Computed conditional probabilities for sample 5000 / 10000
-[t-SNE] Computed conditional probabilities for sample 6000 / 10000
-[t-SNE] Computed conditional probabilities for sample 7000 / 10000
-[t-SNE] Computed conditional probabilities for sample 8000 / 10000
-[t-SNE] Computed conditional probabilities for sample 9000 / 10000
+[...]
 [t-SNE] Computed conditional probabilities for sample 10000 / 10000
 [t-SNE] Mean sigma: 1.823966
 [t-SNE] Error after 100 iterations with early exaggeration: 18.533819
@@ -322,9 +335,7 @@ t-SNE done! Time elapsed: 1619.55461097 seconds
         <span class="o">+</span> <span class="n">ggtitle</span><span class="p">(</span><span class="s">&quot;tSNE dimensions colored by Digit (SVD)&quot;</span><span class="p">)</span>
 <span class="n">chart</span>
 </code></pre></div>
-<p><img src="/assets/mnist-tsne-svd.png" style="max-width:600px;" /></p>
-
-<p>Now lets try the data that was reduced using PCA.</p>
+<p>Code: t-SNE on PCA-reduced data</p>
 <div class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">n_sne</span> <span class="o">=</span> <span class="mi">10000</span>
 
 <span class="n">time_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
@@ -337,14 +348,7 @@ t-SNE done! Time elapsed: 1619.55461097 seconds
 <pre class="python-output">
 [t-SNE] Computing pairwise distances...
 [t-SNE] Computed conditional probabilities for sample 1000 / 10000
-[t-SNE] Computed conditional probabilities for sample 2000 / 10000
-[t-SNE] Computed conditional probabilities for sample 3000 / 10000
-[t-SNE] Computed conditional probabilities for sample 4000 / 10000
-[t-SNE] Computed conditional probabilities for sample 5000 / 10000
-[t-SNE] Computed conditional probabilities for sample 6000 / 10000
-[t-SNE] Computed conditional probabilities for sample 7000 / 10000
-[t-SNE] Computed conditional probabilities for sample 8000 / 10000
-[t-SNE] Computed conditional probabilities for sample 9000 / 10000
+[...]
 [t-SNE] Computed conditional probabilities for sample 10000 / 10000
 [t-SNE] Mean sigma: 1.814452
 [t-SNE] Error after 100 iterations with early exaggeration: 18.725542
@@ -361,10 +365,6 @@ t-SNE done! Time elapsed: 1620.80310392 seconds
         <span class="o">+</span> <span class="n">ggtitle</span><span class="p">(</span><span class="s">&quot;tSNE dimensions colored by Digit (PCA)&quot;</span><span class="p">)</span>
 <span class="n">chart</span>
 </code></pre></div>
-<p><img src="/assets/mnist-tsne-pca.png" style="max-width:600px;" /></p>
-
-<p>some conclusion?</p>
-
                 </article>
 
                 <!-- mathjax -->
