@@ -23,7 +23,9 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 100%; 
     /*font-weight: 400; */
 }
-
+p {
+    color: rgba(0,0,0,0.87);
+}
 strong {
     font-weight: 600;
 }
@@ -187,7 +189,7 @@ p.description {
     letter-spacing: -1px;
 }
 
-.post-content p {
+.post-content p, .post-content ul, .post-content li {
     font-size: 1em;
     line-height: 1.75em;
     font-weight: 300;
@@ -222,15 +224,16 @@ p.description {
     margin: 30px 0px;
     padding: 10px 15px;
     background-color: #eee;
-    border: 1px solid #bbb;
+    border: 1px solid #ccc;
     border-radius: 3px; -webkit-border-radius: 3px; -moz-border-radius: 3px;
-    font-size: 14px;
-    line-height: 1.75em;
     overflow: auto;
 }
 
 .post code { 
-    padding: 1px 5px; 
+    padding: 2px 5px; 
+    /*color: steelblue;*/
+    font-size: 1em;
+    line-height: 1.75em;
 }
 
 .post ul,
@@ -240,12 +243,17 @@ p.description {
     border: 0;
     padding-right: 0;
     padding-left: 0;
+    /*color: rgba(0,0,0,0.87);*/
+    font-size: 16px;
+    line-height: 1.75em;
 }
 
 .post pre.python-output {
     margin-top: -25px;
     background-color: rgba(0,50,255,0.025);
     opacity: 0.75;
+    font-size: 16px;
+    line-height: 1.75em;
 }
 
 
@@ -300,6 +308,7 @@ p.description {
 .highlight .gs { font-weight: bold } /* Generic.Strong */
 .highlight .gu { color: #aaaaaa } /* Generic.Subheading */
 .highlight .gt { color: #aa0000 } /* Generic.Traceback */
+.highlight .kn { font-weight: bold }
 .highlight .kc { font-weight: bold } /* Keyword.Constant */
 .highlight .kd { font-weight: bold } /* Keyword.Declaration */
 .highlight .kp { font-weight: bold } /* Keyword.Pseudo */
@@ -314,7 +323,7 @@ p.description {
 .highlight .ni { color: #800080 } /* Name.Entity */
 .highlight .ne { color: #990000; font-weight: bold } /* Name.Exception */
 .highlight .nf { color: #990000; font-weight: bold } /* Name.Function */
-.highlight .nn { color: #555555 } /* Name.Namespace */
+.highlight .nn { color: #14273B; } /*{ color: #555555 }*/ /* Name.Namespace */
 .highlight .nt { color: #000080 } /* Name.Tag */
 .highlight .nv { color: #008080 } /* Name.Variable */
 .highlight .ow { font-weight: bold } /* Operator.Word */

@@ -1,56 +1,10 @@
----
-layout: post
-comments: true
-title:  "Clustering using a similarity graph in D3"
-excerpt: "..."
-date:   2015-11-01 11:22:00
-author: Luuk Derksen
-mathjax: false
-tags:
-  - d3
-  - visualisation
----
-
-<style>
-    .edge {
-        stroke-width: 0.5px;
-    }
-    .setosa {
-        fill: green;
-        stroke: green;
-    }
-    .virginica {
-        fill: red;
-        stroke: red;
-    }
-    .versicolor {
-        fill: blue;
-        stroke: blue;
-    }
-    .unknown {
-        stroke: #aaa;
-    }
-    .graph-container-generic {
-        border: 1px solid #aaa;
-        border-radius: 5px;
-    }
-</style>
-<script src="/js/d3.v3.5.5.min.js"></script>
-
-Building a similarity graph clustering using D3
-
-using the iris dataset.
-
-Data handling function...
-
-~~~javascript
 var class_key = 'Species',
     classes = [],
     features = [],
     n = 0;
 
 // Read in the data, parse and pass on.
-d3.csv("data-iris.csv", function (d,i) {
+d3.csv("/assets/data-iris.csv", function (d,i) {
     // Get the keys (headers) of the columns.
     if( i === 0 ){
         features = Object.keys(d);
@@ -63,13 +17,11 @@ d3.csv("data-iris.csv", function (d,i) {
     }
     return d;
 }, function (error, data) {
-    // Pass the data to another function here...
+    drawGraph1(data);
+    drawGraph2(data);
 } );
-~~~
 
-Now we can start creating something that draws a force-directed graph.
 
-~~~javascript
 function drawGraph1 (data) {
     // Draw a force-directed graph without edges 
     // and the nodes colored by species.
@@ -101,30 +53,58 @@ function createNodes(data){
     }
     return nodes;
 }
-~~~
-
-This will return us the following visualisation.
-
-<div id="graph-container-1"></div>
-
-Distance: Euclidean.
-Data: Raw.
-
-Now lets draw edges between all points. However, the length of the edge will depend on how closely they are related.
 
 
-<div id="graph-container-2"></div>
+function drawGraph2 (data) {
+    // Draw a force directed graph with all edges a 
+    // similar length and the nodes colored by species.
+    // First we need to create the graph object.
+    var graph = {
+        "nodes": createNodes(data),
+        "edges": [],
+        "stats": {
+            "minDistance": 999.0,
+            "maxDistance": -999.0,
+            "avgDistance": 0.0
+        }
+    } 
+    //
+    for( var i=0; i<graph.nodes.length; i++ ){
+        for( var j=(i+1); j<graph.nodes.length; j++ ){
+            // Calculate the similarity measure.
+            dist = calculateSimilarityEuclidean(graph.nodes[i]["points"],graph.nodes[j]["points"]);
+            if( dist < 0.75 ){
+                graph.edges.push( {
+                    'source': i,
+                    'target': j,
+                    'value': dist,
+                    "source-class": graph.nodes[i]["class"],
+                    "target-class": graph.nodes[j]["class"]
+                } );
+                graph.nodes[i]["degree"]++;
+                graph.nodes[j]["degree"]++;
+            }
+            graph.stats.minDistance = Math.min(graph.stats.minDistance,dist);
+            graph.stats.maxDistance = Math.max(graph.stats.maxDistance,dist);
+            graph.stats.avgDistance += dist/(graph.nodes.length*(graph.nodes.length-1));
+        }
+    }
+    // Draw the force directed graph.
+    createForceDirectedGraph(graph,"graph-container-2");
+}
 
 
+// Helper functions
+
+function calculateSimilarityEuclidean(x1,x2){
+    var tmpSum = 0.0;
+    for( var d=0; d<x1.length; d++ ){
+        tmpSum = tmpSum + Math.pow(x1[d]-x2[d], 2);
+    }
+    return Math.sqrt(tmpSum);
+}
 
 
-
-
-<script src="/js-blogs/similarity-graph-d3.js"></script>
-
-### Code: Force Directed Graph
-
-~~~javascript
 function createForceDirectedGraph (graph,svgID) {
     console.log("Graph Stats", graph.stats)
     var width = 700,
@@ -139,9 +119,9 @@ function createForceDirectedGraph (graph,svgID) {
     var edges = svg.append("g").attr("class","edges");
     //
     var force = d3.layout.force()
-        .charge(-50)
+        .charge(-25)
         .linkDistance(function (d) { 
-            return 700 * Math.max(0.05, (d.value-graph.stats.minDistance)/graph.stats.maxDistance ); 
+            return 500 * Math.max(0.05, (d.value-graph.stats.minDistance)/graph.stats.maxDistance ); 
         })
         .size([width, height]);
     force.nodes(graph.nodes)
@@ -191,4 +171,3 @@ function createForceDirectedGraph (graph,svgID) {
             .attr("cy", function(d) { return d.y; });
     }); // end of on-tick.
 } // end of function createForceDirectedGraph
-~~~

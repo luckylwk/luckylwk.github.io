@@ -28,7 +28,7 @@
         
         <style>
             .lwk-main-container {
-                background: #f7f7f7;
+                background: #f9f9f9;
             }
             .lwk-main-container .mdl-layout__header,
             .lwk-main-container .mdl-layout__drawer-button {
@@ -104,7 +104,7 @@
 <div class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">fetch_mldata</span>
 
-<span class="n">mnist</span> <span class="o">=</span> <span class="n">fetch_mldata</span><span class="p">(</span><span class="s">&quot;MNIST original&quot;</span><span class="p">)</span>
+<span class="n">mnist</span> <span class="o">=</span> <span class="n">fetch_mldata</span><span class="p">(</span><span class="s">"MNIST original"</span><span class="p">)</span>
 <span class="n">X</span> <span class="o">=</span> <span class="n">mnist</span><span class="o">.</span><span class="n">data</span> <span class="o">/</span> <span class="mf">255.0</span>
 <span class="n">y</span> <span class="o">=</span> <span class="n">mnist</span><span class="o">.</span><span class="n">target</span>
 
@@ -117,15 +117,15 @@
 <p>We are going to convert the matrix and vector to a Pandas DataFrame. This is very similar to the DataFrames used in R and will make it easier for us to plot it later on.</p>
 <div class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 
-<span class="n">feat_cols</span> <span class="o">=</span> <span class="p">[</span> <span class="s">&#39;pixel&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="p">]</span>
+<span class="n">feat_cols</span> <span class="o">=</span> <span class="p">[</span> <span class="s">'pixel'</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="p">]</span>
 
 <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">columns</span><span class="o">=</span><span class="n">feat_cols</span><span class="p">)</span>
-<span class="n">df</span><span class="p">[</span><span class="s">&#39;label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span>
-<span class="n">df</span><span class="p">[</span><span class="s">&#39;label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">&#39;label&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+<span class="n">df</span><span class="p">[</span><span class="s">'label'</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span>
+<span class="n">df</span><span class="p">[</span><span class="s">'label'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">'label'</span><span class="p">]</span><span class="o">.</span><span class="nb">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
 
 <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span>
 
-<span class="k">print</span> <span class="s">&#39;Size of the dataframe: {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">'Size of the dataframe: {}'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </code></pre></div>
 <pre class="python-output">
 Size of the dataframe: (70000, 785)
@@ -164,7 +164,7 @@ Size of the dataframe: (70000, 785)
 <span class="n">plt</span><span class="o">.</span><span class="n">gray</span><span class="p">()</span>
 <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">7</span><span class="p">)</span> <span class="p">)</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">30</span><span class="p">):</span>
-    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;Digit: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">rndperm</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="s">&#39;label&#39;</span><span class="p">])</span> <span class="p">)</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s">'Digit: '</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">rndperm</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="s">'label'</span><span class="p">])</span> <span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">matshow</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">rndperm</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">feat_cols</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">28</span><span class="p">,</span><span class="mi">28</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div>
@@ -190,11 +190,11 @@ Size of the dataframe: (70000, 785)
 <span class="n">pca</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 <span class="n">pca_result</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">feat_cols</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
 
-<span class="n">df</span><span class="p">[</span><span class="s">&#39;pca-one&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pca_result</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
-<span class="n">df</span><span class="p">[</span><span class="s">&#39;pca-two&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pca_result</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span> 
-<span class="n">df</span><span class="p">[</span><span class="s">&#39;pca-three&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pca_result</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">df</span><span class="p">[</span><span class="s">'pca-one'</span><span class="p">]</span> <span class="o">=</span> <span class="n">pca_result</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">df</span><span class="p">[</span><span class="s">'pca-two'</span><span class="p">]</span> <span class="o">=</span> <span class="n">pca_result</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span> 
+<span class="n">df</span><span class="p">[</span><span class="s">'pca-three'</span><span class="p">]</span> <span class="o">=</span> <span class="n">pca_result</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span>
 
-<span class="k">print</span> <span class="s">&#39;Explained variation per principal component: {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pca</span><span class="o">.</span><span class="n">explained_variance_ratio_</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">'Explained variation per principal component: {}'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pca</span><span class="o">.</span><span class="n">explained_variance_ratio_</span><span class="p">)</span>
 </code></pre></div>
 <pre class="python-output">
 Explained variation per principal component: [ 0.16756229  0.0826886   0.05374424]
@@ -203,9 +203,9 @@ Explained variation per principal component: [ 0.16756229  0.0826886   0.0537442
 <p>Now, given that the first two components account for about 25% of the variation in the entire dataset lets see if that is enough to visually set the different digits apart. What we can do is create a scatterplot of the first and second principal component and color each of the different types of digits with a different color. If we are lucky the same type of digits will be positioned (i.e., clustered) together in groups, which would mean that the first two principal components actually tell us a great deal about the specific types of digits.</p>
 <div class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">ggplot</span> <span class="kn">import</span> <span class="o">*</span>
 
-<span class="n">chart</span> <span class="o">=</span> <span class="n">ggplot</span><span class="p">(</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">rndperm</span><span class="p">[:</span><span class="mi">3000</span><span class="p">],:],</span> <span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">&#39;x-pca&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">&#39;y-pca&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;label&#39;</span><span class="p">)</span> <span class="p">)</span> \
+<span class="n">chart</span> <span class="o">=</span> <span class="n">ggplot</span><span class="p">(</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">rndperm</span><span class="p">[:</span><span class="mi">3000</span><span class="p">],:],</span> <span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">'x-pca'</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">'y-pca'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'label'</span><span class="p">)</span> <span class="p">)</span> \
         <span class="o">+</span> <span class="n">geom_point</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">75</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span> \
-        <span class="o">+</span> <span class="n">ggtitle</span><span class="p">(</span><span class="s">&quot;First and Second Principal Components colored by digit&quot;</span><span class="p">)</span>
+        <span class="o">+</span> <span class="n">ggtitle</span><span class="p">(</span><span class="s">"First and Second Principal Components colored by digit"</span><span class="p">)</span>
 <span class="n">chart</span>
 </code></pre></div>
 <p><img src="/assets/mnist-pca.png" style="max-width:600px;" /></p>
@@ -219,7 +219,7 @@ Explained variation per principal component: [ 0.16756229  0.0826886   0.0537442
 <p><em>t-Distributed stochastic neighbor embedding (t-SNE) minimizes the divergence between two distributions: a distribution that measures pairwise similarities of the input objects and a distribution that measures pairwise similarities of the corresponding low-dimensional points in the embedding.</em></p>
 
 <p>Essentially what this means is that it looks at the original data that is entered into the algorithm and looks at how to best represent this data using less dimensions by matching both distributions. The way it does this is computationally quite heavy and therefore there are some (serious) limitations to the use of this technique. For example one of the recommendations is that, in case of very high dimensional data, you may need to apply another dimensionality reduction technique before using t-SNE:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"> |  It is highly recommended to use another dimensionality reduction
+<div class="highlight"><pre><code class="language-" data-lang=""> |  It is highly recommended to use another dimensionality reduction
  |  method (e.g. PCA for dense data or TruncatedSVD for sparse data)
  |  to reduce the number of dimensions to a reasonable amount (e.g. 50)
  |  if the number of features is very high.
@@ -240,7 +240,7 @@ Explained variation per principal component: [ 0.16756229  0.0826886   0.0537442
 <span class="n">time_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 <span class="n">tsne</span> <span class="o">=</span> <span class="n">TSNE</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">perplexity</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
 <span class="n">tsne_results</span> <span class="o">=</span> <span class="n">tsne</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">rndperm</span><span class="p">[:</span><span class="n">n_sne</span><span class="p">],</span><span class="n">feat_cols</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
-<span class="k">print</span> <span class="s">&#39;t-SNE done! Time elapsed: {} seconds&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">time_start</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">'t-SNE done! Time elapsed: {} seconds'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">time_start</span><span class="p">)</span>
 </code></pre></div>
 <pre class="python-output">
 [t-SNE] Computing pairwise distances...
@@ -259,12 +259,12 @@ t-SNE done! Time elapsed: 813.213096142 seconds
 
 <p>Now that we have the two resulting dimensions we can again visualise them by creating a scatter plot of the two dimensions and coloring each sample by its respective label.</p>
 <div class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">df_tsne</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">rndperm</span><span class="p">[:</span><span class="n">n_sne</span><span class="p">],:]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-<span class="n">df_tsne</span><span class="p">[</span><span class="s">&#39;x-tsne&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tsne_results</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
-<span class="n">df_tsne</span><span class="p">[</span><span class="s">&#39;y-tsne&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tsne_results</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">df_tsne</span><span class="p">[</span><span class="s">'x-tsne'</span><span class="p">]</span> <span class="o">=</span> <span class="n">tsne_results</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">df_tsne</span><span class="p">[</span><span class="s">'y-tsne'</span><span class="p">]</span> <span class="o">=</span> <span class="n">tsne_results</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
 
-<span class="n">chart</span> <span class="o">=</span> <span class="n">ggplot</span><span class="p">(</span> <span class="n">df_tsne</span><span class="p">,</span> <span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">&#39;x-tsne&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">&#39;y-tsne&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;label&#39;</span><span class="p">)</span> <span class="p">)</span> \
+<span class="n">chart</span> <span class="o">=</span> <span class="n">ggplot</span><span class="p">(</span> <span class="n">df_tsne</span><span class="p">,</span> <span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">'x-tsne'</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">'y-tsne'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'label'</span><span class="p">)</span> <span class="p">)</span> \
         <span class="o">+</span> <span class="n">geom_point</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span> \
-        <span class="o">+</span> <span class="n">ggtitle</span><span class="p">(</span><span class="s">&quot;tSNE dimensions colored by digit&quot;</span><span class="p">)</span>
+        <span class="o">+</span> <span class="n">ggtitle</span><span class="p">(</span><span class="s">"tSNE dimensions colored by digit"</span><span class="p">)</span>
 <span class="n">chart</span>
 </code></pre></div>
 <p><img src="/assets/mnist-tsne-1.png" style="max-width:600px;" /></p>
@@ -275,7 +275,7 @@ t-SNE done! Time elapsed: 813.213096142 seconds
 <div class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">pca_50</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
 <span class="n">pca_result_50</span> <span class="o">=</span> <span class="n">pca_50</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">feat_cols</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
 
-<span class="k">print</span> <span class="s">&#39;Explained variation per principal component (PCA): {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">pca_50</span><span class="o">.</span><span class="n">explained_variance_ratio_</span><span class="p">))</span>
+<span class="k">print</span> <span class="s">'Explained variation per principal component (PCA): {}'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">pca_50</span><span class="o">.</span><span class="n">explained_variance_ratio_</span><span class="p">))</span>
 </code></pre></div>
 <pre class="python-output">
 Explained variation per principal component (PCA): 84.6676222833%
@@ -301,7 +301,7 @@ Explained variation per principal component (PCA): 84.6676222833%
 <span class="n">tsne</span> <span class="o">=</span> <span class="n">TSNE</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">perplexity</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
 <span class="n">tsne_pca_results</span> <span class="o">=</span> <span class="n">tsne</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">pca_result_50</span><span class="p">[</span><span class="n">rndperm</span><span class="p">[:</span><span class="n">n_sne</span><span class="p">]])</span>
 
-<span class="k">print</span> <span class="s">&#39;t-SNE done! Time elapsed: {} seconds&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">time_start</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">'t-SNE done! Time elapsed: {} seconds'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">time_start</span><span class="p">)</span>
 </code></pre></div>
 <pre class="python-output">
 [t-SNE] Computing pairwise distances...
@@ -315,12 +315,12 @@ t-SNE done! Time elapsed: 1620.80310392 seconds
 </pre>
 <div class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">df_tsne</span> <span class="o">=</span> <span class="bp">None</span>
 <span class="n">df_tsne</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">rndperm</span><span class="p">[:</span><span class="n">n_sne</span><span class="p">],:]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-<span class="n">df_tsne</span><span class="p">[</span><span class="s">&#39;x-tsne-pca&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tsne_pca_results</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
-<span class="n">df_tsne</span><span class="p">[</span><span class="s">&#39;y-tsne-pca&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tsne_pca_results</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">df_tsne</span><span class="p">[</span><span class="s">'x-tsne-pca'</span><span class="p">]</span> <span class="o">=</span> <span class="n">tsne_pca_results</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">df_tsne</span><span class="p">[</span><span class="s">'y-tsne-pca'</span><span class="p">]</span> <span class="o">=</span> <span class="n">tsne_pca_results</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
 
-<span class="n">chart</span> <span class="o">=</span> <span class="n">ggplot</span><span class="p">(</span> <span class="n">df_tsne</span><span class="p">,</span> <span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">&#39;x-tsne-pca&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">&#39;y-tsne-pca&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;label&#39;</span><span class="p">)</span> <span class="p">)</span> \
+<span class="n">chart</span> <span class="o">=</span> <span class="n">ggplot</span><span class="p">(</span> <span class="n">df_tsne</span><span class="p">,</span> <span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">'x-tsne-pca'</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">'y-tsne-pca'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'label'</span><span class="p">)</span> <span class="p">)</span> \
         <span class="o">+</span> <span class="n">geom_point</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span> \
-        <span class="o">+</span> <span class="n">ggtitle</span><span class="p">(</span><span class="s">&quot;tSNE dimensions colored by Digit (PCA)&quot;</span><span class="p">)</span>
+        <span class="o">+</span> <span class="n">ggtitle</span><span class="p">(</span><span class="s">"tSNE dimensions colored by Digit (PCA)"</span><span class="p">)</span>
 <span class="n">chart</span>
 </code></pre></div>
                 </article>
@@ -338,15 +338,8 @@ t-SNE done! Time elapsed: 1620.80310392 seconds
         <footer class="site-footer">
 
     <!-- Google Analytics -->
-    <script>
-        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-        ga('create', 'UA-47414860-1', 'auto');
-        ga('send', 'pageview');
-    </script>
+    <script src="/js/ga.js"></script>
+    <script src="/js/hotjar.js"></script>
 
 </footer>
 

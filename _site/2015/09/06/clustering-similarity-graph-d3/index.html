@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+
+                
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        
+        <title>Clustering using a similarity graph in D3</title>
+        
+        <meta name="viewport" content="width=device-width">
+        <meta name="description" content="Some thoughts and writeups.">
+        
+        <link rel="stylesheet" href="//storage.googleapis.com/code.getmdl.io/1.0.4/material.indigo-pink.min.css">
+        <script src="//storage.googleapis.com/code.getmdl.io/1.0.4/material.min.js"></script>
+        <!-- Icon-font -->
+        <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+        <!-- Fonts -->
+        <link href='//fonts.googleapis.com/css?family=Merriweather:400,300,700' rel='stylesheet' type='text/css'>
+        <link href='//fonts.googleapis.com/css?family=Hind:300,400,500,600' rel='stylesheet' type='text/css'>
+
+        <link rel="canonical" href="http://luckylwk.github.io/2015/09/06/clustering-similarity-graph-d3/">
+
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="/css/main.css">
+
+        
+        <style>
+            .lwk-main-container {
+                background: #f7f7f7;
+            }
+            .lwk-main-container .mdl-layout__header,
+            .lwk-main-container .mdl-layout__drawer-button {
+                color: white;
+            }
+            .mdl-layout__header {
+                background: rgba(12,16,61,1);
+            }
+        </style>
+
+    </head>
+
+    <body>
+
+        <div class="lwk-main-container mdl-layout mdl-js-layout">
+
+            <!-- <div id="particles-js" class="particles-container"></div> -->
+            <!-- // <script src="../js/particles.min.js"></script> -->
+            <!-- // <script src="../js/app.js"></script> -->
+
+                                
+
+            <header class="mdl-layout__header mdl-layout__header">
+                <div class="mdl-layout__header-row">
+                    <!-- Title -->
+                    <span class="mdl-layout-title">luckylwk</span>
+                    <!-- Add spacer, to align navigation to the right -->
+                    <div class="mdl-layout-spacer"></div>
+                    <!-- Navigation -->
+                    <nav class="mdl-navigation">
+                        <a class="mdl-navigation__link" href="/machine-learning/">Machine Learning</a>
+                        <a class="mdl-navigation__link" href="/data-visualisation/">Data Visualisation</a>
+                        <a class="mdl-navigation__link" href="/about/">About</a>
+                    </nav>
+                </div>
+            </header>
+            <div class="mdl-layout__drawer">
+                <span class="mdl-layout-title">luckylwk</span>
+                <nav class="mdl-navigation">
+                    <a class="mdl-navigation__link" href="/machine-learning/">Machine Learning</a>
+                    <a class="mdl-navigation__link" href="/data-visualisation/">Data Visualisation</a>
+                    <a class="mdl-navigation__link" href="/about/">About</a>
+                    <a class="mdl-navigation__link" href="https://www.twitter.com/luckylwk" target="_blank">Twitter</a>
+                    <a class="mdl-navigation__link" href="https://uk.linkedin.com/pub/luuk-derksen/a/80/956" target="_blank">LinkedIn</a>
+                    <a class="mdl-navigation__link" href="https://github.com/luckylwk" target="_blank">Github</a>
+                </nav>
+            </div>
+
+            <main class="mdl-layout__content">
+
+                        <div class="wrap">
+            <div class="post">
+
+                <header class="post-header">
+                    <h1>Clustering using a similarity graph in D3</h1>
+                    <p class="meta">Sep 6, 2015 • Luuk Derksen</p>
+                    <a href="https://twitter.com/share" class="twitter-share-button" data-text="Check out Clustering using a similarity graph in D3" data-via="luckylwk">Tweet</a>
+                    <script>
+                        !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+                    </script>
+                </header>
+
+                <article class="post-content">
+                <style>
+    .edge {
+        stroke-width: 0.5px;
+    }
+    .setosa {
+        fill: green;
+        stroke: green;
+    }
+    .virginica {
+        fill: red;
+        stroke: red;
+    }
+    .versicolor {
+        fill: blue;
+        stroke: blue;
+    }
+    .unknown {
+        stroke: #aaa;
+    }
+    .graph-container-generic {
+        border: 1px solid #aaa;
+        border-radius: 5px;
+    }
+</style>
+
+<script src="/js/d3.v3.5.5.min.js"></script>
+
+<p>Building a similarity graph clustering using D3</p>
+
+<p>using the iris dataset.</p>
+
+<p>Data handling function...</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">class_key</span> <span class="o">=</span> <span class="s1">'Species'</span><span class="p">,</span>
+    <span class="nx">classes</span> <span class="o">=</span> <span class="p">[],</span>
+    <span class="nx">features</span> <span class="o">=</span> <span class="p">[],</span>
+    <span class="nx">n</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+<span class="c1">// Read in the data, parse and pass on.</span>
+<span class="nx">d3</span><span class="p">.</span><span class="nx">csv</span><span class="p">(</span><span class="s2">"data-iris.csv"</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">d</span><span class="p">,</span><span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Get the keys (headers) of the columns.</span>
+    <span class="k">if</span><span class="p">(</span> <span class="nx">i</span> <span class="o">===</span> <span class="mi">0</span> <span class="p">){</span>
+        <span class="nx">features</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">d</span><span class="p">);</span>
+        <span class="nx">features</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span> <span class="nx">features</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">class_key</span><span class="p">),</span> <span class="mi">1</span> <span class="p">);</span>
+        <span class="nx">n</span> <span class="o">=</span> <span class="nx">features</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="c1">// Get the classes based on the class_key</span>
+    <span class="k">if</span><span class="p">(</span> <span class="nx">classes</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">d</span><span class="p">[</span><span class="nx">class_key</span><span class="p">])</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="p">){</span>
+        <span class="nx">classes</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">d</span><span class="p">[</span><span class="nx">class_key</span><span class="p">]);</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="nx">d</span><span class="p">;</span>
+<span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Pass the data to another function here...</span>
+<span class="p">}</span> <span class="p">);</span>
+</code></pre></div>
+<p>Now we can start creating something that draws a force-directed graph.</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">drawGraph1</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Draw a force-directed graph without edges </span>
+    <span class="c1">// and the nodes colored by species.</span>
+    <span class="c1">// First we need to create the graph object.</span>
+    <span class="kd">var</span> <span class="nx">graph</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"nodes"</span><span class="p">:</span> <span class="nx">createNodes</span><span class="p">(</span><span class="nx">data</span><span class="p">),</span>
+        <span class="s2">"edges"</span><span class="p">:</span> <span class="p">[],</span>
+    <span class="p">}</span>
+    <span class="c1">// Draw the force directed graph.</span>
+    <span class="nx">createForceDirectedGraph</span><span class="p">(</span><span class="nx">graph</span><span class="p">,</span><span class="s2">"graph-container-1"</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// Function to create the nodes array as it is needed for the force-directed graph.</span>
+<span class="kd">function</span> <span class="nx">createNodes</span><span class="p">(</span><span class="nx">data</span><span class="p">){</span>
+    <span class="nx">nodes</span> <span class="o">=</span> <span class="p">[];</span>
+    <span class="k">for</span><span class="p">(</span> <span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">data</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">){</span>
+        <span class="kd">var</span> <span class="nx">obj</span> <span class="o">=</span> <span class="p">{};</span>
+        <span class="nx">obj</span><span class="p">[</span><span class="s2">"class"</span><span class="p">]</span> <span class="o">=</span> <span class="nx">data</span><span class="p">[</span><span class="nx">i</span><span class="p">][</span><span class="nx">class_key</span><span class="p">];</span>
+        <span class="nx">obj</span><span class="p">[</span><span class="s2">"points"</span><span class="p">]</span> <span class="o">=</span> <span class="p">[];</span>
+        <span class="k">for</span><span class="p">(</span> <span class="kd">var</span> <span class="nx">f</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">f</span><span class="o">&lt;</span><span class="nx">features</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">f</span><span class="o">++</span> <span class="p">){</span>
+            <span class="nx">obj</span><span class="p">[</span><span class="nx">features</span><span class="p">[</span><span class="nx">f</span><span class="p">]]</span> <span class="o">=</span> <span class="o">+</span><span class="nx">data</span><span class="p">[</span><span class="nx">i</span><span class="p">][</span><span class="nx">features</span><span class="p">[</span><span class="nx">f</span><span class="p">]];</span>
+            <span class="nx">obj</span><span class="p">[</span><span class="s2">"points"</span><span class="p">].</span><span class="nx">push</span><span class="p">(</span><span class="o">+</span><span class="nx">data</span><span class="p">[</span><span class="nx">i</span><span class="p">][</span><span class="nx">features</span><span class="p">[</span><span class="nx">f</span><span class="p">]]);</span>
+        <span class="p">}</span>
+        <span class="c1">// Save the node index.</span>
+        <span class="nx">obj</span><span class="p">[</span><span class="s2">"ix"</span><span class="p">]</span> <span class="o">=</span> <span class="nx">i</span><span class="p">;</span>
+        <span class="c1">// Create a degree of connectedness.</span>
+        <span class="nx">obj</span><span class="p">[</span><span class="s2">"degree"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="nx">nodes</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">obj</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="nx">nodes</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>This will return us the following visualisation.</p>
+
+<div id="graph-container-1"></div>
+
+<div id="graph-container-2"></div>
+
+<script src="/js-blogs/similarity-graph-d3.js"></script>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">createForceDirectedGraph</span> <span class="p">(</span><span class="nx">graph</span><span class="p">,</span><span class="nx">svgID</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"Graph Stats"</span><span class="p">,</span> <span class="nx">graph</span><span class="p">.</span><span class="nx">stats</span><span class="p">)</span>
+    <span class="kd">var</span> <span class="nx">width</span> <span class="o">=</span> <span class="mi">700</span><span class="p">,</span>
+        <span class="nx">height</span> <span class="o">=</span> <span class="mi">500</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">svg</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s2">"#"</span><span class="o">+</span><span class="nx">svgID</span><span class="p">)</span>
+        <span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s2">"svg"</span><span class="p">)</span>
+        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">"id"</span><span class="p">,</span><span class="s2">"graph"</span><span class="p">)</span>
+        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">"class"</span><span class="p">,</span><span class="s2">"graph-container-generic"</span><span class="p">)</span>
+        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">"width"</span><span class="p">,</span> <span class="nx">width</span><span class="p">)</span>
+        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">"height"</span><span class="p">,</span> <span class="nx">height</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">nodes</span> <span class="o">=</span> <span class="nx">svg</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s2">"g"</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s2">"class"</span><span class="p">,</span><span class="s2">"nodes"</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">edges</span> <span class="o">=</span> <span class="nx">svg</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s2">"g"</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s2">"class"</span><span class="p">,</span><span class="s2">"edges"</span><span class="p">);</span>
+    <span class="c1">//</span>
+    <span class="kd">var</span> <span class="nx">force</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">layout</span><span class="p">.</span><span class="nx">force</span><span class="p">()</span>
+        <span class="p">.</span><span class="nx">charge</span><span class="p">(</span><span class="o">-</span><span class="mi">50</span><span class="p">)</span>
+        <span class="p">.</span><span class="nx">linkDistance</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> 
+            <span class="k">return</span> <span class="mi">700</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span> <span class="p">(</span><span class="nx">d</span><span class="p">.</span><span class="nx">value</span><span class="o">-</span><span class="nx">graph</span><span class="p">.</span><span class="nx">stats</span><span class="p">.</span><span class="nx">minDistance</span><span class="p">)</span><span class="o">/</span><span class="nx">graph</span><span class="p">.</span><span class="nx">stats</span><span class="p">.</span><span class="nx">maxDistance</span> <span class="p">);</span> 
+        <span class="p">})</span>
+        <span class="p">.</span><span class="nx">size</span><span class="p">([</span><span class="nx">width</span><span class="p">,</span> <span class="nx">height</span><span class="p">]);</span>
+    <span class="nx">force</span><span class="p">.</span><span class="nx">nodes</span><span class="p">(</span><span class="nx">graph</span><span class="p">.</span><span class="nx">nodes</span><span class="p">)</span>
+        <span class="p">.</span><span class="nx">links</span><span class="p">(</span><span class="nx">graph</span><span class="p">.</span><span class="nx">edges</span><span class="p">)</span>
+        <span class="p">.</span><span class="nx">start</span><span class="p">();</span>
+    <span class="c1">// draw nodes.</span>
+    <span class="kd">var</span> <span class="nx">node</span> <span class="o">=</span> <span class="nx">svg</span><span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="s2">".node"</span><span class="p">)</span>
+        <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">graph</span><span class="p">.</span><span class="nx">nodes</span><span class="p">)</span>
+        <span class="p">.</span><span class="nx">enter</span><span class="p">().</span><span class="nx">append</span><span class="p">(</span><span class="s2">"circle"</span><span class="p">)</span>
+        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">"class"</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="s2">"node "</span> <span class="o">+</span> <span class="nx">d</span><span class="p">.</span><span class="kr">class</span><span class="p">;</span> <span class="p">}</span> <span class="p">)</span>
+        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">"r"</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span><span class="p">(</span> <span class="nx">d</span><span class="p">.</span><span class="nx">degree</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">){</span>
+                <span class="k">return</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nx">d</span><span class="p">.</span><span class="nx">degree</span><span class="o">/</span><span class="mi">10</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="k">return</span> <span class="mi">5</span><span class="p">;</span>
+        <span class="p">})</span>
+        <span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="s2">"stroke"</span><span class="p">,</span><span class="s2">"black"</span><span class="p">)</span>
+        <span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="s2">"stroke-width"</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span><span class="p">(</span> <span class="nx">d</span><span class="p">.</span><span class="nx">degree</span> <span class="o">===</span> <span class="mi">0</span> <span class="p">){</span>
+                <span class="k">return</span> <span class="mi">3</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="p">})</span>
+        <span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">force</span><span class="p">.</span><span class="nx">drag</span><span class="p">);</span>
+    <span class="c1">// draw edges.</span>
+    <span class="kd">var</span> <span class="nx">edge</span> <span class="o">=</span> <span class="nx">edges</span><span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="s2">".edge"</span><span class="p">)</span>
+        <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">graph</span><span class="p">.</span><span class="nx">edges</span><span class="p">)</span>
+        <span class="p">.</span><span class="nx">enter</span><span class="p">().</span><span class="nx">append</span><span class="p">(</span><span class="s2">"line"</span><span class="p">)</span>
+        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">"class"</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> 
+            <span class="nx">cls</span> <span class="o">=</span> <span class="s2">"unknown"</span><span class="p">;</span>
+            <span class="k">if</span><span class="p">(</span> <span class="nx">d</span><span class="p">[</span><span class="s2">"source-class"</span><span class="p">]</span> <span class="o">===</span> <span class="nx">d</span><span class="p">[</span><span class="s2">"target-class"</span><span class="p">]</span> <span class="p">){</span>
+                <span class="nx">cls</span> <span class="o">=</span> <span class="nx">d</span><span class="p">[</span><span class="s2">"source-class"</span><span class="p">];</span>
+            <span class="p">}</span>
+            <span class="k">return</span> <span class="s2">"edge "</span> <span class="o">+</span> <span class="nx">cls</span><span class="p">;</span> 
+        <span class="p">})</span>
+        <span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="s2">"opacity"</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="mf">0.25</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">1.0</span><span class="o">-</span><span class="p">(</span><span class="nx">d</span><span class="p">.</span><span class="nx">value</span><span class="o">-</span><span class="nx">graph</span><span class="p">.</span><span class="nx">stats</span><span class="p">.</span><span class="nx">minDistance</span><span class="p">)</span><span class="o">/</span><span class="nx">graph</span><span class="p">.</span><span class="nx">stats</span><span class="p">.</span><span class="nx">maxDistance</span> <span class="p">);</span>
+        <span class="p">})</span>
+        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">"data-weight"</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span> <span class="p">}</span> <span class="p">);</span>
+    <span class="c1">//</span>
+    <span class="nx">force</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">"tick"</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">edge</span><span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">"x1"</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">source</span><span class="p">.</span><span class="nx">x</span><span class="p">;</span> <span class="p">})</span>
+            <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">"y1"</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">source</span><span class="p">.</span><span class="nx">y</span><span class="p">;</span> <span class="p">})</span>
+            <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">"x2"</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">x</span><span class="p">;</span> <span class="p">})</span>
+            <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">"y2"</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">y</span><span class="p">;</span> <span class="p">});</span>
+        <span class="nx">node</span><span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">"cx"</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">x</span><span class="p">;</span> <span class="p">})</span>
+            <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">"cy"</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">y</span><span class="p">;</span> <span class="p">});</span>
+    <span class="p">});</span> <span class="c1">// end of on-tick.</span>
+<span class="p">}</span> <span class="c1">// end of function createForceDirectedGraph</span>
+</code></pre></div>
+                </article>
+
+                <!-- mathjax -->
+                
+                
+            </div>
+        </div>
+            
+            </main>
+
+        </div>
+
+        <footer class="site-footer">
+
+    <!-- Google Analytics -->
+    <script src="/js/ga.js"></script>
+    <script src="/js/hotjar.js"></script>
+
+</footer>
+
+
+    </body>
+
+</html>
