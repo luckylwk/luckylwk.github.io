@@ -8,7 +8,7 @@ author: Luuk Derksen
 mathjax: false
 tags:
   - apache-cassandra
-  - machine-learning
+  - data-engineering
 ---
 
 ### Installing Apache Cassandra

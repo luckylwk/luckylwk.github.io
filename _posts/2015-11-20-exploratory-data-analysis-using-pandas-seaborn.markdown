@@ -375,10 +375,10 @@ for e, column in enumerate(['DayMins','DayCharge','DayCalls',
 
 From these graphs the most interesting ones may be the `DayMins` and `DayCharge`. Obviously these two will be related since the charge is most likely determined by the minutes used and some tariff. From the above graphs it is interesting to note that they seem to have a [bimodal distribution](https://en.wikipedia.org/wiki/Multimodal_distribution) with a higher maximum. This may indicate that very active users are more likely to churn, perhaps because they are always looking for a better package/deal or because they are more affected by poor service or not meeting their expectations.
 
----
+
 ### External Data
 
-...
+One way to deal with the state variable that we have now is to try and convert it to a geographical value. Luckily the web comes to the rescue and I found a list with the average latitudes and longitudes for each US State. A bit rough, but it is just for the sake of the exercise.
 
 ~~~python
 df_state = pd.read_csv('churn---state-latlon.csv')
@@ -390,29 +390,31 @@ print df_state.head(2)
 1    AL    32.799   -86.8073
 </pre>
 
-...
+Great, we can now merge this data into the DataFrame we were working with using the `merge` function. This will duplicate the `state` column, so we can drop that one as well.
 
 ~~~python
-pvtable = churn_df.pivot_table(index='State', values='Churn', aggfunc=[len, np.sum, np.mean, np.std] )
-print pvtable.head(2)
+churn_df = churn_df.merge(df_state,left_on='State',right_on='state')
+churn_df.drop('state', axis=1, inplace=True)
+print churn_df.head(2)
 ~~~
 <pre class="python-output">
-       len  sum      mean       std
-State                              
-AK      52    3  0.057692  0.235435
-AL      80    8  0.100000  0.301893
-</pre>
+   AccountLength  AreaCode     Phone  IntlPlan  VMPlan  VMMessage  DayMins  \
+0            128       415  382-4657         0       1         25    265.1   
+1             70       408  411-4582         0       0          0    232.1   
 
-...
+   DayCalls  DayCharge  EveMins    ...      NightMins  NightCalls  \
+0       110      45.07    197.4    ...          244.7          91   
+1       122      39.46    292.3    ...          201.2         112   
 
-~~~python
-df_state_merged = pd.merge(pvtable,df_state,left_index=True,right_on='state')
-print df_state_merged.head(2)
-~~~
-<pre class="python-output">
-   len  sum      mean       std state  latitude  longitude
-0   52    3  0.057692  0.235435    AK    61.385  -152.2683
-1   80    8  0.100000  0.301893    AL    32.799   -86.8073
+   NightCharge  IntlMins  IntlCalls  IntlCharge  CustServCalls  Churn  \
+0        11.01        10          3         2.7              1      0   
+1         9.05         0          0         0.0              3      0   
+
+   latitude  longitude  
+0   38.5111   -96.8005  
+1   38.5111   -96.8005  
+
+[2 rows x 22 columns]
 </pre>
 
 ...

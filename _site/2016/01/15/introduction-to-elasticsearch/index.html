@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+
+                
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        
+        <title>Introduction to ElasticSearch</title>
+        
+        <meta name="viewport" content="width=device-width">
+        <meta name="description" content="Some thoughts and writeups.">
+        
+        <link rel="stylesheet" href="//storage.googleapis.com/code.getmdl.io/1.0.4/material.indigo-pink.min.css">
+        <script src="//storage.googleapis.com/code.getmdl.io/1.0.4/material.min.js"></script>
+        <!-- Icon-font -->
+        <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+        <!-- Fonts -->
+        <link href='//fonts.googleapis.com/css?family=Merriweather:400,300,700' rel='stylesheet' type='text/css'>
+        <link href='//fonts.googleapis.com/css?family=Hind:300,400,500,600' rel='stylesheet' type='text/css'>
+
+        <link rel="canonical" href="http://luckylwk.github.io/2016/01/15/introduction-to-elasticsearch/">
+
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="/css/main.css">
+
+        <link rel="icon" type="image/png" href="/assets/github-favicon.png">
+
+        
+        <style>
+            .lwk-main-container {
+                background: #f9f9f9;
+            }
+            .lwk-main-container .mdl-layout__header,
+            .lwk-main-container .mdl-layout__drawer-button {
+                color: white;
+            }
+            .mdl-layout__header {
+                background: rgba(12,16,61,1);
+            }
+        </style>
+
+    </head>
+
+    <body>
+
+        <div class="lwk-main-container mdl-layout mdl-js-layout">
+
+            <!-- <div id="particles-js" class="particles-container"></div> -->
+            <!-- // <script src="../js/particles.min.js"></script> -->
+            <!-- // <script src="../js/app.js"></script> -->
+
+                                
+
+            <header class="mdl-layout__header mdl-layout__header">
+                <div class="mdl-layout__header-row">
+                    <!-- Title -->
+                    <span class="mdl-layout-title">luckylwk</span>
+                    <!-- Add spacer, to align navigation to the right -->
+                    <div class="mdl-layout-spacer"></div>
+                    <!-- Navigation -->
+                    <nav class="mdl-navigation">
+                        <a class="mdl-navigation__link" href="/machine-learning/">Machine Learning</a>
+                        <a class="mdl-navigation__link" href="/data-visualisation/">Data Visualisation</a>
+                        <a class="mdl-navigation__link" href="/data-engineering/">Data Engineering</a>
+                        <a class="mdl-navigation__link" href="/about/">About</a>
+                    </nav>
+                </div>
+            </header>
+            <div class="mdl-layout__drawer">
+                <span class="mdl-layout-title">luckylwk</span>
+                <nav class="mdl-navigation">
+                    <a class="mdl-navigation__link" href="/machine-learning/">Machine Learning</a>
+                    <a class="mdl-navigation__link" href="/data-visualisation/">Data Visualisation</a>
+                    <a class="mdl-navigation__link" href="/data-engineering/">Data Engineering</a>
+                    <a class="mdl-navigation__link" href="/about/">About</a>
+                    <a class="mdl-navigation__link" href="https://www.twitter.com/luckylwk" target="_blank">Twitter</a>
+                    <a class="mdl-navigation__link" href="https://uk.linkedin.com/pub/luuk-derksen/a/80/956" target="_blank">LinkedIn</a>
+                    <a class="mdl-navigation__link" href="https://github.com/luckylwk" target="_blank">Github</a>
+                </nav>
+            </div>
+
+            <main class="mdl-layout__content">
+
+                        <div class="wrap">
+            <div class="post">
+
+                <header class="post-header">
+                    <h1>Introduction to ElasticSearch</h1>
+                    <p class="meta">Jan 15, 2016 • Luuk Derksen</p>
+                    <a href="https://twitter.com/share" class="twitter-share-button" data-text="Check out Introduction to ElasticSearch" data-via="luckylwk">Tweet</a>
+                    <script>
+                        !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+                    </script>
+                </header>
+
+                <article class="post-content">
+                <p>Some basic notes on installing ElasticSearch (2.1.1) and Sense and starting to use it to search text.</p>
+
+<p>Although the <a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/getting-started.html">documentation</a> of Elastic is great I sometimes struggled to see the actual results of the queries and therefore wrote this little introduction-post.</p>
+
+<h3>Installing ElasticSearch (2.1.1)</h3>
+
+<p>First download and unpack ElasticSearch:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span><span class="nb">cd</span> ~/
+
+<span class="gp">$ </span>wget https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-2.1.1.tar.gz
+
+<span class="gp">$ </span>tar -xvzf elasticsearch-2.1.1.tar.gz
+
+<span class="gp">$ </span>rm elasticsearch-2.1.1.tar.gz
+
+<span class="gp">$ </span>mv elasticsearch-2.1.1/ elastic-elasticsearch-2.1.1/
+
+<span class="gp">$ </span><span class="nb">cd </span>elastic-elasticsearch-2.1.1
+</code></pre></div>
+<p>Next we need to install the licenses.</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span><span class="nb">cd</span> ~/elastic-elasticsearch-2.1.1/
+
+<span class="gp">$ </span>sudo bin/plugin install license
+<span class="gp">-&gt; </span>Installing license...
+Plugins directory <span class="o">[</span>/home/vagrant/elasticsearch-2.1.1/plugins] does not exist. Creating...
+Trying https://download.elastic.co/elasticsearch/release/org/elasticsearch/plugin/license/2.1.1/license-2.1.1.zip ...
+Downloading .......DONE
+Verifying https://download.elastic.co/elasticsearch/release/org/elasticsearch/plugin/license/2.1.1/license-2.1.1.zip checksums <span class="k">if </span>available ...
+Downloading .DONE
+Installed license into /home/vagrant/elastic-elasticsearch-2.1.1/plugins/license
+</code></pre></div>
+<p>Install Kibana, the visualisation toolkit and something we will need to run the UI for elasticsearch (i.e., Sense).</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span><span class="nb">cd</span> ~/
+
+<span class="gp">$ </span>wget https://download.elastic.co/kibana/kibana/kibana-4.3.1-linux-x64.tar.gz
+
+<span class="gp">$ </span>tar -xvzf kibana-4.3.1-linux-x64.tar.gz
+
+<span class="gp">$ </span>rm kibana-4.3.1-linux-x64.tar.gz
+
+<span class="gp">$ </span>mv kibana-4.3.1-linux-x64/ elastic-kibana-4.3.1/
+
+<span class="gp">$ </span><span class="nb">cd </span>elastic-kibana-4.3.1/
+</code></pre></div><div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>./bin/kibana plugin --install elastic/sense
+Installing sense
+Attempting to extract from https://download.elastic.co/elastic/sense/sense-latest.tar.gz
+Downloading 318236 bytes....................
+Extraction <span class="nb">complete
+</span>Optimizing and caching browser bundles...
+</code></pre></div>
+<p>To summarise. We have installed <strong>ElasticSearch</strong>, <strong>Kibana</strong> and the <strong>Sense</strong> UI plugin.</p>
+
+<p>Move back to your home directory using <code>cd ~/</code> to finally start using ElasticSearch.</p>
+
+<h3>Starting the Service(s)</h3>
+
+<p>To start ElasticSearch we can run:</p>
+<div class="highlight"><pre><code class="language-" data-lang=""># Use the flag -d for background deamon.
+$ ./elastic-elasticsearch-2.1.1/bin/elasticsearch -d 
+</code></pre></div>
+<p>To see what the process id is:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>ps aux | grep elastic
+vagrant   2134 60.5  8.6 1886424 177556 pts/0  Sl   15:57   0:04 /usr/bin/java -Xms256m -Xmx1g -Djava.awt.headless<span class="o">=</span><span class="nb">true</span> -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction<span class="o">=</span>75 -XX:+UseCMSInitiatingOccupancyOnly -XX:+HeapDumpOnOutOfMemoryError -XX:+DisableExplicitGC -Dfile.encoding<span class="o">=</span>UTF-8 -Djna.nosys<span class="o">=</span><span class="nb">true</span> -Des.path.home<span class="o">=</span>/home/vagrant/elasticsearch-2.1.1 -cp /home/vagrant/elasticsearch-2.1.1/lib/elasticsearch-2.1.1.jar:/home/vagrant/elasticsearch-2.1.1/lib/<span class="k">*</span> org.elasticsearch.bootstrap.Elasticsearch start -d
+vagrant   2187  0.0  0.0  10432   668 pts/0    S+   15:57   0:00 grep elastic
+</code></pre></div>
+<p>To start Kibana we can run:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c"># To start Kibana, supress output and put it in a background process</span>
+<span class="gp">$ </span>nohup ./elastic-kibana-4.3.1/bin/kibana &amp;
+</code></pre></div>
+<p>The URL we can use now to interface with ElasticSearch through a web-interface is:</p>
+
+<ul>
+<li>Sense on Kibana - http://127.0.0.1:5601/app/sense</li>
+</ul>
+
+<h3>ElasticSearch via Command-Line</h3>
+
+<p>Since our database is now empty, lets start putting some information in. Before we do so a few pointers to get information about the database itself via the command line.</p>
+
+<p>Run these from without the VM because the normal port is <code>9200</code>.</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>curl http://127.0.0.1:9200/_cat/health?v
+<span class="c"># output:</span>
+epoch      timestamp cluster       status node.total node.data shards pri relo init unassign pending_tasks
+1444212818 10:13:38  elasticsearch green           1         1      0   0    0    0        0             0
+</code></pre></div>
+<p>Nodes</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>curl http://127.0.0.1:9200/_cat/nodes?v
+<span class="c"># output:</span>
+host                     ip        heap.percent ram.percent load node.role master name
+vagrant-ubuntu-trusty-64 10.0.2.15            3          15 0.08 d         <span class="k">*</span>      Fagin
+</code></pre></div>
+<p>Indices</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>curl http://127.0.0.1:9200/_cat/indices?v
+<span class="c"># output:</span>
+health status index pri rep docs.count docs.deleted store.size pri.store.size
+</code></pre></div>
+<p>Creating an index named <code>news</code></p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>curl -XPUT http://127.0.0.1:9200/news?pretty
+<span class="c"># output:</span>
+<span class="o">{</span>
+  <span class="s2">"acknowledged"</span> : <span class="nb">true</span>
+<span class="o">}</span>
+</code></pre></div><div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>curl http://127.0.0.1:9200/_cat/indices?v
+<span class="c"># output:</span>
+health status index    pri rep docs.count docs.deleted store.size pri.store.size
+yellow open   news     5   1          0            0       575b           575b
+</code></pre></div>
+<p>Similarly you can delete an index.</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>curl -XDELETE http://127.0.0.1:9200/news
+</code></pre></div>
+<h3>Indices, Types and Documents</h3>
+
+<p>Before moving on its a good idea to get a better understanding into the three main categories in ElasticSearch:</p>
+
+<ul>
+<li><strong>Index</strong>: <em>An index is a collection of documents that have somewhat similar characteristics. For example, you can have an index for customer data, another index for a product catalog, and yet another index for order data. An index is identified by a name (that must be all lowercase) and this name is used to refer to the index when performing indexing, search, update, and delete operations against the documents in it. In a single cluster, you can define as many indexes as you want.</em>
+
+<ul>
+<li>Must read: <a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/index-management.html">Index Management</a>. Read through the pages and pay close attention to: <strong>analyzers</strong> and <strong>mapping</strong>. Just like in relational databases you need to pay close attention to what analyzers and mapping you use for the data. Its a bit like thinking about what <em>type</em> of data you want to store and how it is searchable/sortable as text (sort by sentence, or bag-of-words etc).</li>
+</ul></li>
+<li><strong>Type</strong>: <em>Within an index, you can define one or more types. A type is a logical category/partition of your index whose semantics is completely up to you. In general, a type is defined for documents that have a set of common fields. For example, let’s assume you run a blogging platform and store all your data in a single index. In this index, you may define a type for user data, another type for blog data, and yet another type for comments data.</em></li>
+<li><strong>Document</strong>: <em>A document is a basic unit of information that can be indexed. For example, you can have a document for a single customer, another document for a single product, and yet another for a single order. This document is expressed in JSON (JavaScript Object Notation) which is an ubiquitous internet data interchange format. Within an index/type, you can store as many documents as you want. Note that although a document physically resides in an index, a document actually must be indexed/assigned to a type inside an index.</em></li>
+</ul>
+
+<h3>Sense Interface</h3>
+
+<p>For this we will use the <code>Sense</code> Kibana-app. Go to <a href="http://127.0.0.1:5601/app/sense">http://127.0.0.1:5601/app/sense</a> to open it. Since this runs on Kibana within the VM we can have it connect locally to <code>http://localhost:9200</code></p>
+
+<h3>Creating an Index with Mapping</h3>
+
+<p>To create a new index we can use <code>PUT /&lt;INDEX-NAME&gt;</code>.</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">PUT</span> <span class="o">/</span><span class="nx">news</span>
+<span class="p">{</span>
+    <span class="s2">"mappings"</span><span class="err">:</span> <span class="p">{</span>
+        <span class="s2">"articles"</span><span class="err">:</span> <span class="p">{</span>
+            <span class="s2">"properties"</span><span class="err">:</span> <span class="p">{</span>
+                <span class="s2">"webTitle"</span><span class="err">:</span> <span class="p">{</span>
+                    <span class="s2">"type"</span><span class="err">:</span> <span class="s2">"multi_field"</span><span class="p">,</span>
+                    <span class="s2">"fields"</span><span class="err">:</span> <span class="p">{</span>
+                        <span class="s2">"webTitle"</span><span class="err">:</span> <span class="p">{</span> 
+                            <span class="s2">"type"</span><span class="err">:</span>         <span class="s2">"string"</span><span class="p">,</span>
+                            <span class="s2">"analyzer"</span><span class="err">:</span>     <span class="s2">"standard"</span>
+                        <span class="p">},</span>
+                        <span class="s2">"whitespace"</span><span class="err">:</span> <span class="p">{</span> 
+                            <span class="s2">"type"</span><span class="err">:</span>         <span class="s2">"string"</span><span class="p">,</span>
+                            <span class="s2">"analyzer"</span><span class="err">:</span>     <span class="s2">"whitespace"</span>
+                        <span class="p">},</span>
+                        <span class="s2">"english"</span><span class="err">:</span> <span class="p">{</span> 
+                            <span class="s2">"type"</span><span class="err">:</span>         <span class="s2">"string"</span><span class="p">,</span>
+                            <span class="s2">"analyzer"</span><span class="err">:</span>     <span class="s2">"english"</span>
+                        <span class="p">},</span>
+                        <span class="s2">"raw"</span><span class="err">:</span> <span class="p">{</span> 
+                            <span class="s2">"type"</span><span class="err">:</span>         <span class="s2">"string"</span><span class="p">,</span>   
+                            <span class="s2">"index"</span><span class="err">:</span>        <span class="s2">"not_analyzed"</span>
+                        <span class="p">}</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3>Adding Documents</h3>
+
+<p>We&#39;ll now manually create a <code>document</code> in the <code>news</code> index. We give it a type <code>articles</code> and no <code>_id</code> so that will be automatically generated. To do this use the following &#39;query&#39;.</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">POST</span> <span class="o">/</span><span class="nx">news</span><span class="o">/</span><span class="nx">articles</span>
+<span class="p">{</span>
+    <span class="s2">"type"</span><span class="err">:</span> <span class="s2">"liveblog"</span><span class="p">,</span>
+    <span class="s2">"sectionId"</span><span class="err">:</span> <span class="s2">"politics"</span><span class="p">,</span>
+    <span class="s2">"webTitle"</span><span class="err">:</span> <span class="s2">"Tory minister attacks BBC for its coverage of Elliott Johnson story - Politics live"</span><span class="p">,</span>
+    <span class="s2">"webPublicationDate"</span><span class="err">:</span> <span class="s2">"2015-12-10T15:08:42Z"</span><span class="p">,</span>
+    <span class="s2">"id"</span><span class="err">:</span> <span class="s2">"politics/blog/live/2015/dec/10/cameron-fails-to-win-support-of-polish-pm-for-his-plan-to-change-eu-benefit-rules-politics-live"</span><span class="p">,</span>
+    <span class="s2">"webUrl"</span><span class="err">:</span> <span class="s2">"http://www.theguardian.com/politics/blog/live/2015/dec/10/cameron-fails-to-win-support-of-polish-pm-for-his-plan-to-change-eu-benefit-rules-politics-live"</span><span class="p">,</span>
+    <span class="s2">"apiUrl"</span><span class="err">:</span> <span class="s2">"http://content.guardianapis.com/politics/blog/live/2015/dec/10/cameron-fails-to-win-support-of-polish-pm-for-his-plan-to-change-eu-benefit-rules-politics-live"</span><span class="p">,</span>
+    <span class="s2">"sectionName"</span><span class="err">:</span> <span class="s2">"Politics"</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>The output will looks something like:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="p">{</span>
+   <span class="s2">"_index"</span><span class="err">:</span> <span class="s2">"news"</span><span class="p">,</span>
+   <span class="s2">"_type"</span><span class="err">:</span> <span class="s2">"articles"</span><span class="p">,</span>
+   <span class="s2">"_id"</span><span class="err">:</span> <span class="s2">"AVGMeZ9hbQL4kpTUdIf8"</span><span class="p">,</span>
+   <span class="s2">"_version"</span><span class="err">:</span> <span class="mi">1</span><span class="p">,</span>
+   <span class="s2">"created"</span><span class="err">:</span> <span class="kc">true</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Adding an article without specifying an <code>_id</code> uses <code>POST</code>. If you want to insert one using a specific <code>_id</code> you can use the <code>PUT</code> request.</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">PUT</span> <span class="o">/</span><span class="p">{</span><span class="nx">INDEX</span><span class="p">}</span><span class="sr">/{TYPE}/</span><span class="p">{</span><span class="nx">ID</span><span class="p">}</span>
+<span class="p">{</span>
+    <span class="s2">"field1"</span> <span class="err">:</span> <span class="s2">"text"</span><span class="p">,</span>
+    <span class="s2">"field2"</span> <span class="err">:</span> <span class="s2">"text"</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Lets add some more articles to make sure we have some stuff to work with from here.</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">POST</span> <span class="o">/</span><span class="nx">news</span><span class="o">/</span><span class="nx">articles</span>
+<span class="p">{</span>
+    <span class="s2">"type"</span><span class="err">:</span> <span class="s2">"liveblog"</span><span class="p">,</span>
+    <span class="s2">"sectionId"</span><span class="err">:</span> <span class="s2">"business"</span><span class="p">,</span>
+    <span class="s2">"webTitle"</span><span class="err">:</span> <span class="s2">"VW emissions scandal: misconduct, process failure and tolerance of rule-breaking blamed – as it happened"</span><span class="p">,</span>
+    <span class="s2">"webPublicationDate"</span><span class="err">:</span> <span class="s2">"2015-12-10T14:59:44Z"</span><span class="p">,</span>
+    <span class="s2">"id"</span><span class="err">:</span> <span class="s2">"business/live/2015/dec/10/volkswagen-vw-grilling-emissions-scandal-bank-of-england-business-live"</span><span class="p">,</span>
+    <span class="s2">"webUrl"</span><span class="err">:</span> <span class="s2">"http://www.theguardian.com/business/live/2015/dec/10/volkswagen-vw-grilling-emissions-scandal-bank-of-england-business-live"</span><span class="p">,</span>
+    <span class="s2">"apiUrl"</span><span class="err">:</span> <span class="s2">"http://content.guardianapis.com/business/live/2015/dec/10/volkswagen-vw-grilling-emissions-scandal-bank-of-england-business-live"</span><span class="p">,</span>
+    <span class="s2">"sectionName"</span><span class="err">:</span> <span class="s2">"Business"</span>
+<span class="p">}</span>
+
+<span class="nx">POST</span> <span class="o">/</span><span class="nx">news</span><span class="o">/</span><span class="nx">articles</span> 
+<span class="p">{</span>
+    <span class="s2">"type"</span><span class="err">:</span> <span class="s2">"liveblog"</span><span class="p">,</span>
+    <span class="s2">"sectionId"</span><span class="err">:</span> <span class="s2">"environment"</span><span class="p">,</span>
+    <span class="s2">"webTitle"</span><span class="err">:</span> <span class="s2">"Paris talks: negotiators await new draft climate deal - live blog"</span><span class="p">,</span>
+    <span class="s2">"webPublicationDate"</span><span class="err">:</span> <span class="s2">"2015-12-10T14:58:25Z"</span><span class="p">,</span>
+    <span class="s2">"id"</span><span class="err">:</span> <span class="s2">"environment/blog/live/2015/dec/10/paris-climate-talks-cop21-draft-deal-negotiations-continue-live-blog"</span><span class="p">,</span>
+    <span class="s2">"webUrl"</span><span class="err">:</span> <span class="s2">"http://www.theguardian.com/environment/blog/live/2015/dec/10/paris-climate-talks-cop21-draft-deal-negotiations-continue-live-blog"</span><span class="p">,</span>
+    <span class="s2">"apiUrl"</span><span class="err">:</span> <span class="s2">"http://content.guardianapis.com/environment/blog/live/2015/dec/10/paris-climate-talks-cop21-draft-deal-negotiations-continue-live-blog"</span><span class="p">,</span>
+    <span class="s2">"sectionName"</span><span class="err">:</span> <span class="s2">"Environment"</span>
+<span class="p">}</span>
+
+<span class="nx">POST</span> <span class="o">/</span><span class="nx">news</span><span class="o">/</span><span class="nx">articles</span>
+<span class="p">{</span>
+    <span class="s2">"type"</span><span class="err">:</span> <span class="s2">"article"</span><span class="p">,</span>
+    <span class="s2">"sectionId"</span><span class="err">:</span> <span class="s2">"world"</span><span class="p">,</span>
+    <span class="s2">"webTitle"</span><span class="err">:</span> <span class="s2">"Japanese PM's website hacked by whaling protesters"</span><span class="p">,</span>
+    <span class="s2">"webPublicationDate"</span><span class="err">:</span> <span class="s2">"2015-12-10T14:40:35Z"</span><span class="p">,</span>
+    <span class="s2">"id"</span><span class="err">:</span> <span class="s2">"world/2015/dec/10/japanese-pms-website-hacked-whaling-protesters"</span><span class="p">,</span>
+    <span class="s2">"webUrl"</span><span class="err">:</span> <span class="s2">"http://www.theguardian.com/world/2015/dec/10/japanese-pms-website-hacked-whaling-protesters"</span><span class="p">,</span>
+    <span class="s2">"apiUrl"</span><span class="err">:</span> <span class="s2">"http://content.guardianapis.com/world/2015/dec/10/japanese-pms-website-hacked-whaling-protesters"</span><span class="p">,</span>
+    <span class="s2">"sectionName"</span><span class="err">:</span> <span class="s2">"World news"</span>
+<span class="p">}</span>
+
+<span class="nx">POST</span> <span class="o">/</span><span class="nx">news</span><span class="o">/</span><span class="nx">articles</span>
+<span class="p">{</span>
+    <span class="s2">"type"</span><span class="err">:</span> <span class="s2">"article"</span><span class="p">,</span>
+    <span class="s2">"sectionId"</span><span class="err">:</span> <span class="s2">"politics"</span><span class="p">,</span>
+    <span class="s2">"webTitle"</span><span class="err">:</span> <span class="s2">"Senior minister attacks Newsnight over Tory bullying claims coverage"</span><span class="p">,</span>
+    <span class="s2">"webPublicationDate"</span><span class="err">:</span> <span class="s2">"2015-12-10T14:36:54Z"</span><span class="p">,</span>
+    <span class="s2">"id"</span><span class="err">:</span> <span class="s2">"politics/2015/dec/10/nick-boles-minister-attacks-newsnight-tory-bullying-claims-lord-feldman"</span><span class="p">,</span>
+    <span class="s2">"webUrl"</span><span class="err">:</span> <span class="s2">"http://www.theguardian.com/politics/2015/dec/10/nick-boles-minister-attacks-newsnight-tory-bullying-claims-lord-feldman"</span><span class="p">,</span>
+    <span class="s2">"apiUrl"</span><span class="err">:</span> <span class="s2">"http://content.guardianapis.com/politics/2015/dec/10/nick-boles-minister-attacks-newsnight-tory-bullying-claims-lord-feldman"</span><span class="p">,</span>
+    <span class="s2">"sectionName"</span><span class="err">:</span> <span class="s2">"Politics"</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>So we have now added 5 articles. Notice that 2 have the word <strong>Tory</strong> in there.</p>
+
+<h3>Searching and Retrieving Documents</h3>
+
+<p>Retrieve an article by using the <code>_id</code></p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">GET</span> <span class="o">/</span><span class="p">{</span><span class="nx">INDEX</span><span class="p">}</span><span class="sr">/{TYPE}/</span><span class="p">{</span><span class="nx">ID</span><span class="p">}</span>
+</code></pre></div>
+<p>Usually you will try to actually search the database for matching articles. To return all documents you can &#39;search empty&#39;. You can use the following ways to return everything for now...</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// Everything</span>
+<span class="nx">GET</span> <span class="o">/</span><span class="nx">_all</span><span class="o">/</span><span class="nx">_search</span>
+
+<span class="c1">// Everything within news</span>
+<span class="nx">GET</span> <span class="o">/</span><span class="nx">news</span><span class="o">/</span><span class="nx">_search</span>
+
+<span class="c1">// Everything within news/articles</span>
+<span class="nx">GET</span> <span class="o">/</span><span class="nx">news</span><span class="o">/</span><span class="nx">articles</span><span class="o">/</span><span class="nx">_search</span>
+</code></pre></div>
+<p>Because we don&#39;t have any more indices or types this will do for now.</p>
+
+<p>Before looking at actually searching lets take a look at how to &#39;filter&#39; the fields that we get back from a selected document. To retrieve only specific <code>fields</code> we can specify the exact fields we want back. You can use both a <code>POST</code> and a <code>GET</code> request for this.</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">POST</span> <span class="o">/</span><span class="nx">news</span><span class="o">/</span><span class="nx">articles</span><span class="o">/</span><span class="nx">_search</span>
+<span class="p">{</span>
+    <span class="s2">"fields"</span> <span class="err">:</span> <span class="p">[</span> <span class="s2">"webTitle"</span><span class="p">,</span> <span class="s2">"sectionName"</span><span class="p">,</span> <span class="s2">"webPublicationDate"</span> <span class="p">]</span>
+<span class="p">}</span>
+
+<span class="nx">GET</span> <span class="o">/</span><span class="nx">news</span><span class="o">/</span><span class="nx">articles</span><span class="o">/</span><span class="nx">_search</span><span class="p">?</span><span class="nx">fields</span><span class="o">=</span><span class="nx">webTitle</span><span class="p">,</span><span class="nx">sectionName</span><span class="p">,</span><span class="nx">webPublicationDate</span>
+</code></pre></div>
+<p>So we know how to retrieve all documents in an index/type and how to specify what fields we want back. Lets look at searching! Some <a href="https://www.elastic.co/guide/en/elasticsearch/reference/1.4/search-search.html">documentation</a> and <a href="https://www.elastic.co/guide/en/elasticsearch/reference/1.4/_executing_searches.html">documentation</a></p>
+
+<p>We can search using queries with both POST and GET.</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">POST</span> <span class="o">/</span><span class="nx">news</span><span class="o">/</span><span class="nx">articles</span><span class="o">/</span><span class="nx">_search</span> 
+<span class="p">{</span>
+    <span class="s2">"fields"</span> <span class="err">:</span> <span class="p">[</span><span class="s2">"webTitle"</span><span class="p">,</span> <span class="s2">"sectionName"</span><span class="p">,</span> <span class="s2">"webPublicationDate"</span><span class="p">],</span>
+    <span class="s2">"query"</span><span class="err">:</span> <span class="p">{</span> 
+        <span class="s2">"match"</span><span class="err">:</span> <span class="p">{</span> <span class="s2">"webTitle"</span> <span class="err">:</span> <span class="s2">"Tory"</span> <span class="p">}</span> 
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">GET</span> <span class="o">/</span><span class="nx">news</span><span class="o">/</span><span class="nx">articles</span><span class="o">/</span><span class="nx">_search</span><span class="p">?</span><span class="nx">q</span><span class="o">=</span><span class="nx">webTitle</span><span class="p">:</span><span class="nx">Tory</span><span class="o">&amp;</span><span class="nx">fields</span><span class="o">=</span> <span class="nx">webTitle</span><span class="p">,</span><span class="nx">sectionName</span><span class="p">,</span><span class="nx">webPublicationDate</span>
+</code></pre></div>
+<p>To search on multiple words but not on exact matches we can again use the <code>match</code> query.</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">POST</span> <span class="o">/</span><span class="nx">news</span><span class="o">/</span><span class="nx">articles</span><span class="o">/</span><span class="nx">_search</span> 
+<span class="p">{</span>
+    <span class="s2">"fields"</span> <span class="err">:</span> <span class="p">[</span><span class="s2">"webTitle"</span><span class="p">,</span> <span class="s2">"sectionName"</span><span class="p">,</span> <span class="s2">"webPublicationDate"</span><span class="p">],</span>
+    <span class="s2">"query"</span><span class="err">:</span> <span class="p">{</span> 
+        <span class="s2">"match"</span><span class="err">:</span> <span class="p">{</span> <span class="s2">"webTitle"</span> <span class="err">:</span> <span class="s2">"Tory Paris"</span> <span class="p">}</span> 
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">GET</span> <span class="o">/</span><span class="nx">news</span><span class="o">/</span><span class="nx">articles</span><span class="o">/</span><span class="nx">_search</span><span class="p">?</span><span class="nx">q</span><span class="o">=</span><span class="nx">webTitle</span><span class="p">:</span><span class="nx">Tory</span><span class="o">&amp;</span><span class="nx">fields</span><span class="o">=</span> <span class="nx">webTitle</span><span class="p">,</span><span class="nx">sectionName</span><span class="p">,</span><span class="nx">webPublicationDate</span>
+</code></pre></div>
+<p>Exact matching of a string using <code>match_phrase</code></p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">POST</span> <span class="o">/</span><span class="nx">news</span><span class="o">/</span><span class="nx">articles</span><span class="o">/</span><span class="nx">_search</span> 
+<span class="p">{</span>
+    <span class="s2">"fields"</span> <span class="err">:</span> <span class="p">[</span><span class="s2">"webTitle"</span><span class="p">,</span> <span class="s2">"sectionName"</span><span class="p">,</span> <span class="s2">"webPublicationDate"</span><span class="p">],</span>
+    <span class="s2">"query"</span><span class="err">:</span> <span class="p">{</span> 
+        <span class="s2">"match_phrase"</span><span class="err">:</span> <span class="p">{</span> <span class="s2">"webTitle"</span> <span class="err">:</span> <span class="s2">"Tory newsnight"</span> <span class="p">}</span> 
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Boolean matching</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">POST</span> <span class="o">/</span><span class="nx">news</span><span class="o">/</span><span class="nx">articles</span><span class="o">/</span><span class="nx">_search</span> 
+<span class="p">{</span>
+    <span class="s2">"fields"</span> <span class="err">:</span> <span class="p">[</span><span class="s2">"webTitle"</span><span class="p">,</span> <span class="s2">"sectionName"</span><span class="p">,</span> <span class="s2">"webPublicationDate"</span><span class="p">],</span>
+    <span class="s2">"query"</span><span class="err">:</span> <span class="p">{</span> 
+        <span class="s2">"bool"</span><span class="err">:</span> <span class="p">{</span>
+            <span class="s2">"must"</span><span class="err">:</span> <span class="p">[</span>
+                <span class="p">{</span> <span class="s2">"match"</span><span class="p">:</span> <span class="p">{</span> <span class="s2">"webTitle"</span> <span class="p">:</span> <span class="s2">"Tory"</span> <span class="p">}</span> <span class="p">},</span>
+                <span class="p">{</span> <span class="s2">"match"</span><span class="p">:</span> <span class="p">{</span> <span class="s2">"webTitle"</span> <span class="p">:</span> <span class="s2">"newsnight"</span> <span class="p">}</span> <span class="p">}</span>
+            <span class="p">]</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>There are more options: <code>should</code>, <code>must_not</code>.</p>
+
+<h3>Sorting Documents</h3>
+
+<p>Sorting documents is both very easy and not so much. Lets start with the simple stuff. Some <a href="https://www.elastic.co/guide/en/elasticsearch/reference/1.4/search-request-sort.html">documentation</a>. Basic sorting can be done using POST and GET.</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">POST</span> <span class="o">/</span><span class="nx">news</span><span class="o">/</span><span class="nx">articles</span><span class="o">/</span><span class="nx">_search</span>
+<span class="p">{</span>
+    <span class="s2">"fields"</span> <span class="err">:</span> <span class="p">[</span><span class="s2">"webTitle"</span><span class="p">,</span> <span class="s2">"sectionName"</span><span class="p">,</span> <span class="s2">"webPublicationDate"</span><span class="p">],</span>
+    <span class="s2">"sort"</span> <span class="err">:</span> <span class="p">[</span>
+        <span class="p">{</span> <span class="s2">"webPublicationDate"</span> <span class="p">:</span> <span class="p">{</span> <span class="s2">"order"</span> <span class="p">:</span> <span class="s2">"asc"</span> <span class="p">}</span> <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+
+<span class="nx">GET</span> <span class="o">/</span><span class="nx">news</span><span class="o">/</span><span class="nx">articles</span><span class="o">/</span><span class="nx">_search</span><span class="p">?</span><span class="nx">sort</span><span class="o">=</span><span class="nx">webPublicationDate</span><span class="p">:</span><span class="nx">asc</span><span class="o">&amp;</span><span class="nx">fields</span><span class="o">=</span> <span class="nx">webTitle</span><span class="p">,</span><span class="nx">sectionName</span><span class="p">,</span><span class="nx">webPublicationDate</span>
+</code></pre></div>
+<p>This allows us to sort on <code>webPublicationDate</code>. Any sorting that is not on strings is quite straightforward. Now lets try sorting the information based on the <code>webTitle</code> instead of the <code>webPublicationDate</code>.</p>
+
+<p>&#39;Normal&#39; string searching happens on a text bag-of-words basis.</p>
+
+<ul>
+<li>https://www.elastic.co/guide/en/elasticsearch/guide/current/multi-fields.html</li>
+<li>https://www.elastic.co/guide/en/elasticsearch/guide/current/sorting-collations.html</li>
+</ul>
+
+<p>supports both POST and GET requests.</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">POST</span> <span class="o">/</span><span class="nx">news</span><span class="o">/</span><span class="nx">articles</span><span class="o">/</span><span class="nx">_search</span>
+<span class="p">{</span>
+    <span class="s2">"fields"</span> <span class="err">:</span> <span class="p">[</span><span class="s2">"webTitle"</span><span class="p">,</span> <span class="s2">"sectionName"</span><span class="p">,</span> <span class="s2">"webPublicationDate"</span><span class="p">],</span>
+    <span class="s2">"sort"</span> <span class="err">:</span> <span class="p">[</span>
+        <span class="s2">"webTitle"</span><span class="p">,</span>
+        <span class="s2">"_score"</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+
+<span class="nx">GET</span> <span class="o">/</span><span class="nx">news</span><span class="o">/</span><span class="nx">articles</span><span class="o">/</span><span class="nx">_search</span><span class="p">?</span><span class="nx">sort</span><span class="o">=</span><span class="nx">webTitle</span><span class="p">,</span><span class="nx">_score</span><span class="o">&amp;</span><span class="nx">fields</span><span class="o">=</span><span class="nx">webTitle</span><span class="p">,</span><span class="nx">sectionName</span><span class="p">,</span><span class="nx">webPublicationDate</span>
+</code></pre></div>
+<p>We can see it go wrong here already. It will sort on words like <strong>and</strong> and <strong>attack</strong>. It splits the sentence in a bag-of-words and uses the <code>min</code> or <code>max</code> of the list to select the word to use in the sorting. Ideally here we would like to sort based on the full title whilst still retaining the flexibility of searching on the bag-of-words title. This all has to do with the <strong>mapping</strong> of the documents.</p>
+
+<h3>MAPPING</h3>
+
+<p>You can see the <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-get-field-mapping.html">mapping</a> of all content by </p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">GET</span> <span class="o">/</span><span class="nx">news</span><span class="o">/</span><span class="nx">_mapping</span>
+
+<span class="nx">GET</span> <span class="o">/</span><span class="nx">_all</span><span class="o">/</span><span class="nx">_mapping</span>
+</code></pre></div>
+<p>This will give you something looking like</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="p">{</span>
+   <span class="s2">"news"</span><span class="err">:</span> <span class="p">{</span>
+      <span class="s2">"mappings"</span><span class="err">:</span> <span class="p">{</span>
+         <span class="s2">"articles"</span><span class="err">:</span> <span class="p">{</span>
+            <span class="s2">"properties"</span><span class="err">:</span> <span class="p">{</span>
+               <span class="p">...</span>
+               <span class="s2">"webTitle"</span><span class="err">:</span> <span class="p">{</span>
+                  <span class="s2">"type"</span><span class="err">:</span> <span class="s2">"string"</span>
+               <span class="p">},</span>
+               <span class="p">...</span>
+</code></pre></div>
+<p>So an index (news) has mappings and each type (articles) will have its own mappings per field. To directly get the mapping for a single field you can use the  following query:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">GET</span> <span class="o">/</span><span class="nx">news</span><span class="o">/</span><span class="nx">_mapping</span><span class="o">/</span><span class="nx">articles</span><span class="o">/</span><span class="nx">field</span><span class="o">/</span><span class="nx">webTitle</span>
+</code></pre></div>
+<p>giving</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">webTitle</span><span class="s2">": {
+    "</span><span class="nx">type</span><span class="s2">": "</span><span class="nx">string</span><span class="s2">",
+    "</span><span class="nx">analyzer</span><span class="s2">": "</span><span class="nx">standard</span><span class="s2">",
+    "</span><span class="nx">fields</span><span class="s2">": {
+      "</span><span class="nx">english</span><span class="s2">": {
+        "</span><span class="nx">type</span><span class="s2">": "</span><span class="nx">string</span><span class="s2">",
+        "</span><span class="nx">analyzer</span><span class="s2">": "</span><span class="nx">english</span><span class="s2">"
+      },
+      "</span><span class="nx">raw</span><span class="s2">": {
+        "</span><span class="nx">type</span><span class="s2">": "</span><span class="nx">string</span><span class="s2">",
+        "</span><span class="nx">index</span><span class="s2">": "</span><span class="nx">not_analyzed</span><span class="s2">"
+      },
+      "</span><span class="nx">whitespace</span><span class="s2">": {
+        "</span><span class="nx">type</span><span class="s2">": "</span><span class="nx">string</span><span class="s2">",
+        "</span><span class="nx">analyzer</span><span class="s2">": "</span><span class="nx">whitespace</span><span class="err">"</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+</code></pre></div>
+<p>We can use the <code>webTitle.raw</code> for the sorting for example. Lets see how this works...</p>
+
+<p><strong>Sorting continued</strong></p>
+
+<p>To sort by the sentence, descending (note the <code>webTitle.raw</code>):</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">POST</span> <span class="o">/</span><span class="nx">news</span><span class="o">/</span><span class="nx">articles</span><span class="o">/</span><span class="nx">_search</span>
+<span class="p">{</span>
+    <span class="s2">"fields"</span> <span class="err">:</span> <span class="p">[</span><span class="s2">"webTitle"</span><span class="p">,</span> <span class="s2">"sectionName"</span><span class="p">,</span> <span class="s2">"webPublicationDate"</span><span class="p">],</span>
+    <span class="s2">"query"</span><span class="err">:</span> <span class="p">{</span> 
+        <span class="s2">"bool"</span><span class="err">:</span> <span class="p">{</span>
+            <span class="s2">"must"</span><span class="err">:</span> <span class="p">[</span>
+                <span class="p">{</span> <span class="s2">"match"</span><span class="p">:</span> <span class="p">{</span> <span class="s2">"webTitle"</span> <span class="p">:</span> <span class="s2">"Tory"</span> <span class="p">}</span> <span class="p">}</span>
+            <span class="p">]</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s2">"sort"</span> <span class="err">:</span> <span class="p">[</span>
+        <span class="s2">"_score"</span><span class="p">,</span>
+        <span class="p">{</span> <span class="s2">"webTitle.raw"</span> <span class="p">:</span> <span class="p">{</span> <span class="s2">"order"</span> <span class="p">:</span> <span class="s2">"desc"</span> <span class="p">}</span> <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3>Aggregation</h3>
+
+<p>Aggregating counts/stats using <code>aggs</code>.</p>
+
+<ul>
+<li>https://www.elastic.co/guide/en/elasticsearch/reference/1.4/<em>executing</em>aggregations.html</li>
+</ul>
+
+<p>Like a COUNT(*) GROUP BY </p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">POST</span> <span class="o">/</span><span class="nx">news</span><span class="o">/</span><span class="nx">articles</span><span class="o">/</span><span class="nx">_search</span>
+<span class="p">{</span>
+    <span class="s2">"size"</span><span class="err">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s2">"aggs"</span><span class="err">:</span> <span class="p">{</span>
+        <span class="s2">"group_by_state"</span><span class="err">:</span> <span class="p">{</span>
+            <span class="s2">"terms"</span><span class="err">:</span> <span class="p">{</span>
+                <span class="s2">"field"</span><span class="err">:</span> <span class="s2">"sectionName"</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+                </article>
+
+                <!-- mathjax -->
+                
+                
+            </div>
+        </div>
+            
+            </main>
+
+        </div>
+
+        <footer class="site-footer">
+
+    <!-- Google Analytics -->
+    <script src="/js/ga.js"></script>
+    <script src="/js/hotjar.js"></script>
+
+</footer>
+
+
+    </body>
+
+</html>
