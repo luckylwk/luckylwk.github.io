@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         
-        <title>Data Visualisation posts</title>
+        <title>Named Entity Recognition for Text Analysis</title>
         
         <meta name="viewport" content="width=device-width">
         <meta name="description" content="Some thoughts and writeups.">
@@ -20,7 +20,7 @@
         <link href='//fonts.googleapis.com/css?family=Merriweather:400,300,700' rel='stylesheet' type='text/css'>
         <link href='//fonts.googleapis.com/css?family=Hind:300,400,500,600' rel='stylesheet' type='text/css'>
 
-        <link rel="canonical" href="http://luckylwk.github.io/data-visualisation/">
+        <link rel="canonical" href="http://luckylwk.github.io/2015/09/06/ner/">
 
         <!-- Custom CSS -->
         <link rel="stylesheet" href="/css/main.css">
@@ -83,58 +83,50 @@
 
             <main class="mdl-layout__content">
 
-                                <div class="wrap">
-                        
-                    <ul class="notes">
-                    
-                        
-                    
-                        
-                    
-                        
-                        <li>
-                            <a href="/2015/11/20/exploratory-data-analysis-using-pandas-seaborn/" class="notes">
-                                <span class="date">Nov 20, 2015</span>
-                                <h3>Analysing and predicting customer churn using Pandas, Scikit-Learn and Seaborn</h3>
-                                <!-- <span class="label">ML</span> -->
-                                <p class="description">A report outlining all steps around analysing, visualising, understanding and predicting customer churn-behaviour based on an actual dataset. All data/code is open and available on Github.</p>
-                            </a><br/>
-                        </li>
-                        
-                    
-                        
-                        <li>
-                            <a href="/2015/09/13/visualising-mnist-pca-tsne/" class="notes">
-                                <span class="date">Sep 13, 2015</span>
-                                <h3>Visualising high-dimensional datasets using PCA and tSNE</h3>
-                                <!-- <span class="label">ML</span> -->
-                                <p class="description">A walkthrough of using PCA and tSNE to perform dimensionality reduction on high-dimensional datasets in order to allow for visual exploration of the data. All code is in Python and uses the Scikit-Learn and GGPlot libraries.</p>
-                            </a><br/>
-                        </li>
-                        
-                    
-                        
-                        <li>
-                            <a href="/2015/09/05/hexbin-heatmap-d3/" class="notes">
-                                <span class="date">Sep 5, 2015</span>
-                                <h3>Hexbin Heatmap using D3</h3>
-                                <!-- <span class="label">ML</span> -->
-                                <p class="description">Javascript code to generate a hexbin-heatmap in D3 with histograms on both dimensions.</p>
-                            </a><br/>
-                        </li>
-                        
-                    
-                        
-                    
-                        
-                    
-                        
-                    
-                        
-                    
-                    </ul>
+                        <div class="wrap">
+            <div class="post">
 
-                </div>
+                <header class="post-header">
+                    <h1>Named Entity Recognition for Text Analysis</h1>
+                    <p class="meta">Sep 6, 2015 • Luuk Derksen</p>
+                    <a href="https://twitter.com/share" class="twitter-share-button" data-text="Check out Named Entity Recognition for Text Analysis" data-via="luckylwk">Tweet</a>
+                    <script>
+                        !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+                    </script>
+                </header>
+
+                <article class="post-content">
+                <style>
+    #supercontainer {
+        border: 2px solid #ccc;
+        border-radius: 3px;
+        padding: 10px;
+    }
+</style>
+
+<p>Comparison of different <strong>Named Entity Recognition</strong> (NER) tools and APIs.</p>
+
+<ul>
+<li>NLTK (Python)</li>
+<li>Stanford NER (Java)</li>
+<li>Alchemy by IBM (API)</li>
+<li>Indico.io (API)</li>
+<li>Intellexer (API)</li>
+</ul>
+
+<p>Three pieces of text:</p>
+
+<p>&quot;Israeli PM condemns video of Jewish extremists celebrating toddler&#39;s death&quot;
+&quot;Duchy Originals forced to buy back shares from Prince Charles&#39;s charitable foundation&quot;
+&quot;Russia&#39;s airstrikes on Syria appear futile with little progress on ground&quot;</p>
+
+                </article>
+
+                <!-- mathjax -->
+                
+                
+            </div>
+        </div>
             
             </main>
 

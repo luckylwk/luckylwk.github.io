@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+
+                
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        
+        <title>Named Entity Recognition (NER) for Text Analysis</title>
+        
+        <meta name="viewport" content="width=device-width">
+        <meta name="description" content="Some thoughts and writeups.">
+        
+        <link rel="stylesheet" href="//storage.googleapis.com/code.getmdl.io/1.0.4/material.indigo-pink.min.css">
+        <script src="//storage.googleapis.com/code.getmdl.io/1.0.4/material.min.js"></script>
+        <!-- Icon-font -->
+        <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+        <!-- Fonts -->
+        <link href='//fonts.googleapis.com/css?family=Merriweather:400,300,700' rel='stylesheet' type='text/css'>
+        <link href='//fonts.googleapis.com/css?family=Hind:300,400,500,600' rel='stylesheet' type='text/css'>
+
+        <link rel="canonical" href="http://luckylwk.github.io/2016/03/27/ner/">
+
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="/css/main.css">
+
+        <link rel="icon" type="image/png" href="/assets/github-favicon.png">
+
+        
+        <style>
+            .lwk-main-container {
+                background: #f9f9f9;
+            }
+            .lwk-main-container .mdl-layout__header,
+            .lwk-main-container .mdl-layout__drawer-button {
+                color: white;
+            }
+            .mdl-layout__header {
+                background: rgba(12,16,61,1);
+            }
+        </style>
+
+    </head>
+
+    <body>
+
+        <div class="lwk-main-container mdl-layout mdl-js-layout">
+
+            <!-- <div id="particles-js" class="particles-container"></div> -->
+            <!-- // <script src="../js/particles.min.js"></script> -->
+            <!-- // <script src="../js/app.js"></script> -->
+
+                                
+
+            <header class="mdl-layout__header mdl-layout__header">
+                <div class="mdl-layout__header-row">
+                    <!-- Title -->
+                    <span class="mdl-layout-title">luckylwk</span>
+                    <!-- Add spacer, to align navigation to the right -->
+                    <div class="mdl-layout-spacer"></div>
+                    <!-- Navigation -->
+                    <nav class="mdl-navigation">
+                        <a class="mdl-navigation__link" href="/machine-learning/">Machine Learning</a>
+                        <a class="mdl-navigation__link" href="/data-visualisation/">Data Visualisation</a>
+                        <a class="mdl-navigation__link" href="/data-engineering/">Data Engineering</a>
+                        <a class="mdl-navigation__link" href="/about/">About</a>
+                    </nav>
+                </div>
+            </header>
+            <div class="mdl-layout__drawer">
+                <span class="mdl-layout-title">luckylwk</span>
+                <nav class="mdl-navigation">
+                    <a class="mdl-navigation__link" href="/machine-learning/">Machine Learning</a>
+                    <a class="mdl-navigation__link" href="/data-visualisation/">Data Visualisation</a>
+                    <a class="mdl-navigation__link" href="/data-engineering/">Data Engineering</a>
+                    <a class="mdl-navigation__link" href="/about/">About</a>
+                    <a class="mdl-navigation__link" href="https://www.twitter.com/luckylwk" target="_blank">Twitter</a>
+                    <a class="mdl-navigation__link" href="https://uk.linkedin.com/pub/luuk-derksen/a/80/956" target="_blank">LinkedIn</a>
+                    <a class="mdl-navigation__link" href="https://github.com/luckylwk" target="_blank">Github</a>
+                </nav>
+            </div>
+
+            <main class="mdl-layout__content">
+
+                        <div class="wrap">
+            <div class="post">
+
+                <header class="post-header">
+                    <h1>Named Entity Recognition (NER) for Text Analysis</h1>
+                    <p class="meta">Mar 27, 2016 • Luuk Derksen</p>
+                    <a href="https://twitter.com/share" class="twitter-share-button" data-text="Check out Named Entity Recognition (NER) for Text Analysis" data-via="luckylwk">Tweet</a>
+                    <script>
+                        !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+                    </script>
+                </header>
+
+                <article class="post-content">
+                <style>
+    
+    .entity {
+        background: rgba(172,213,227,0.75);
+        border: 0px;
+        border-radius: 3px;
+        padding: 3px 6px;
+    }
+
+    table.tb {
+        width: 100%;
+        /*border-collapse:separate;*/
+        /*border-spacing:0 20px;*/
+    }
+    td {
+        padding: 1em;
+        border-top: 1px solid #ccc;
+    }
+    td:first-child {
+        min-width: 200px;
+        font-weight: bold;
+        vertical-align: top;
+        padding-right: 1em;
+        padding-bottom: 1em;
+    }
+
+</style>
+
+<p>Comparison of different <strong>Named Entity Recognition</strong> (NER) tools and APIs.</p>
+
+<ul>
+<li>NLTK (Python)</li>
+<li>SpaCy (Python)</li>
+<li>Stanford NER (Java)</li>
+<li>Alchemy by IBM (API)</li>
+<li>Indico.io (API)</li>
+<li>Intellexer (API)</li>
+<li>Cogito (API)</li>
+<li>Saplo (API)</li>
+<li>TextRazor (API)</li>
+</ul>
+
+<p>Three pieces of text:</p>
+
+<ul>
+<li>&quot;Israeli PM condemns video of Jewish extremists celebrating toddler&#39;s death&quot;</li>
+<li>&quot;Duchy Originals forced to buy back shares from Prince Charles&#39;s charitable foundation&quot;</li>
+<li>&quot;The king was returning that day to his Versailles, a 118-room snowbird’s paradise that will become a winter White House if he is elected president. Mar-a-Lago is where Mr. Trump comes to escape, entertain and luxuriate in a Mediterranean-style manse, built 90 years ago by the cereal heiress Marjorie Merriweather Post.&quot;</li>
+</ul>
+
+<p>The aim of the whole blog is two-fold. Firstly it just serves to compare the libraries/API&#39;s on NER. Secondly I was curious to explore if it may get &#39;better&#39; when dealing with a larger body of text (i.e., a paragraph), although I could probably have selected a better paragraph to properly explore this.</p>
+
+<p>To start we use two single sentences to get an idea of how well it would perform on news-headlines. The first one we are going to run through all the extractors is </p>
+
+<p><em>&quot;Duchy Originals forced to buy back shares from Prince Charles&#39;s charitable foundation&quot;</em></p>
+
+<table class="tb">
+    <tr>
+        <td>NLTK</td>
+        <td><span class="entity">Duchy</span> <span class="entity">Originals</span> forced to buy back shares from <span class="entity">Prince</span> <span class="entity">Charles</span>'s charitable foundation</td>
+    </tr>
+    <tr>
+        <td>Stanford NER</td>
+        <td>Duchy Originals forced to buy back shares from <span class="entity location">Prince</span> <span class="entity location">Charles</span>'s charitable foundation</td>
+    </tr>
+    <tr>
+        <td>SpaCy</td>
+        <td>Duchy Originals forced to buy back shares from <span class="entity">Prince Charles</span>'s charitable foundation</td>
+    </tr>
+    <tr>
+        <td>Alchemy (API)</td>
+        <td><span class="entity">Duchy Originals</span> forced to buy back shares from <span class="entity">Prince Charles</span>'s charitable foundation</td>
+    </tr>
+    <tr>
+        <td>Indico.io (API)</td>
+        <td><span class="entity">Duchy</span> Originals forced to buy back shares from <span class="entity">Prince Charles</span>'s charitable foundation</td>
+    </tr>
+    <tr>
+        <td>Saplo (API)</td>
+        <td><span class="entity">Duchy</span> Originals forced to buy back shares from <span class="entity">Prince Charles</span>'s charitable foundation</td>
+    </tr>
+    <tr>
+        <td>Intellexer (API)</td>
+        <td>Duchy Originals forced to buy back shares from <span class="entity">Prince Charles</span>'s charitable foundation</td>
+    </tr>
+    <tr>
+        <td>TextRazor (API)</td>
+        <td><span class="entity">Duchy</span> Originals forced to buy back shares from <span class="entity">Prince Charles</span>'s <span class="entity">charitable foundation</span></td>
+    </tr>
+    <tr>
+        <td>Cogito (API)</td>
+        <td>Duchy Originals forced to buy back shares from Prince <span class="entity">Charles</span>'s charitable foundation</td>
+    </tr>
+</table>
+
+<p>The second sentence we&#39;ll try is</p>
+
+<p><em>&quot;Tories in civil war as Duncan Smith attacks austerity programme&quot;</em></p>
+
+<table class="tb">
+    <tr>
+        <td>NLTK</td>
+        <td>Tories in civil war as <span class="entity person">Duncan Smith</span> attacks austerity programme</td>
+    </tr>
+    <tr>
+        <td>Stanford NER</td>
+        <td>Tories in civil war as <span class="entity person">Duncan Smith</span> attacks austerity programme</td>
+    </tr>
+    <tr>
+        <td>SpaCy</td>
+        <td>Tories in civil war as <span class="entity person">Duncan Smith</span> attacks austerity programme</td>
+    </tr>
+    <tr>
+        <td>Alchemy (API)</td>
+        <td>Tories in <span class="entity other">civil war</span> as <span class="entity person">Duncan Smith</span> attacks austerity programme</td>
+    </tr>
+    <tr>
+        <td>Indico.io (API)</td>
+        <td><span class="entity location">Tories</span> in civil war as <span class="entity unknown">Duncan Smith</span> attacks austerity programme</td>
+    </tr>
+    <tr>
+        <td>Saplo (API)</td>
+        <td><span class="entity person">Tories</span> in civil war as <span class="entity person">Duncan Smith</span> attacks austerity programme</td>
+    </tr>
+    <tr>
+        <td>Intellexer (API)</td>
+        <td>Tories in civil war as <span class="entity person">Duncan Smith</span> attacks austerity programme</td>
+    </tr>
+    <tr>
+        <td>TextRazor (API)</td>
+        <td><span class="entity organisation">Tories</span> in civil war as <span class="entity person">Duncan Smith</span> attacks austerity programme</td>
+    </tr>
+    <tr>
+        <td>Cogito (API)</td>
+        <td>Tories in civil war as <span class="entity person">Duncan Smith</span> attacks austerity programme</td>
+    </tr>
+</table>
+
+<p>In addition to the sentences we explored earlier I&#39;ll now see how well they can deal with a paragraph of text. The paragraph we will use for this is:</p>
+
+<p><em>&quot;The king was returning that day to his Versailles, a 118-room snowbird’s paradise that will become a winter White House if he is elected president. Mar-a-Lago is where Mr. Trump comes to escape, entertain and luxuriate in a Mediterranean-style manse, built 90 years ago by the cereal heiress Marjorie Merriweather Post.&quot;</em></p>
+
+<table class="tb">
+    <tr>
+        <td>NLTK</td>
+        <td>The king was returning that day to his <span class="entity location">Versailles</span>, a 118-room snowbird’s paradise that will become a winter <span class="entity facility">White House</span> if he is elected president. Mar-a-Lago is where Mr. Trump comes to escape, entertain and luxuriate in a Mediterranean-style manse, built 90 years ago by the cereal heiress Marjorie Merriweather Post.</td>
+    </tr>
+    <tr>
+        <td>Stanford NER</td>
+        <td>The king was returning that day to his <span class="entity location">Versailles</span>, a 118-room snowbird’s paradise that will become a winter <span class="entity organisation">White House</span> if he is elected president. <span class="entity organisation">Mar-a-Lago</span> is where Mr. <span class="entity person">Trump</span> comes to escape, entertain and luxuriate in a Mediterranean-style manse, built 90 years ago by the cereal heiress <span class="entity organisation">Marjorie Merriweather Post</span>.</td>
+    </tr>
+    <tr>
+        <td>SpaCy</td>
+    </tr>
+    <tr>
+        <td>Alchemy (API)</td>
+        <td>The king was returning that day to his Versailles, a 118-room snowbird’s paradise that will become a winter <span class="entity facility">White House</span> if he is elected <span class="entity position">president</span>. Mar-a-Lago is where <span class="entity person">Mr. Trump</span> comes to escape, entertain and luxuriate in a Mediterranean-style manse, built <span class="entity datetime">90 years</span> ago by the cereal heiress <span class="entity person">Marjorie Merriweather</span> Post.</td>
+    </tr>
+    <tr>
+        <td>Indico.io (API)</td>
+        <td>The <span class="entity person">king</span> was returning that day to his Versailles, a 118-room <span class="entity unknown">snowbird</span>’s paradise that will become a winter White House if he is elected president. Mar-a-Lago is where <span class="entity unknown">Mr.</span> Trump comes to escape, entertain and luxuriate in a Mediterranean-style <span class="entity unknown">manse</span>, built 90 years ago by the cereal heiress <span class="entity unknown">Marjorie Merriweather</span> Post.</td>
+    </tr>
+    <tr>
+        <td>Saplo (API)</td>
+        <td>The king was returning that day to his <span class="entity location">Versailles</span>, a 118-room snowbird’s paradise that will become a winter <span class="entity person">White House</span> if he is elected president. <span class="entity unknown">Mar-a-Lago</span> is where Mr. Trump comes to escape, entertain and luxuriate in a <span class="entity location">Mediterranean</span>-style manse, built 90 years ago by the cereal heiress <span class="entity organisation">Marjorie Merriweather Post</span>.</td>
+    </tr>
+    <tr>
+        <td>Intellexer (API)</td>
+        <td>The king was returning <span class="entity datetime">that day</span> to his <span class="entity location">Versailles</span>, a 118-room snowbird’s paradise that will become a winter <span class="entity organisation">White House</span> if he is elected <span class="entity position">president</span>. Mar-a-Lago is where <span class="entity person">Mr. Trump</span> comes to escape, entertain and luxuriate in a Mediterranean-style manse, built <span class="entity datetime">90 years</span> ago by the cereal heiress <span class="entity person">Marjorie Merriweather Post</span>.</td>
+    </tr>
+    <tr>
+        <td>TextRazor (API)</td>
+        <td>The king was returning that day to his <span class="entity location">Versailles</span>, a 118-room snowbird’s <span class="entity unknown">paradise</span> that will become a winter <span class="entity facility">White House</span> if he is elected president. <span class="entity location">Mar-a-Lago</span> is where <span class="entity person">Mr. Trump</span> comes to escape, entertain and luxuriate in a Mediterranean-style <span class="entity unknown">manse</span>, built 90 years ago by the <span class="entity unknown">cereal</span> heiress <span class="entity person">Marjorie Merriweather Post</span>.</td>
+    </tr>
+    <tr>
+        <td>Cogito (API)</td>
+        <td>The king was returning that day to his Versailles, a 118-room snowbird’s paradise that will become a winter <span class="entity organisation">White House</span> if he is elected president. <span class="entity unknown">Mar-a-Lago</span> is where Mr. <span class="entity person">Trump</span> comes to escape, entertain and luxuriate in a Mediterranean-style manse, built 90 years ago by the cereal heiress <span class="entity unknown">Marjorie Merriweather Post.</span></td>
+    </tr>
+</table>
+
+<h3>Conclusion</h3>
+
+<p>NLTK did not recognize Trump.</p>
+
+<h3>Code</h3>
+
+<p>...</p>
+
+                </article>
+
+                <!-- mathjax -->
+                
+                
+            </div>
+        </div>
+            
+            </main>
+
+        </div>
+
+        <footer class="site-footer">
+
+    <!-- Google Analytics -->
+    <script src="/js/ga.js"></script>
+    <script src="/js/hotjar.js"></script>
+
+</footer>
+
+
+    </body>
+
+</html>
