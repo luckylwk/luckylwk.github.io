@@ -3,7 +3,7 @@ layout: post
 comments: true
 title:  "Named Entity Recognition (NER) for Text Analysis"
 excerpt: "A comparison of various libraries and API's that allow you to recognize and extract entities from text."
-date:   2016-03-27 20:00:00
+date:   2016-04-14 10:00:00
 author: Luuk Derksen
 mathjax: false
 tags:
@@ -51,7 +51,7 @@ Comparison of different **Named Entity Recognition** (NER) tools and APIs.
 * Saplo (API)
 * TextRazor (API)
 
-Three pieces of text:
+To test all of these tools I have selected three pieces of text:
 
 * "Israeli PM condemns video of Jewish extremists celebrating toddler's death"
 * "Duchy Originals forced to buy back shares from Prince Charles's charitable foundation"
@@ -189,8 +189,4 @@ In addition to the sentences we explored earlier I'll now see how well they can 
 
 ### Conclusion
 
-NLTK did not recognize Trump.
-
-### Code
-
-...
+I don't really have any conclusion, I merely wanted to see how different tools/API's performed on text.

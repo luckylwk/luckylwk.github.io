@@ -120,8 +120,6 @@ Since we as humans like our two- and three-dimensional plots lets start with tha
 ~~~python
 from sklearn.decomposition import PCA
 
-feat_cols = df.columns[1:]
-
 pca = PCA(n_components=3)
 pca_result = pca.fit_transform(df[feat_cols].values)
 
