@@ -1,0 +1,60 @@
+---
+import Layout from '../layouts/BlogPost.astro';
+---
+
+<Layout
+	title="About"
+	description="About me and what I'm learning"
+	pubDate={new Date('August 08 2021')}
+>
+	<p>
+		This is just a place for me to keep some notes and learnings on topics I'm interested in.<br/>
+
+		As I am a very visual learner, I like to create visualisations to better understand concepts.
+	</p>
+
+
+	<h3>Topics I'm currently exploring</h3>
+
+	<p>
+		<ul>
+			<li>Speculative Decoding - <a href="/blog/speculative-decoding/">Read</a></li>
+			<li>Data Types (FP8, NVFP4, etc.) & Quantization</li>
+			<li>KV Cache</li>
+			<li>Attention Mechanisms</li>
+			<li>Training Techniques (SFT, RLVR, DPO, RLHF)</li>
+			<li>Mixture of Experts (MoE)</li>
+			<li>Inference Optimization (vLLM, SGLang, etc.)</li>
+			<li>LoRA (Low-Rank Adaptation)</li>
+			<li>Knowledge Distillation</li>
+			<li>Tokenization</li>
+			<li>Model Pruning</li>
+		</ul>
+	</p>
+
+	<h3>Stack / Setup</h3>
+
+	<p>
+		<strong>Server & Training:</strong>
+		<ul>
+			<li>Server: Mac Mini M1</li>
+			<li>DGX Spark: Training, Local Inference</li>
+			<li>Modal: Training, Evaluations, Sandboxes</li>
+			<li>Prime Intellect: Training, Evaluations, Sandboxes</li>
+		</ul>
+
+		<strong>Tools:</strong>
+		<ul>
+			<li>Harness: OpenCode</li>
+			<li>OpenRouter</li>
+			<li>AgentMail (agent communication)</li>
+			<li>Slack (agent communication)</li>
+			<li>Linear (agent communication)</li>
+			<li>MongoDB</li>
+			<li>ZVec</li>
+			<li>Obsidian (notes)</li>
+			<li>SuperMemory</li>
+			<li>Resend (reporting emails)</li>
+		</ul>
+	</p>
+</Layout>

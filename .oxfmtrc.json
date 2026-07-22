@@ -1,0 +1,15 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "useTabs": true,
+  "singleQuote": true,
+  "semi": true,
+  "printWidth": 100,
+  "trailingComma": "all",
+  "ignorePatterns": ["pnpm-lock.yaml", "PLAN.md"],
+  "overrides": [
+    {
+      "files": ["*.json", "*.jsonc", "*.md", "*.mdx"],
+      "options": { "useTabs": false, "tabWidth": 2 }
+    }
+  ]
+}

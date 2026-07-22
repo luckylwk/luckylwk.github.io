@@ -1,0 +1,69 @@
+---
+// Static references appendix. Renders the shared `references` array (passed as
+// `items`) as a numbered list; each entry gets an `id="ref-{id}"` anchor that
+// the inline <Cite /> markers link to. No client JS — pure server render.
+interface Reference {
+	id: string;
+	title: string;
+	url: string;
+	author?: string;
+	source?: string;
+	date?: string;
+}
+
+const { items = [] } = Astro.props as { items?: Reference[] };
+---
+
+<ol class="references">
+	{
+		items.map((ref, i) => (
+			<li id={`ref-${ref.id}`}>
+				<span class="num">[{i + 1}]</span>
+				<span class="body">
+					<a href={ref.url} target="_blank" rel="noopener noreferrer">
+						{ref.title}
+					</a>
+					<span class="meta">
+						{[ref.author, ref.source, ref.date].filter(Boolean).join(' · ')}
+					</span>
+				</span>
+			</li>
+		))
+	}
+</ol>
+
+<style>
+	.references {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+	.references li {
+		display: flex;
+		gap: 0.6rem;
+		margin: 0.6rem 0;
+		scroll-margin-top: 1.5rem;
+	}
+	.references .num {
+		flex-shrink: 0;
+		font-family: var(--font-ui);
+		font-size: 0.8rem;
+		font-weight: 600;
+		color: var(--accent);
+		line-height: 1.5;
+	}
+	.references .body {
+		display: flex;
+		flex-direction: column;
+	}
+	.references .meta {
+		font-family: var(--font-ui);
+		font-size: 0.76rem;
+		color: var(--ink-faint);
+		margin-top: 0.1rem;
+	}
+	/* Brief highlight when jumped to from an inline citation. */
+	.references li:target .num {
+		color: var(--ink);
+	}
+</style>

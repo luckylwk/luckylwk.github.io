@@ -1,0 +1,172 @@
+---
+title: 'Speculative decoding: getting more tokens per forward pass'
+description: 'How to make autoregressive generation faster without changing what the model outputs — draft-and-verify, acceptance sampling, and the variants (EAGLE3, MTP, DFlash, DSpark) that push it further.'
+pubDate: 'Jul 13 2026'
+tags: ['ml', 'inference', 'llm']
+draft: false
+---
+
+import Cite from '../../components/common/Cite.jsx';
+import References from '../../components/common/References.astro';
+import PullQuote from '../../components/common/PullQuote.astro';
+import AutoregressiveTimeline from '../../components/AutoregressiveTimeline.jsx';
+import PrefillVsDecodeCompute from '../../components/PrefillVsDecodeCompute.jsx';
+import SpeculativeDecoding from '../../components/SpeculativeDecoding.jsx';
+
+export const references = [
+	{
+		id: 'google-specdec',
+		title: 'Looking back at speculative decoding',
+		url: 'https://research.google/blog/looking-back-at-speculative-decoding/',
+		source: 'Google Research',
+	},
+	{
+		id: 'nvidia-specdec',
+		title: 'An introduction to speculative decoding for reducing latency in AI inference',
+		url: 'https://developer.nvidia.com/blog/an-introduction-to-speculative-decoding-for-reducing-latency-in-ai-inference/',
+		source: 'NVIDIA Developer',
+	},
+	{
+		id: 'dflash',
+		title: 'DFlash: Block Diffusion for Flash Speculative Decoding',
+		url: 'https://arxiv.org/abs/2602.06036',
+		source: 'arXiv',
+	},
+	{
+		id: 'dspark',
+		title: 'DSpark: Confidence-Scheduled Speculative Decoding with Semi-Autoregressive Generation',
+		url: 'https://arxiv.org/abs/2607.05147',
+		source: 'arXiv',
+	},
+];
+
+Language models write one token at a time. To produce the next token, the model
+runs a full pass through all of its billions of parameters — and it can't start
+that pass until the previous token is finished, because the new token depends on
+everything written so far. The generation, also known as autoregressive
+generation, is therefore a strictly serial process, and that is the main reason
+it feels slow.
+
+Speculative decoding is a way to speed this up by generating several tokens per
+compute pass instead of one, and to do it without changing a single thing about what
+the model outputs. The results are identical to ordinary decoding — just
+faster.
+
+<PullQuote>
+	Speculative decoding has proven to be an effective technique for faster and
+	cheaper inference from LLMs without compromising quality.<Cite id="google-specdec" refs={references} client:visible />
+</PullQuote>
+
+## Memory vs Compute
+
+To see where the opportunity is, it helps to know exactly where the time goes.
+
+Each pass through the model has to read every one of its parameters out of the
+GPU's memory. For a large model that's tens of gigabytes, and moving those bytes
+from memory into the chip's compute units is the slow part. The actual
+arithmetic — multiplying the numbers together — finishes almost instantly by
+comparison. So when you generate a single token, the expensive resource isn't
+math; it's **memory bandwidth**, and the arithmetic units sit mostly idle
+waiting for data to arrive.
+
+<AutoregressiveTimeline client:visible />
+
+Here's the consequence that makes everything else work: **because the weights have
+to be loaded anyway, running the math for a handful of tokens in the same pass
+costs barely more wall-clock time than running it for one**. The bytes are already
+on the chip; putting the idle arithmetic units to work on a few extra tokens is
+nearly free.
+
+That's the free lunch. The only catch is that normal decoding can't take
+advantage of it — to run token 100 you need token 99, which needs token 98, and
+so on, so you're forced back into computing them one at a time. Speculative
+decoding is the machinery that lets us _fill_ a pass with several tokens even
+though we don't yet know for certain what those tokens are.
+
+## Prefill vs Decode
+
+Generation actually has two distinct phases, and they behave completely
+differently. When you hand the model a prompt like _"The quick brown fox,"_ it
+reads every one of those tokens in a **single parallel pass** — none of them
+depend on the model's own output, so the arithmetic units are genuinely busy.
+This is **prefill**. Only afterwards does the model enter **decode**, where it
+must produce the continuation one token at a time, spending a whole forward pass
+per token and reusing the cached keys and values from every earlier position.
+
+<PrefillVsDecodeCompute client:visible />
+
+The staircase is the whole story: prefill is one pass that swallows the whole
+prompt at once — for a short prompt, about the cost of generating a single
+token — while decode is a tower of narrow passes that each yield one token.
+Speculative decoding is, in effect, an attempt to make decode look more like
+prefill — to verify several candidate tokens in one parallel pass.
+
+As a crude analogy: **Speculative decoding tries to batch decode tokens like 
+prefill batches prompt tokens**.
+
+## Draft & Verify
+
+The way speculative decoding works is by using a smaller, faster process/model to 
+predict the next token(s) - known as **draft tokens** - and then using the larger,
+more accurate model to verify those predictions in a single parallel pass.
+
+<PullQuote>
+	By predicting and verifying multiple tokens simultaneously, this technique
+	shortens the path to results and makes AI inference faster and more
+	responsive, significantly reducing latency while preserving output
+	quality.<Cite id="nvidia-specdec" refs={references} client:visible />
+</PullQuote>
+
+Two things are important to make this work:
+1. The draft model needs to be fast and cheap to compute, it should be a lot 
+more efficient than the larger model and not be too heavy on resources
+2. The draft model needs to be reasonably accurate, it should be able to predict
+the a few of the next token(s) correctly most of the time. Otherwise we are just 
+waisting compute.
+
+<SpeculativeDecoding client:visible />
+
+Watch one round at a time: the draft model spends a handful of its own compute
+passes drafting multiple tokens ahead, and the target model spends exactly **one** 
+expensive compute pass checking the whole batch once. It keeps every token up to the 
+first wrong guess and overwrites that guess with its own choice, so a single target 
+pass commits several tokens. The more often the draft model guesses right, the more tokens
+are verified and used on the expensive pass.
+
+## Autoregressive (Sequential) vs Parallel
+
+The key insight thusfar is that speculative decoding allows us to verify multiple tokens in a single pass, 
+instead of having to verify them sequentially. This is a big win when it comes to latency.
+As long as the drafting of tokens is relatively cheap this means we can get tokens
+back to the user faster.
+
+When it comes to the drafting there are different approaches that have been tried and tested. Of the 
+popular drafting strategies fall into two main camps: autoregressive and parallel.
+
+### Autoregressive (Sequential) Drafting
+
+EAGLE3 and MTP (Multi-Token Prediction) rely on autoregressive drafting: they generate 
+tokens sequentially (recursively for EAGLE3), which provides strong inter-token dependencies 
+and often solid acceptance rates, but the sequential nature can limit speed for longer drafts. 
+
+### Parallel (& Hybrid) Drafting
+
+In contrast, two recent implementations, DFlash <Cite id="dflash" refs={references} client:visible />
+and DSpark <Cite id="dspark" refs={references} client:visible />, emphasize parallel drafting.
+
+* **DFlash** uses a lightweight block diffusion model to predict an entire block of tokens in a single forward pass. This maximizes GPU utilization and minimizes drafting latency, making it ideal for high-throughput, structured tasks.
+* **DSpark** takes a hybrid approach, pairing a parallel backbone with lightweight sequential elements to preserve inter-token dependencies and reduce acceptance decay over longer sequences. It excels in adaptive, high-concurrency environments.
+
+Overall, parallel methods trade a small degree of dependency precision for dramatically faster draft generation, pushing overall engine speedups significantly higher.
+
+## References
+
+<References items={references} />
+
+### Other Links
+
+- [How Speculative Decoding Makes LLMs Faster Without Retraining (and What DSpark Adds)](https://deepseek.ai/blog/deepseek-dspark-speculative-decoding)
+- [Redis Blog: Speculative Decoding in LLMs](https://redis.io/blog/speculative-decoding-llm/)
+- [PyTorch Blog: Hitchhiker's Guide to Speculative Decoding](https://pytorch.org/blog/hitchhikers-guide-speculative-decoding/)
+- [Hemingkx's Speculative Decoding Papers](https://github.com/hemingkx/SpeculativeDecodingPapers)
+- [DeepSeek Blog: How Speculative Decoding Makes LLMs Faster Without Retraining](https://deepseek.ai/blog/deepseek-dspark-speculative-decoding)

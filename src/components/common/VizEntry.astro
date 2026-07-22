@@ -1,0 +1,31 @@
+---
+const { title, description } = Astro.props;
+---
+
+<div class="viz-item">
+	<h2>{title}</h2>
+	<p>{description}</p>
+	<div class="stage">
+		<slot />
+	</div>
+</div>
+
+<style>
+	.viz-item h2 {
+		margin: 0 0 0.4rem;
+		font-size: 1.15rem;
+	}
+	.viz-item p {
+		margin: 0 0 1.25rem;
+		color: var(--ink-soft);
+		max-width: 40rem;
+	}
+	.viz-item .stage {
+		display: block;
+		width: var(--measure-wide);
+		max-width: calc(100vw - 2.5rem);
+		margin-left: 50%;
+		transform: translateX(-50%);
+		box-sizing: border-box;
+	}
+</style>
