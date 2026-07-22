@@ -1,0 +1,70 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '../../components/common/BaseHead.astro';
+import Footer from '../../components/common/Footer.astro';
+import FormattedDate from '../../components/ui/FormattedDate.astro';
+import Header from '../../components/common/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+
+const notes = (await getCollection('notes', ({ data }) => !data.draft)).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+
+// Group notes by publication year so the index reads like an editorial archive.
+const byYear = new Map<number, typeof notes>();
+for (const note of notes) {
+	const year = note.data.pubDate.getFullYear();
+	if (!byYear.has(year)) byYear.set(year, []);
+	byYear.get(year)!.push(note);
+}
+const years = [...byYear.entries()].sort((a, b) => b[0] - a[0]);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`Notes | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+		<style>
+			h1 {
+				margin-top: 0;
+				margin-bottom: 3rem;
+			}
+			.year-group {
+				margin-bottom: 3rem;
+			}
+			.year {
+				font-family: var(--font-ui);
+				font-size: 0.72rem;
+				letter-spacing: 0.14em;
+				color: var(--ink-faint);
+				margin: 0 0 0.75rem;
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<h1>Notes</h1>
+			{
+				years.map(([year, yearNotes]) => (
+					<section class="year-group">
+						<p class="year">{year}</p>
+						<ul class="post-list">
+							{yearNotes.map((note) => (
+								<li>
+									<a href={`/notes/${note.id}/`}>
+										<span class="title">{note.data.title}</span>
+										<span class="date">
+											<FormattedDate date={note.data.pubDate} />
+										</span>
+									</a>
+								</li>
+							))}
+						</ul>
+					</section>
+				))
+			}
+		</main>
+		<Footer />
+	</body>
+</html>

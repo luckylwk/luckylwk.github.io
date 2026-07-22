@@ -1,0 +1,119 @@
+---
+import BaseHead from '../components/common/BaseHead.astro';
+import Footer from '../components/common/Footer.astro';
+import Header from '../components/common/Header.astro';
+import VizEntry from '../components/common/VizEntry.astro';
+import { SITE_TITLE } from '../consts';
+
+import AutoregressiveTimeline from '../components/AutoregressiveTimeline.jsx';
+import BarChart from '../components/ui/BarChart.jsx';
+import Counter from '../components/ui/Counter.jsx';
+import Float32Viewer from '../components/Float32Viewer.jsx';
+import IntBitViewer from '../components/IntBitViewer.jsx';
+import PrecisionRounder from '../components/PrecisionRounder.jsx';
+import PrefillVsDecodeCompute from '../components/PrefillVsDecodeCompute.jsx';
+import SpeculativeDecoding from '../components/SpeculativeDecoding.jsx';
+
+const SAMPLE_BAR_DATA = [
+	{ label: 'FP32', value: 32 },
+	{ label: 'FP16', value: 16 },
+	{ label: 'FP8', value: 8 },
+	{ label: 'FP4', value: 4 },
+];
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead
+			title={`Visualisations | ${SITE_TITLE}`}
+			description="A gallery of the interactive React components used across this site."
+		/>
+		<style>
+			.intro {
+				margin-bottom: 3.5rem;
+			}
+			.intro h1 {
+				margin-top: 0;
+			}
+			.intro p {
+				font-size: 1.15rem;
+				color: var(--ink-soft);
+				max-width: 40rem;
+			}
+			.viz-list {
+				display: flex;
+				flex-direction: column;
+				gap: 3.5rem;
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<section class="intro">
+				<h1>Visualisations</h1>
+				<p>A gallery of the interactive React components used across this site.</p>
+			</section>
+
+			<section class="viz-list">
+				<VizEntry
+					title="Counter"
+					description="A minimal interactive island: local state only, no external data."
+				>
+					<Counter client:visible />
+				</VizEntry>
+
+				<VizEntry
+					title="Float32 Viewer"
+					description="An interactive IEEE-754 float32 bit-layout visualizer. Drag the slider to watch the sign, exponent, and significand bits flip live."
+				>
+					<Float32Viewer client:visible />
+				</VizEntry>
+
+				<VizEntry
+					title="Integer Bit Viewer"
+					description="An interactive integer bit-layout visualizer for signed and unsigned values, updating each bit as you drag."
+				>
+					<IntBitViewer client:visible initial={133} />
+				</VizEntry>
+
+				<VizEntry
+					title="Precision Rounder"
+					description="Drag a value across the BF16, FP8, and FP4 grids to feel how rounding error grows as bit width shrinks."
+				>
+					<PrecisionRounder client:visible />
+				</VizEntry>
+
+				<VizEntry
+					title="Prefill vs Decode — Forward Passes"
+					description="The same staircase drawn as forward passes: prefill swallows the whole prompt in one pass (about the cost of generating a single token), while decode spends a full pass on every token."
+				>
+					<PrefillVsDecodeCompute client:visible />
+				</VizEntry>
+
+				<VizEntry
+					title="Autoregressive Generation"
+					description="A timeline of token-by-token generation, showing how each new token is fed back in as input for the next step."
+				>
+					<AutoregressiveTimeline client:visible />
+				</VizEntry>
+
+				<VizEntry
+					title="Speculative Decoding"
+					description="Animates the draft-then-verify loop: a small model proposes several tokens, the target model checks them in one pass, and only the accepted prefix survives."
+				>
+					<SpeculativeDecoding client:visible />
+				</VizEntry>
+
+				<VizEntry
+					title="Bar Chart"
+					description="A general-purpose, data-driven bar chart island for embedding small datasets in prose."
+				>
+					<BarChart data={SAMPLE_BAR_DATA} client:visible />
+				</VizEntry>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>

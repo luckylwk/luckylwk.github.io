@@ -1,0 +1,70 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '../../components/common/BaseHead.astro';
+import Footer from '../../components/common/Footer.astro';
+import FormattedDate from '../../components/ui/FormattedDate.astro';
+import Header from '../../components/common/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+
+// Group posts by publication year so the index reads like an editorial archive.
+const byYear = new Map<number, typeof posts>();
+for (const post of posts) {
+	const year = post.data.pubDate.getFullYear();
+	if (!byYear.has(year)) byYear.set(year, []);
+	byYear.get(year)!.push(post);
+}
+const years = [...byYear.entries()].sort((a, b) => b[0] - a[0]);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`Writing | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+		<style>
+			h1 {
+				margin-top: 0;
+				margin-bottom: 3rem;
+			}
+			.year-group {
+				margin-bottom: 3rem;
+			}
+			.year {
+				font-family: var(--font-ui);
+				font-size: 0.72rem;
+				letter-spacing: 0.14em;
+				color: var(--ink-faint);
+				margin: 0 0 0.75rem;
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<h1>Writing</h1>
+			{
+				years.map(([year, yearPosts]) => (
+					<section class="year-group">
+						<p class="year">{year}</p>
+						<ul class="post-list">
+							{yearPosts.map((post) => (
+								<li>
+									<a href={`/blog/${post.id}/`}>
+										<span class="title">{post.data.title}</span>
+										<span class="date">
+											<FormattedDate date={post.data.pubDate} />
+										</span>
+									</a>
+								</li>
+							))}
+						</ul>
+					</section>
+				))
+			}
+		</main>
+		<Footer />
+	</body>
+</html>
